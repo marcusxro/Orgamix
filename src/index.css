@@ -20,3 +20,15 @@
   background-color: #2e2e2e;
   padding-inline: 5px;
 }
+
+.positioner {
+  position: fixed;
+  top: 0;
+  z-index: 2000;
+  background-color: #242424;
+  left: 0;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}

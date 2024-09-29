@@ -4,9 +4,20 @@ import { useNavigate } from 'react-router-dom'
 import { firebaseAuthKey } from '../../firebase/FirebaseKey'
 import axios from 'axios'
 import Loader from '../../comps/Loader'
+import { supabase } from '../../supabase/supabaseClient'
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+interface dataType {
+    userid: string;
+    username: string;
+    password: string;
+    email: string;
+    id: number;
+    fullname: string;
+}
+
 
 
 const SignUp: React.FC = () => {
@@ -19,6 +30,8 @@ const SignUp: React.FC = () => {
     const nav = useNavigate()
 
     const [seePass, setSeePass] = useState<boolean>(false)
+
+
 
     const notif = (params: string) => {
         toast.success(params, {
@@ -48,6 +61,29 @@ const SignUp: React.FC = () => {
     }
 
 
+    async function createUser(params: string) {
+        try {
+            const { error } = await supabase.from('accounts').insert({
+                userid: params,
+                username: Username,
+                password: password,
+                email: email,
+            })
+            if (error) {
+                console.error('Error inserting data:', error);
+            } else {
+                setUsername("")
+                setEmail("")
+                setRepPassword("")
+                setPassword("")
+                notif('Account created! please verify your email')
+                setIsLoading(false)
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
 
     function createUserAccount(e: FormEvent) {
         e.preventDefault()
@@ -76,27 +112,9 @@ const SignUp: React.FC = () => {
                 sendEmailVerification(userCred.user)
                 const user = firebaseAuthKey.currentUser
                 if (user && !user.emailVerified) {
-                    axios.post('http://localhost:8080/CreateAccount', {
-                        Username: Username,
-                        Email: email,
-                        Password: password,
-                        Uid: userCred?.user?.uid
-                    }).then((res) => {
-                        console.log(res.status)
-                        if (res.status === 201) {
-                            setUsername("")
-                            setEmail("")
-                            setRepPassword("")
-                            setPassword("")
-                            notif('Account created! please verify your email')
-                            setIsLoading(false)
-                        } else {
-                            setIsLoading(false)
-                        }
 
-                    }).catch((err) => {
-                        console.log(err)
-                    })
+                    createUser(user?.uid)
+                 
                 }
 
 
@@ -144,25 +162,28 @@ const SignUp: React.FC = () => {
                     onChange={(e) => {
                         setUsername(e.target.value)
                     }}
+                    maxLength={20}
                     required
                     className='p-2 rounded-md outline-none'
                     type="text" placeholder='Username' />
                 <input
                     value={password}
+                    maxLength={20}
                     onChange={(e) => {
                         setPassword(e.target.value)
                     }}
                     required
                     className='p-2 rounded-md outline-none '
-                    type={`${seePass ? "text": "password"}`} placeholder='Password' />
+                    type={`${seePass ? "text" : "password"}`} placeholder='Password' />
                 <input
                     value={repPassword}
+                    maxLength={20}
                     onChange={(e) => {
                         setRepPassword(e.target.value)
                     }}
                     required
                     className='p-2 rounded-md outline-none '
-                    type={`${seePass ? "text": "password"}`} placeholder='Repeat Password' />
+                    type={`${seePass ? "text" : "password"}`} placeholder='Repeat Password' />
                 <div className='gap-2 flex px-1 w-auto items-center'>
                     <input
                         checked={seePass}

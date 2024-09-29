@@ -1,9 +1,10 @@
 import React from 'react'
+import Header from '../comps/Header'
 
 const Homepage = () => {
   return (
-    <div className='bg-slate-400'>
-      sds
+    <div className='h-auto relative'>
+      <Header />
     </div>
   )
 }

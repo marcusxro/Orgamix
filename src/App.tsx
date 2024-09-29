@@ -4,6 +4,7 @@ import Homepage from './pages/Homepage';
 import SignIn from './pages/AuthPages/SignIn';
 import SignUp from './pages/AuthPages/SignUp';
 import ForgotPassword from './pages/AuthPages/ForgotPassword';
+import System from './pages/isLoggedIn/System';
 
 
 
@@ -16,6 +17,8 @@ function App() {
           <Route path='/sign-in' element={<SignIn />} />
           <Route path='/sign-up' element={<SignUp />} />
           <Route path='/recover' element={<ForgotPassword />} />
+
+          <Route path='/user/dashboard' element={<System />} />
         </Routes>
       </div>
       </Router>
