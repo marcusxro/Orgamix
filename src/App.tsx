@@ -5,6 +5,7 @@ import SignIn from './pages/AuthPages/SignIn';
 import SignUp from './pages/AuthPages/SignUp';
 import ForgotPassword from './pages/AuthPages/ForgotPassword';
 import System from './pages/isLoggedIn/System';
+import Tasks from './pages/isLoggedIn/Tasks';
 
 
 
@@ -19,6 +20,7 @@ function App() {
           <Route path='/recover' element={<ForgotPassword />} />
 
           <Route path='/user/dashboard' element={<System />} />
+          <Route path='/user/tasks' element={<Tasks />} />
         </Routes>
       </div>
       </Router>

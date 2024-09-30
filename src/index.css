@@ -21,6 +21,17 @@
   padding-inline: 5px;
 }
 
+.positioners {
+  position: fixed;
+  top: 0;
+  z-index: 2000;
+  left: 0;
+  background: rgba(214, 214, 214, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(223, 223, 223, 0.37);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
 .positioner {
   position: fixed;
   top: 0;
@@ -31,4 +42,12 @@
 
 *::-webkit-scrollbar {
   display: none;
+}
+
+.stickyPostion {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  height: 100%;
 }

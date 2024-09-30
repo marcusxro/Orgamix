@@ -10,6 +10,7 @@ import { supabase } from '../supabase/supabaseClient';
 import IsLoggedIn from '../firebase/IsLoggedIn';
 import gsap from 'gsap'
 import userNoProfile from '../assets/UserNoProfile.jpg'
+import { useNavigate } from 'react-router-dom';
 
 
 interface dataType {
@@ -28,13 +29,14 @@ interface paramsType {
 const Sidebar: React.FC<paramsType> = ({location}) => {
 
     const [user] = IsLoggedIn()
-    const [toggled, setToggled] = useState<string>("Dashboard")
+
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
 
 
     useEffect(() => {
-        getAccounts();
+       if(user) { getAccounts();}
     }, [user]);
+
     const midRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
@@ -114,10 +116,38 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
     }
 
 
+    const nav = useNavigate()
+
+
+    function navigateToPages(params: string) {
+        const btnSidebar = document.querySelectorAll('.btnSidebar')
+
+        function exapandWidth() {
+            gsap.to(midRef.current, {
+                maxWidth: '80px',
+                duration: 0.3
+            })
+
+            for (let i = 0; i < btnSidebar.length; i++) {
+                gsap.to(btnSidebar[i].querySelectorAll('span'), {
+                    display: 'none'
+                })
+                gsap.to(btnSidebar[i].querySelectorAll('span'), {
+                    scale: '0',
+                    transformOrigin: 'left center',
+                    duration: 0.3
+                })
+            }
+        }
+        
+        exapandWidth()
+        nav(params)
+    }
+
     return (
         <div
             ref={midRef}
-            className='flex flex-col border-r-[1px] border-r-[#414141] positioner text-[#c9c9c9] bg h-[100dvh] p-2 gap-3 w-full max-w-[80px] overflow-hidden'>
+            className='flex flex-col border-r-[1px] overflow-auto border-r-[#414141] positioner text-[#c9c9c9] bg h-[100dvh] p-2 gap-3 w-full max-w-[80px]'>
 
             <div className='mb-1 px-5 pt-2 items-center justify-start  flex btnSidebar gap-3'>
 
@@ -145,12 +175,12 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
             <div
                 className='flex flex-col gap-3 border-y-[.1px] border-y-[#303030] py-1 justify-start'>
                 <div
-                    onClick={() => { setToggled("Dashboard") }}
+                    onClick={() => { navigateToPages("/user/dashboard") }}
                     className={`${location === "Dashboard" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
                     <div className='text-2xl'><LuLayoutDashboard /></div><span> Dashboard</span>
                 </div>
                 <div
-                    onClick={() => { setToggled("Tasks") }}
+                    onClick={() => { navigateToPages("/user/tasks")}}
                     className={`${location === "Tasks" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
                     <div className='text-2xl'>
                         <GoTasklist />
@@ -158,7 +188,7 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                     <span>Tasks</span>
                 </div>
                 <div
-                    onClick={() => { setToggled("Notes") }}
+                    onClick={() => { navigateToPages("/user/tasks")}}
                     className={`${location === "Notes" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>
@@ -167,7 +197,7 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                     <span>Notes</span>
                 </div>
                 <div
-                    onClick={() => { setToggled("Goals") }}
+                    onClick={() => { navigateToPages("/user/tasks")}}
                     className={`${location === "Goals" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>
@@ -176,7 +206,7 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                     <span> Goals</span>
                 </div>
                 <div
-                    onClick={() => { setToggled("Projects") }}
+                    onClick={() => { navigateToPages("/user/tasks") }}
                     className={`${location === "Projects" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>
@@ -185,7 +215,7 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                     <span>Projects</span>
                 </div>
                 <div
-                    onClick={() => { setToggled("Events") }}
+                    onClick={() => { navigateToPages("/user/tasks") }}
                     className={`${location === "Events" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>
@@ -197,7 +227,7 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
             </div>
             <div className='border-t-[.1px] border-t-[#303030] mt-auto pt-1'>
                 <div
-                    onClick={() => { setToggled("Settings") }}
+                    onClick={() => { navigateToPages("/user/tasks") }}
                     className={`${location === "Settings" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../../supabase/supabaseClient'
 import Sidebar from '../../comps/Sidebar'
 import IsLoggedIn from '../../firebase/IsLoggedIn'
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface dataType {
     userid: string;
@@ -14,14 +15,14 @@ interface dataType {
 
 
 const System: React.FC = () => {
-
+    const location = useLocation()
     const [user] = IsLoggedIn()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
 
 
     useEffect(() => {
-        getAccounts()
-    }, [user])
+      if(user) {  getAccounts() }
+    }, [user, location])
 
 
     async function getAccounts() {
@@ -33,6 +34,7 @@ const System: React.FC = () => {
                 console.error('Error fetching data:', error);
             } else {
                 setFetchedData(data);
+                console.log(data)
             }
         } catch (err) {
             console.log(err);
