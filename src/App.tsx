@@ -6,6 +6,8 @@ import SignUp from './pages/AuthPages/SignUp';
 import ForgotPassword from './pages/AuthPages/ForgotPassword';
 import System from './pages/isLoggedIn/System';
 import Tasks from './pages/isLoggedIn/Tasks';
+import Notes from './pages/isLoggedIn/Notes';
+import VisitNote from './comps/System/VisitNote';
 
 
 
@@ -21,6 +23,10 @@ function App() {
 
           <Route path='/user/dashboard' element={<System />} />
           <Route path='/user/tasks' element={<Tasks />} />
+
+          <Route path='/user/notes' element={<Notes />} />
+
+         <Route path='/user/notes/:uid/:time' element={<VisitNote />} />
         </Routes>
       </div>
       </Router>

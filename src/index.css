@@ -24,7 +24,7 @@
 .positioners {
   position: fixed;
   top: 0;
-  z-index: 2000;
+  z-index: 20000000;
   left: 0;
   background: rgba(41, 41, 41, 0.25);
   box-shadow: 0 8px 32px 0 rgba(223, 223, 223, 0.37);
@@ -35,7 +35,7 @@
 .positioner {
   position: fixed;
   top: 0;
-  z-index: 2000;
+  z-index: 200;
   background-color: #242424;
   left: 0;
 }
@@ -50,4 +50,5 @@
   right: 0;
   padding: 10px;
   height: 100%;
+  z-index: 20000000;
 }

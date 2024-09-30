@@ -42,8 +42,7 @@ const Tasks: React.FC = () => {
     const [edit, setedit] = useState<taskDataType | null>(null)
     const [isNotifying, setIsNotifying] = useState(false);
     const [isComplete, setIsComplete] = useState<string | number | null>(null)
-    const [sortVal, setSortVal] = useState<string | null>(null); // To store sorting value
-
+    const [sortVal, setSortVal] = useState<string | null>(null); 
 
 
     const [isSort, setSort] = useState<boolean>(false)
@@ -329,7 +328,7 @@ const Tasks: React.FC = () => {
                     onClick={() => { setViewTask(null) }}
                     className='positioners w-full h-full flex items-center justify-center p-3'>
 
-                    <ViewTask objPass={viewTask} />
+                    <ViewTask objPass={viewTask} closer={setViewTask} />
 
                 </div>
             }
