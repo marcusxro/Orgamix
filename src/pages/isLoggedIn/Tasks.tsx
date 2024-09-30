@@ -10,6 +10,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useStoreBoolean from '../../Zustand/UseStore'
 import { IoMdAdd } from "react-icons/io";
+import ViewTask from '../../comps/System/ViewTask'
+import TaskSorter from '../../comps/System/TaskSorter'
 
 interface taskDataType {
     title: string;
@@ -20,7 +22,9 @@ interface taskDataType {
     priority: string;
     userid: string;
     repeat: string
-    category: string
+    createdAt: string;
+    link: string;
+    category: string;
 }
 
 
@@ -38,6 +42,24 @@ const Tasks: React.FC = () => {
     const [edit, setedit] = useState<taskDataType | null>(null)
     const [isNotifying, setIsNotifying] = useState(false);
     const [isComplete, setIsComplete] = useState<string | number | null>(null)
+    const [sortVal, setSortVal] = useState<string | null>(null); // To store sorting value
+
+
+
+    const [isSort, setSort] = useState<boolean>(false)
+
+
+    useEffect(() => {
+        const sortMethod = localStorage.getItem('sortMethod')
+
+        if (sortMethod) {
+            getUserTask()
+
+            setSortVal(sortMethod)
+        }
+    }, [isSort])
+
+
 
     const notif = (message: string) => {
         if (!isNotifying) {
@@ -77,7 +99,7 @@ const Tasks: React.FC = () => {
                 subscription.unsubscribe();
             };
         }
-    }, [user, edit])
+    }, [user, edit, isSort])
 
 
     const handleRealtimeEvent = (payload: any) => {
@@ -146,33 +168,71 @@ const Tasks: React.FC = () => {
     }, [showNotif, isNotifying]);
 
 
+    function returnSortTitle() {
+        switch (sortVal) {
+            case "Alphabetically":
+                return "title"
+            case "Creation Date":
+                return "createdAt"
+            default:
+                return "createdAt"
+
+        }
+    }
+
 
     async function getUserTask() {
         try {
+            if (!user || !user.uid) {
+                console.error('User is not defined or uid is missing');
+                return; 
+            }
+
+            
+            const columnName = returnSortTitle()
+
             const { data, error } = await supabase
                 .from('tasks')
                 .select('*')
                 .eq('userid', user?.uid)
-                .eq('isdone', false); // Add this line to filter tasks that are not done
+                .eq('isdone', false)
+                .order(columnName, { ascending: true  }) // Sort by creation date in ascending order
+
+
             if (data) {
-                setTasksData(data)
+                const isRev = sortVal === 'Creation Date' ? data.reverse() : data
+                setTasksData(isRev)
             } else {
                 console.log(error)
             }
         }
         catch (err) {
+            console.log(err)
         }
     }
 
+
     async function getUserTaskCompleted() {
         try {
+            if (!user || !user.uid) {
+                console.error('User is not defined or uid is missing');
+                return; 
+            }
+
+            
+            const columnName = returnSortTitle()
+
             const { data, error } = await supabase
                 .from('tasks')
                 .select('*')
                 .eq('userid', user?.uid)
-                .eq('isdone', true); // Add this line to filter tasks that are not done
+                .eq('isdone', true)
+                .order(columnName, { ascending: true  }) // Sort by creation date in ascending order
+
+
             if (data) {
-                setTasksDataCompleted(data)
+                const isRev = sortVal === 'Creation Date' ? data.reverse() : data
+                setTasksDataCompleted(isRev)
             } else {
                 console.log(error)
             }
@@ -242,13 +302,10 @@ const Tasks: React.FC = () => {
         }
     }
 
-    useEffect(() => {
-        if (user) {
-            console.log(taskDataCompleted)
-        }
-    }, [taskDataCompleted])
 
     const [isShowAdd, setIsShowAdd] = useState<Boolean>(false)
+    const [viewTask, setViewTask] = useState<taskDataType | null>(null)
+
 
 
 
@@ -256,14 +313,33 @@ const Tasks: React.FC = () => {
         <div className='w-full h-full relative'>
             <Sidebar location='Tasks' />
             <ToastContainer />
+            {
+                isSort &&
+                <div
+                    onClick={() => { setSort(false) }}
+                    className='positioners w-full h-full flex items-center justify-center p-3'>
 
+                    <TaskSorter closer={setSort} />
+
+                </div>
+            }
+            {
+                viewTask != null &&
+                <div
+                    onClick={() => { setViewTask(null) }}
+                    className='positioners w-full h-full flex items-center justify-center p-3'>
+
+                    <ViewTask objPass={viewTask} />
+
+                </div>
+            }
 
             {
                 isShowAdd &&
                 <div
                     onClick={() => { setIsShowAdd(false) }}
                     className='positioners w-full h-full flex items-center justify-end'>
-                    <AddNewTask />
+                    <AddNewTask purpose='Modal' closer={setIsShowAdd} />
                 </div>
             }
             {
@@ -296,20 +372,22 @@ const Tasks: React.FC = () => {
                         <div className='flex my-3 border-[#535353] border-[1px] w-auto items-start overflow-hidden  rounded-l-lg  rounded-r-lg'>
                             <div
                                 onClick={() => { setTabination("Pending") }}
-                                className={`${tabItem === 'Pending' && 'text-green-500'} px-5 py-2 bg-[#111111] rounded-l-lg cursor-pointer`}> Pending</div>
+                                className={`${tabItem === 'Pending' && 'text-green-500'} px-4 py-2 bg-[#111111] rounded-l-lg cursor-pointer `}> Pending</div>
                             <div className='w-[1px] bg-[#535353]'>
 
                             </div>
                             <div
                                 onClick={() => { setTabination("Completed") }}
-                                className={`${tabItem === 'Completed' && 'text-green-500'} px-5 py-2 bg-[#111111]  rounded-r-lg cursor-pointer`}> Completed</div>
+                                className={`${tabItem === 'Completed' && 'text-green-500'} px-4 py-2 bg-[#111111]  rounded-r-lg cursor-pointer`}> Completed</div>
                         </div>
 
-                        <div className='p-2  bg-[#111111] border-[#535353] border-[1px] rounded-lg cursor-pointer text-2xl hover:bg-[#535353]'>
+                        <div
+                            onClick={() => { setSort(true) }}
+                            className='p-2  bg-[#111111] border-[#535353] border-[1px] rounded-lg cursor-pointer text-2xl hover:bg-[#535353]'>
                             <GoSortAsc />
                         </div>
                     </div>
-                    <div className='mt-4 grid gap-3 grid-cols-1 w-full sm:grid-cols-3 xl:grid-cols-4 pb-[10px]'>
+                    <div className='mt-4 grid gap-3 grid-cols-1 w-full xs:hidden sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 pb-[10px]'>
                         {
                             tabItem === 'Pending' ?
                                 <>
@@ -324,14 +402,14 @@ const Tasks: React.FC = () => {
                                                     </div>
                                                     <p className='text-[#888] break-all'>{itm?.description != '' ? itm?.description : 'No Description'}</p>
 
-                                                    <div className='mt-auto pt-2 flex gap-4'>
+                                                    <div className='mt-auto pt-2 flex gap-4 text-[10px] md:text-sm'>
                                                         {
                                                             itm.deadline != '' &&
                                                             <div className='flex gap-1 items-center justify-start'>
                                                                 <div>
                                                                     < CiCalendarDate />
                                                                 </div>
-                                                                <p className='text-[#888] text-sm'>{itm?.deadline != '' && itm?.deadline}</p>
+                                                                <p className='text-[#888]'>{itm?.deadline != '' && itm?.deadline}</p>
                                                             </div>
                                                         }
                                                         {
@@ -340,16 +418,16 @@ const Tasks: React.FC = () => {
                                                                 <div className='w-[10px] h-[10px] bg-red-500'>
 
                                                                 </div>
-                                                                <p className='text-[#888] text-sm'>{itm?.category != '' && itm?.category}</p>
+                                                                <p className='text-[#888]'>{itm?.category != '' && itm?.category}</p>
                                                             </div>
                                                         }
                                                         {
                                                             itm?.priority != '' &&
-                                                            <div className='flex items-center gap-1 justify-start'>
+                                                            <div className='hidden items-center gap-1 justify-start  md:flex'>
                                                                 <div className='w-[10px] h-[10px] bg-yellow-500'>
 
                                                                 </div>
-                                                                <p className='text-[#888] text-sm'>{itm?.priority != '' && itm?.priority} priority</p>
+                                                                <p className='text-[#888]'>{itm?.priority != '' && itm?.priority} priority</p>
                                                             </div>
                                                         }
                                                     </div>
@@ -374,7 +452,9 @@ const Tasks: React.FC = () => {
                                                                 </>
                                                                 :
                                                                 <>
-                                                                    <div className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
+                                                                    <div
+                                                                        onClick={() => { setViewTask(itm) }}
+                                                                        className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
 
                                                                     <div
                                                                         onClick={() => { setActions(itm?.id) }}
@@ -476,7 +556,9 @@ const Tasks: React.FC = () => {
                                                                 </>
                                                                 :
                                                                 <>
-                                                                    <div className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
+                                                                    <div
+                                                                        onClick={() => { setViewTask(itm) }}
+                                                                        className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
 
                                                                     <div
                                                                         onClick={() => { setActions(itm?.id) }}
@@ -521,7 +603,7 @@ const Tasks: React.FC = () => {
                 </div>
 
                 <div className='ml-auto stickyPostion hidden lg:block'>
-                    <AddNewTask />
+                    <AddNewTask purpose='Sidebar' closer={setIsShowAdd} />
                 </div>
             </div>
         </div>

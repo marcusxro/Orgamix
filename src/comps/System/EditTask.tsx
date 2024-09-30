@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import useStoreBoolean from '../../Zustand/UseStore';
 
 interface objPassContent {
+
     title: string;
     deadline: string;
     description: string;
@@ -15,7 +16,11 @@ interface objPassContent {
     priority: string;
     userid: string;
     repeat: string
-    category: string
+    createdAt: string;
+    link: string;
+    category: string;
+
+
 }
 
 interface taskDataType {
@@ -24,7 +29,7 @@ interface taskDataType {
 }
 
 
-const EditTask: React.FC<taskDataType> = ({ objPass, closer}) => {
+const EditTask: React.FC<taskDataType> = ({ objPass, closer }) => {
     const [user] = IsLoggedIn()
     const [title, setTitle] = useState(objPass?.title || '');
     const [Description, setDescription] = useState<string>(objPass?.description || '')
@@ -33,7 +38,7 @@ const EditTask: React.FC<taskDataType> = ({ objPass, closer}) => {
     const [category, setcategory] = useState<string>(objPass?.category || '')
     const [repeat, setrepeat] = useState<string>(objPass?.repeat || '')
     const [loading, setLoading] = useState<boolean>(false)
-
+    const [link, setLink] = useState<string>(objPass?.link || '')
     const { showNotif, setShowNotif } = useStoreBoolean();
 
 
@@ -63,9 +68,10 @@ const EditTask: React.FC<taskDataType> = ({ objPass, closer}) => {
                     priority: priority,
                     category: category,
                     repeat: repeat,
+                    link: link
                 })
-                .eq('id', objPass?.id)    
-                .eq('userid', user?.uid); 
+                .eq('id', objPass?.id)
+                .eq('userid', user?.uid);
             if (error) {
                 console.log('error encountered, please try again later.')
                 setLoading(false)
@@ -155,6 +161,13 @@ const EditTask: React.FC<taskDataType> = ({ objPass, closer}) => {
                     </select>
                 </div>
             </div>
+            <input
+                required
+                value={link}
+                onChange={(e) => { setLink(e.target.value) }}
+                className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                type="text" placeholder='Link' />
+
 
             <div className='mt-3 w-full'>
                 <div

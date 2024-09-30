@@ -5,9 +5,13 @@ import IsLoggedIn from '../../firebase/IsLoggedIn'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+interface propsPurpose {
+    purpose: string;
+    closer: React.Dispatch<React.SetStateAction<Boolean>>
+}
 
 
-const AddNewTask = () => {
+const AddNewTask: React.FC<propsPurpose> = ({ purpose, closer }) => {
 
     const [user] = IsLoggedIn()
     const [title, setTitle] = useState<string>('')
@@ -17,7 +21,7 @@ const AddNewTask = () => {
     const [priority, setpriority] = useState<string>('')
     const [category, setcategory] = useState<string>('')
     const [repeat, setrepeat] = useState<string>('')
-
+    const [link, setLink] = useState<string>('')
     const [loading, setLoading] = useState<boolean>(false)
 
 
@@ -62,7 +66,10 @@ const AddNewTask = () => {
                 category: category,
                 repeat: repeat,
                 userid: user?.uid,
-                isdone: false
+                isdone: false,
+                createdAt: Date.now(),
+                link: link
+
             })
             if (error) {
                 console.log(error)
@@ -76,6 +83,7 @@ const AddNewTask = () => {
                 setpriority('')
                 setcategory('')
                 setrepeat('')
+                setLink('')
             }
         }
         catch (err) {
@@ -84,11 +92,11 @@ const AddNewTask = () => {
         }
     }
     return (
-        <div 
-        onClick={(e) => {
-            e.stopPropagation()
-        }}
-        className='w-full max-w-[350px] bg-[#313131] 
+        <div
+            onClick={(e) => {
+                e.stopPropagation()
+            }}
+            className='w-full max-w-[350px] bg-[#313131] 
              rounded-lg p-3 h-full border-[#535353] border-[1px] flex flex-col gap-3 overflow-auto'>
             <ToastContainer />
             <div className='mb-2'>
@@ -101,7 +109,7 @@ const AddNewTask = () => {
                 required
                 value={title}
                 onChange={(e) => { setTitle(e.target.value) }}
-                className='p-3 rounded-lg bg-[#111111] outline-none'
+                className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
                 maxLength={50}
                 type="text" placeholder='Title' />
             <textarea
@@ -109,7 +117,7 @@ const AddNewTask = () => {
                 onChange={(e) => { setDescription(e.target.value) }}
                 maxLength={150}
                 placeholder='Description'
-                className='resize-none w-full h-[150px] rounded-lg p-3 bg-[#111111] outline-none'></textarea>
+                className='resize-none w-full h-[150px] rounded-lg p-3 bg-[#111111] outline-none border-[#535353] border-[1px]'></textarea>
 
             <div className='gap-3 flex'>
                 <div className='flex flex-col gap-1'>
@@ -117,18 +125,18 @@ const AddNewTask = () => {
                     <input
                         value={deadline}
                         onChange={(e) => { setdeadline(e.target.value) }}
-                        type="date" className='p-2 rounded-lg bg-[#111111]' />
+                        type="date" className='p-2 rounded-lg bg-[#111111] border-[#535353] border-[1px] text-[#888]' />
                 </div>
                 <div className='flex flex-col gap-1'>
                     <div>Priority</div>
                     <select
                         value={priority}
                         onChange={(e) => { setpriority(e.target.value) }}
-                        className="p-2 rounded-lg bg-[#111111]">
+                        className="p-2 rounded-lg bg-[#111111] border-[#535353] border-[1px] text-[#888]">
                         <option value="">Choose Priority</option>
-                        <option value="low">Low Priority</option>
-                        <option value="medium">Medium Priority</option>
-                        <option value="high">High Priority</option>
+                        <option value="Low">Low Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="High">High Priority</option>
                     </select>
 
                 </div>
@@ -140,7 +148,7 @@ const AddNewTask = () => {
                     <select
                         value={category}
                         onChange={(e) => { setcategory(e.target.value) }}
-                        className='p-2 rounded-lg bg-[#111111]'>
+                        className='p-2 rounded-lg bg-[#111111] border-[#535353] border-[1px] text-[#888]'>
                         <option value="">Choose Category</option>
                         <option value="Work">Work</option>
                         <option value="Personal">Personal</option>
@@ -155,15 +163,23 @@ const AddNewTask = () => {
                     <select
                         value={repeat}
                         onChange={(e) => { setrepeat(e.target.value) }}
-                        className='w-full p-2 rounded-lg bg-[#111111]'>
+                        className='w-full p-2 rounded-lg bg-[#111111] border-[#535353] border-[1px] text-[#888]'>
                         <option value="none">None</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
+                        <option value="Daily">Daily</option>
+                        <option value="Weekly">Weekly</option>
+                        <option value="Monthly">Monthly</option>
                     </select>
                 </div>
+
+
             </div>
 
+            <input
+                required
+                value={link}
+                onChange={(e) => { setLink(e.target.value) }}
+                className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                type="text" placeholder='Link' />
 
             <div className='mt-auto w-full'>
                 <div
@@ -179,6 +195,17 @@ const AddNewTask = () => {
                     }
                 </div>
             </div>
+            {
+                purpose === 'Modal'
+                &&
+                <div className='w-full'>
+                    <div
+                        onClick={() => { closer(false) }}
+                        className={`${loading && 'bg-[#535353] '} bg-[#684444] flex items-center justify-center  p-3 rounded-lg text-center cursor-pointer border-[#535353] border-[1px] hover:bg-[#535353] `}>
+                        Close
+                    </div>
+                </div>
+            }
         </div>
     )
 }
