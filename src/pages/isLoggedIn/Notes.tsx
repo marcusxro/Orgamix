@@ -47,9 +47,6 @@ const Notes = () => {
     }, [user, editTask])
 
 
-
-
-
     const handleRealtimeEvent = (payload: any) => {
         switch (payload.eventType) {
           case 'INSERT':
