@@ -197,7 +197,7 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                     <span>Notes</span>
                 </div>
                 <div
-                    onClick={() => { navigateToPages("/user/tasks")}}
+                    onClick={() => { navigateToPages("/user/goals")}}
                     className={`${location === "Goals" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>

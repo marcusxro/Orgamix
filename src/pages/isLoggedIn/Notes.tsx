@@ -9,7 +9,7 @@ import { CiCalendarDate } from "react-icons/ci";
 import { BiCategory } from "react-icons/bi";
 import { useNavigate } from 'react-router-dom';
 import useStore from '../../Zustand/UseStore';
-import { FaEllipsisVertical } from "react-icons/fa6";
+
 
 interface fetchedDataType {
     id: number;
@@ -131,7 +131,7 @@ const Notes = () => {
                     <div>
                         <div
                             className='text-2xl font-bold'>
-                            Create Note
+                             Notes
                         </div>
                         <div className='text-sm text-[#888]'>
                             Easily create, edit, and organize your notes in this section for a streamlined experience.

@@ -8,6 +8,7 @@ import System from './pages/isLoggedIn/System';
 import Tasks from './pages/isLoggedIn/Tasks';
 import Notes from './pages/isLoggedIn/Notes';
 import VisitNote from './comps/System/VisitNote';
+import Goals from './pages/isLoggedIn/Goals';
 
 
 
@@ -26,10 +27,15 @@ function App() {
 
           <Route path='/user/notes' element={<Notes />} />
 
-         <Route path='/user/notes/:uid/:time' element={<VisitNote />} />
+          <Route path='/user/notes/:uid/:time' element={<VisitNote />} />
+
+
+
+          <Route path='/user/goals' element={<Goals />} />
+
         </Routes>
       </div>
-      </Router>
+    </Router>
   )
 }
 
