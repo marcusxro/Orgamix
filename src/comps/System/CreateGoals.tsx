@@ -18,9 +18,13 @@ interface HabitsType {
 }
 
 interface listenerType {
-    listener: React.Dispatch<React.SetStateAction<boolean>>
+    listener: React.Dispatch<React.SetStateAction<boolean>>;
+    purpose: string;
+    closer: React.Dispatch<React.SetStateAction<boolean>>
 }
-const CreateGoals: React.FC<listenerType> = ({listener}) => {
+
+
+const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer }) => {
     const [user] = IsLoggedIn()
     const [loading, setLoading] = useState<boolean>(false)
     const [title, setTitle] = useState<string>("")
@@ -44,42 +48,34 @@ const CreateGoals: React.FC<listenerType> = ({listener}) => {
 
 
     const addTask = () => {
-        if (newSubTask.trim() === '') return; // Prevent adding empty subtasks
-
+        if (newSubTask.trim() === '') return;
         const newTask: SubTasksType = {
             is_done: false,
-            startedAt: new Date().toISOString(), // Current date as the startedAt time
+            startedAt: new Date().toISOString(),
             subGoal: newSubTask,
         };
 
-        console.log("CLICK");
-
-        // Update the subTasks state correctly
-        setSubTasks((prevTasks) => [...(prevTasks || []), newTask]); // Add parentheses around (prevTasks || [])
-
-        // Clear the input field
+        setSubTasks((prevTasks) => [...(prevTasks || []), newTask]);
         setNewSubTask('');
     };
 
     const removeTask = (index: number) => {
         setSubTasks((prevTasks) => {
-            if (!prevTasks) return []; // Handle case when prevTasks is null
-            return prevTasks.filter((_, i) => i !== index); // Filter out the task at the given index
+            if (!prevTasks) return [];
+            return prevTasks.filter((_, i) => i !== index);
         });
     };
 
-
     const editTask = (index: number) => {
-        if (subTasks != null && subTasks[index]) { // Check if the task exists
+        if (subTasks != null && subTasks[index]) {
             const taskToEdit = subTasks[index];
-            setNewSubTask(taskToEdit.subGoal); // Populate input with the current subtask
-            setEditingIndex(index); // Set the index to the task being edited
+            setNewSubTask(taskToEdit.subGoal);
+            setEditingIndex(index);
         }
     };
 
     const updateTask = () => {
         if (editingIndex === null || editingIndex === undefined) return;
-
         setSubTasks((prevTasks) => {
             if (!prevTasks) return [];
             const updatedTasks = [...prevTasks];
@@ -89,9 +85,8 @@ const CreateGoals: React.FC<listenerType> = ({listener}) => {
             };
             return updatedTasks;
         });
-
-        setNewSubTask(''); // Clear the input field
-        setEditingIndex(null); // Reset editing index
+        setNewSubTask('');
+        setEditingIndex(null);
 
     };
 
@@ -215,7 +210,7 @@ const CreateGoals: React.FC<listenerType> = ({listener}) => {
                 setDeadline("")
                 setDescription("")
                 setHabits([])
-                listener(Prevs=> !Prevs)
+                listener(Prevs => !Prevs)
                 setSubTasks(null)
                 setLoading(false)
             }
@@ -233,7 +228,9 @@ const CreateGoals: React.FC<listenerType> = ({listener}) => {
     }, [habits])
 
     return (
-        <div className='w-[350px] h-full bg-[#313131] z-[5000]
+        <div 
+        onClick={(e) => {e.stopPropagation()}}
+        className='w-[350px] h-full bg-[#313131] z-[5000]
              rounded-lg p-3 border-[#535353] border-[1px] flex flex-col justify-between'>
             <div className='pb-2'>
                 <div className='text-xl font-bold'>Create Goal</div>
@@ -389,22 +386,43 @@ const CreateGoals: React.FC<listenerType> = ({listener}) => {
                 </div>
             </div>
 
-            <div className='w-full  flex rounded-lg overflow-hidden mt-2 border-[#535353] border-[1px]'>
-                <div
-                    className='bg-[#583c3c] flex items-center justify-center w-full border-r-[#535353] border-r-[1px]  p-3 text-center cursor-pointer  hover:bg-[#535353] '>Cancel</div>
-                <div
-                    onClick={() => { createNewGoal() }}
-                    className={`${loading && 'bg-[#535353]'} bg-[#111111] flex items-center justify-center w-full  p-3 text-center cursor-pointer  hover:bg-[#535353]`}>
-                    {
-                        loading ?
-                            <div className='w-[20px] h-[30px] flex items-center justify-center'>
-                                <Loader />
-                            </div>
-                            :
-                            <>Create</>
-                    }
-                </div>
-            </div>
+            {
+                purpose === 'Modal' ?
+                    <div className='w-full  flex rounded-lg overflow-hidden mt-2 border-[#535353] border-[1px]'>
+                        <div
+                        onClick={() => {
+                            closer(prevs=>!prevs)
+                        }}
+                            className='bg-[#583c3c] flex items-center justify-center w-full border-r-[#535353] border-r-[1px]  p-3 text-center cursor-pointer  hover:bg-[#535353] '>Cancel</div>
+                        <div
+                            onClick={() => { createNewGoal() }}
+                            className={`${loading && 'bg-[#535353]'} bg-[#111111] flex items-center justify-center w-full  p-3 text-center cursor-pointer  hover:bg-[#535353]`}>
+                            {
+                                loading ?
+                                    <div className='w-[20px] h-[30px] flex items-center justify-center'>
+                                        <Loader />
+                                    </div>
+                                    :
+                                    <>Create</>
+                            }
+                        </div>
+                    </div>
+                    :
+                    <div className='w-full  flex rounded-lg overflow-hidden mt-2 border-[#535353] border-[1px]'>
+                        <div
+                            onClick={() => { createNewGoal() }}
+                            className={`${loading && 'bg-[#535353]'} bg-[#111111] flex items-center justify-center w-full  p-3 text-center cursor-pointer  hover:bg-[#535353]`}>
+                            {
+                                loading ?
+                                    <div className='w-[20px] h-[30px] flex items-center justify-center'>
+                                        <Loader />
+                                    </div>
+                                    :
+                                    <>Create</>
+                            }
+                        </div>
+                    </div>
+            }
         </div >
     )
 }

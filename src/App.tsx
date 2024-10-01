@@ -9,6 +9,7 @@ import Tasks from './pages/isLoggedIn/Tasks';
 import Notes from './pages/isLoggedIn/Notes';
 import VisitNote from './comps/System/VisitNote';
 import Goals from './pages/isLoggedIn/Goals';
+import GoalTemplates from './pages/isLoggedIn/GoalTemplates';
 
 
 
@@ -32,6 +33,8 @@ function App() {
 
 
           <Route path='/user/goals' element={<Goals />} />
+
+          <Route path='/user/goals/templates' element={<GoalTemplates />} />
 
         </Routes>
       </div>
