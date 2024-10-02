@@ -544,203 +544,205 @@ const ViewGoal: React.FC = () => {
                         :
                         <>
                             <>
-                                <div className='mt-3 mx-auto max-w-[1200px] p-3'>
-                                    <div className='flex flex-col gap-2'>
-                                        <div className='text-xl font-bold'>
-                                            {fetchedData && fetchedData[0]?.title}
-                                        </div>
-                                        <p className='text-sm text-[#888] w-full max-w-[500px]'>
-                                            {fetchedData && fetchedData[0]?.description}
-                                        </p>
-                                        <p className='text-sm text-[#888] w-full max-w-[500px]'>
-                                            {checkDeadlineMet(fetchedData != null && fetchedData[0]?.deadline)}
-                                        </p>
-                                        <div className='flex gap-3 justify-between'>
-                                            {isRenew(fetchedData != null && fetchedData[0]?.deadline)}
-                                        </div>
-                                    </div>
-
-                                    <div className='flex flex-col gap-3 h-auto mt-8'>
-                                        <div className='text-xl font-bold flex items-center gap-2'>
-                                            <GoTasklist />  Tasks
+                                <div className='mt-3 mx-auto max-w-[1200px] flex min-h-[90dvh] flex-col  justify-between  p-3'>
+                                    <div>
+                                        <div className='flex flex-col gap-2'>
+                                            <div className='text-xl font-bold'>
+                                                {fetchedData && fetchedData[0]?.title}
+                                            </div>
+                                            <p className='text-sm text-[#888] w-full max-w-[500px]'>
+                                                {fetchedData && fetchedData[0]?.description}
+                                            </p>
+                                            <p className='text-sm text-[#888] w-full max-w-[500px]'>
+                                                {checkDeadlineMet(fetchedData != null && fetchedData[0]?.deadline)}
+                                            </p>
+                                            <div className='flex gap-3 justify-between'>
+                                                {isRenew(fetchedData != null && fetchedData[0]?.deadline)}
+                                            </div>
                                         </div>
 
-                                        {
-                                            fetchedData != null && fetchedData[0]?.sub_tasks?.map((itm: subtaskType, idx: number) => (
-                                                <div
-                                                    key={idx}
-                                                    className={`${itm?.is_done && 'bg-[#535353]'} flex flex-col gap-2  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]`}>
-                                                    <div>
-                                                        {
-                                                            subTaskIdx === idx ?
-                                                                <input
-                                                                    value={subTaskEdit}
-                                                                    maxLength={50}
-                                                                    onChange={(e) => { setSubTaskEdit(e.target.value) }}
-                                                                    placeholder='Rename your task'
-                                                                    className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] '
-                                                                    type="text" />
-                                                                :
-                                                                <div className={`${itm?.is_done && 'line-through'} text-md font-bold break-all`}>
-                                                                    {itm?.subGoal}
-                                                                </div>
-                                                        }
+                                        <div className='flex flex-col gap-3 h-auto mt-4'>
+                                            <div className='text-xl font-bold flex items-center gap-2'>
+                                                <GoTasklist />  Tasks
+                                            </div>
 
-                                                        <p className={`${itm?.is_done && 'line-through'}  text-sm text-[#888]`}>
-                                                            {itm?.startedAt}
-                                                        </p>
-                                                        <p className={`${itm?.is_done ? "text-green-500" : "text-orange-500"} text-sm text-[#888]`}>
-                                                            {itm?.is_done ? "Completed" : "In progress"}
-                                                        </p>
-                                                    </div>
-                                                    <div className='flex gap-2'>
-                                                        {
-                                                            idx === subTaskIdx ?
-                                                                (<>
-                                                                    <div
-                                                                        onClick={() => { setSubTaskIdx(null) }}
-                                                                        className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-
-                                                                        Cancel
-                                                                    </div>
-
-                                                                    <div
-                                                                        onClick={() => {
-                                                                            renameTask(idx)
-                                                                        }}
-                                                                        className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-
-                                                                        Save
-                                                                    </div>
-                                                                </>)
-
-                                                                : idx === isDeleteTask ?
-                                                                    (
-                                                                    <>
-                                                                     <div
-                                                                        onClick={() => { setIsDeleteTask(null) }}
-                                                                        className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-
-                                                                        Cancel
-                                                                    </div>
-
-                                                                    <div
-                                                                        onClick={() => {
-                                                                            deleteTask(idx)
-                                                                        }}
-                                                                        className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-
-                                                                        Delete
-                                                                    </div>
-                                                                    </>
-                                                                    )
+                                            {
+                                                fetchedData != null && fetchedData[0]?.sub_tasks?.map((itm: subtaskType, idx: number) => (
+                                                    <div
+                                                        key={idx}
+                                                        className={`${itm?.is_done && 'bg-[#535353]'} flex flex-col gap-2  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]`}>
+                                                        <div>
+                                                            {
+                                                                subTaskIdx === idx ?
+                                                                    <input
+                                                                        value={subTaskEdit}
+                                                                        maxLength={50}
+                                                                        onChange={(e) => { setSubTaskEdit(e.target.value) }}
+                                                                        placeholder='Rename your task'
+                                                                        className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] '
+                                                                        type="text" />
                                                                     :
-                                                                    <>
+                                                                    <div className={`${itm?.is_done && 'line-through'} text-md font-bold break-all`}>
+                                                                        {itm?.subGoal}
+                                                                    </div>
+                                                            }
+
+                                                            <p className={`${itm?.is_done && 'line-through'}  text-sm text-[#888]`}>
+                                                                {itm?.startedAt}
+                                                            </p>
+                                                            <p className={`${itm?.is_done ? "text-green-500" : "text-orange-500"} text-sm text-[#888]`}>
+                                                                {itm?.is_done ? "Completed" : "In progress"}
+                                                            </p>
+                                                        </div>
+                                                        <div className='flex gap-2'>
+                                                            {
+                                                                idx === subTaskIdx ?
+                                                                    (<>
+                                                                        <div
+                                                                            onClick={() => { setSubTaskIdx(null) }}
+                                                                            className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+
+                                                                            Cancel
+                                                                        </div>
+
                                                                         <div
                                                                             onClick={() => {
-                                                                                markSubTasksAsDone(idx, itm?.is_done ? false : true)
+                                                                                renameTask(idx)
                                                                             }}
                                                                             className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-                                                                            {
-                                                                                itm?.is_done ?
-                                                                                    <div className='text-[#cc0000]'>
-                                                                                        UNDO
-                                                                                    </div>
-                                                                                    :
-                                                                                    "DONE"
-                                                                            }
+
+                                                                            Save
                                                                         </div>
-                                                                        <div
-                                                                            onClick={() => { getValue(itm?.subGoal, idx) }}
-                                                                            className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-                                                                            EDIT
-                                                                        </div>
-                                                                        <div
-                                                                            onClick={() => { setIsDeleteTask(idx) }}
-                                                                            className='flex gap-1 items-center text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-                                                                            DELETE
-                                                                        </div>
-                                                                    </>
-                                                        }
+                                                                    </>)
+
+                                                                    : idx === isDeleteTask ?
+                                                                        (
+                                                                            <>
+                                                                                <div
+                                                                                    onClick={() => { setIsDeleteTask(null) }}
+                                                                                    className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+
+                                                                                    Cancel
+                                                                                </div>
+
+                                                                                <div
+                                                                                    onClick={() => {
+                                                                                        deleteTask(idx)
+                                                                                    }}
+                                                                                    className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+
+                                                                                    Delete
+                                                                                </div>
+                                                                            </>
+                                                                        )
+                                                                        :
+                                                                        <>
+                                                                            <div
+                                                                                onClick={() => {
+                                                                                    markSubTasksAsDone(idx, itm?.is_done ? false : true)
+                                                                                }}
+                                                                                className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                {
+                                                                                    itm?.is_done ?
+                                                                                        <div className='text-[#cc0000]'>
+                                                                                            UNDO
+                                                                                        </div>
+                                                                                        :
+                                                                                        "DONE"
+                                                                                }
+                                                                            </div>
+                                                                            <div
+                                                                                onClick={() => { getValue(itm?.subGoal, idx) }}
+                                                                                className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                EDIT
+                                                                            </div>
+                                                                            <div
+                                                                                onClick={() => { setIsDeleteTask(idx) }}
+                                                                                className='flex gap-1 items-center text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                DELETE
+                                                                            </div>
+                                                                        </>
+                                                            }
+                                                        </div>
                                                     </div>
+                                                ))
+                                            }
+                                            <div className='flex items-start'>
+                                                <input
+                                                    type='text'
+                                                    value={newSubTask}
+                                                    onChange={handleInputChange} // Call the input change handler
+                                                    maxLength={50}
+                                                    placeholder='Enter new task...'
+                                                    className='flex-grow bg-[#313131] border-[#535353] border-[1px] rounded-lg p-2 text-white'
+                                                />
+                                                <div
+                                                    onClick={() => { addNewSubTask("task") }} // Call the function to add the new task
+                                                    className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 px-3 hover:bg-[#535353] ml-2'>
+                                                    <FaPlus />
                                                 </div>
-                                            ))
-                                        }
-                                        <div className='flex items-start'>
+                                            </div>
+                                        </div>
+
+                                        <div className='flex flex-col gap-3 h-auto mt-8'>
+                                            <div className='text-xl font-bold flex items-center gap-2'>
+                                                <GiDna2 />  Habits
+                                            </div>
+
+                                            {
+                                                fetchedData != null && fetchedData[0]?.habits?.map((itm: habitsType, idx: number) => (
+                                                    <div
+                                                        key={idx}
+                                                        className='flex gap-1  items-center justify-between bg-[#203296] text-[#fff] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
+                                                        <div>
+                                                            <div className={`text-md font-bold break-all`}>
+                                                                {itm?.habit}
+                                                            </div>
+                                                            <p className={`  text-sm text-[#888]`}>
+                                                                {itm?.repeat}
+                                                            </p>
+                                                        </div>
+
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                        <div className='flex items-start mt-3 gap-3'>
                                             <input
                                                 type='text'
-                                                value={newSubTask}
-                                                onChange={handleInputChange} // Call the input change handler
+                                                value={newHabit}
+                                                onChange={handleHabitInputChange} // Call the input change handler
+                                                placeholder='Enter new habit...'
                                                 maxLength={50}
-                                                placeholder='Enter new task...'
-                                                className='flex-grow bg-[#313131] border-[#535353] border-[1px] rounded-lg p-2 text-white'
+                                                className='flex-grow bg-[#313131] border-[#535353] border-[1px] rounded-lg p-2.5 text-white'
                                             />
+                                            <div>
+                                                <select
+                                                    value={repHabit}
+                                                    onChange={(e) => { setRepHabit(e.target.value) }}
+                                                    className='p-2.5 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full text-[#888]'
+                                                    name="" id="">
+                                                    <option value="">Repetition</option>
+                                                    <option value="daily">Daily</option>
+                                                    <option value="weekly">Weekly</option>
+                                                    <option value="monthly">Monthly</option>
+                                                    <option value="yearly">Yearly</option>
+                                                    <option value="weekday">Every Weekday (Mon-Fri)</option>
+                                                    <option value="weekend">Every Weekend</option>
+                                                    <option value="bi-weekly">Bi-weekly</option>
+                                                    <option value="quarterly">Quarterly</option>
+                                                    <option value="never">Never</option>
+                                                </select>
+                                            </div>
                                             <div
-                                                onClick={() => { addNewSubTask("task") }} // Call the function to add the new task
-                                                className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353] ml-2'>
-                                                <FaPlus /> Add New Task
+                                                onClick={() => { addNewSubTask("habit") }} // Call the function to add the new task
+                                                className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3  px-3 hover:bg-[#535353] ml-2'>
+                                                <FaPlus />
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className='flex flex-col gap-3 h-auto mt-8'>
-                                        <div className='text-xl font-bold flex items-center gap-2'>
-                                            <GiDna2 />  Habits
-                                        </div>
-
-                                        {
-                                            fetchedData != null && fetchedData[0]?.habits?.map((itm: habitsType, idx: number) => (
-                                                <div
-                                                    key={idx}
-                                                    className='flex gap-1  items-center justify-between bg-[#203296] text-[#fff] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
-                                                    <div>
-                                                        <div className={`text-md font-bold break-all`}>
-                                                            {itm?.habit}
-                                                        </div>
-                                                        <p className={`  text-sm text-[#888]`}>
-                                                            {itm?.repeat}
-                                                        </p>
-                                                    </div>
-
-                                                </div>
-                                            ))
-                                        }
-                                    </div>
-                                    <div className='flex items-start mt-3 gap-3'>
-                                        <input
-                                            type='text'
-                                            value={newHabit}
-                                            onChange={handleHabitInputChange} // Call the input change handler
-                                            placeholder='Enter new habit...'
-                                            maxLength={50}
-                                            className='flex-grow bg-[#313131] border-[#535353] border-[1px] rounded-lg p-2.5 text-white'
-                                        />
-                                        <div>
-                                            <select
-                                                value={repHabit}
-                                                onChange={(e) => { setRepHabit(e.target.value) }}
-                                                className='p-2.5 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full text-[#888]'
-                                                name="" id="">
-                                                <option value="">Repetition</option>
-                                                <option value="daily">Daily</option>
-                                                <option value="weekly">Weekly</option>
-                                                <option value="monthly">Monthly</option>
-                                                <option value="yearly">Yearly</option>
-                                                <option value="weekday">Every Weekday (Mon-Fri)</option>
-                                                <option value="weekend">Every Weekend</option>
-                                                <option value="bi-weekly">Bi-weekly</option>
-                                                <option value="quarterly">Quarterly</option>
-                                                <option value="never">Never</option>
-                                            </select>
-                                        </div>
-                                        <div
-                                            onClick={() => { addNewSubTask("habit") }} // Call the function to add the new task
-                                            className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353] ml-2'>
-                                            <FaPlus /> Add New Habit
-                                        </div>
-                                    </div>
-
-                                    <div className='mt-7 flex gap-3 justify-between'>
+                                    <div className='mt-7 flex gap-3 justify-between bg-[#111111] p-3 rounded-lg items-center'>
                                         <div>
                                             <div className='font-bold'>Date created</div>
                                             <div className='mt-1 text-[#888] text-sm'>{fetchedData &&
@@ -750,7 +752,7 @@ const ViewGoal: React.FC = () => {
                                             }</div>
                                         </div>
 
-                                        <div className='flex items-start mt-3'>
+                                        <div className='flex items-start'>
                                             <div
                                                 className='flex gap-1  items-center justify-between bg-[#5e1414]  border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
                                                 <MdDelete />  Delete habit
