@@ -10,6 +10,7 @@ import Notes from './pages/isLoggedIn/Notes';
 import VisitNote from './comps/System/VisitNote';
 import Goals from './pages/isLoggedIn/Goals';
 import GoalTemplates from './pages/isLoggedIn/GoalTemplates';
+import ViewGoal from './pages/isLoggedIn/ViewGoal';
 
 
 
@@ -35,6 +36,10 @@ function App() {
           <Route path='/user/goals' element={<Goals />} />
 
           <Route path='/user/goals/templates' element={<GoalTemplates />} />
+
+
+          <Route path='/user/goals/templates/:uid/:time' element={<ViewGoal />} />
+
 
         </Routes>
       </div>

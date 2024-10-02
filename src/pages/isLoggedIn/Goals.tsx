@@ -9,6 +9,7 @@ import { BiCategory } from "react-icons/bi";
 import { MdOutlineQueryStats } from "react-icons/md";
 import { MdDateRange } from "react-icons/md";
 import { LuLayoutTemplate } from "react-icons/lu";
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -41,7 +42,7 @@ const Goals: React.FC = () => {
     const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(true)
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
 
-
+    const nav = useNavigate()
     const [user] = IsLoggedIn()
 
 
@@ -72,8 +73,8 @@ const Goals: React.FC = () => {
 
     function determineDate(date: string): string {
         const deadline = new Date(date);
-        const now = new Date(); 
-        const timeDiff = deadline.getTime() - now.getTime(); 
+        const now = new Date();
+        const timeDiff = deadline.getTime() - now.getTime();
 
         // Convert milliseconds to days
         const daysUntilDeadline = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -93,24 +94,72 @@ const Goals: React.FC = () => {
         }
     }
 
+
     function checkDeadlineMet(deadlineString: string): JSX.Element {
-        const deadline = new Date(deadlineString); 
-        const now = new Date(); 
-        deadline.setHours(0, 0, 0, 0); 
-    
-        // Check if the deadline is met
-        if (deadline.getTime() === now.getTime()) {
+        const deadline = new Date(deadlineString);
+        const now = new Date();
+        deadline.setHours(0, 0, 0, 0);
+        now.setHours(0, 0, 0, 0);
+
+        // Calculate difference in time
+        const timeDiff = deadline.getTime() - now.getTime();
+        const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+        if (daysDiff === 0) {
+            // If deadline is today
             return (
                 <div className='text-sm text-[#cc0000] flex gap-1 items-center'>
                     <MdDateRange />
                     Deadline Met
                 </div>
             );
-        } else {
+        } else if (daysDiff > 0) {
+            // If the deadline is in the future
             return (
-                <div className='text-[#888] text-sm flex gap-1 items-center'>
+                <div className={`${daysDiff <= 3 && 'text-[#cc0000]'} text-[#888] text-sm flex gap-1 items-center`}>
                     <MdDateRange />
-                    {deadlineString} 
+                    {`${deadlineString} / ${daysDiff} ${daysDiff === 1 ? 'day' : 'days'} left`}
+                </div>
+            );
+        } else {
+            // If the deadline has passed
+            return (
+                <div className='text-sm text-[#cc0000] flex gap-1 items-center'>
+                    <MdDateRange />
+                    {`${deadlineString} / ${Math.abs(daysDiff)} ${Math.abs(daysDiff) === 1 ? 'day' : 'days'} ago`}
+                </div>
+            );
+        }
+    }
+
+
+    function isFailed(deadlineString: string, boolVal: boolean) {
+        const deadline = new Date(deadlineString);
+        const now = new Date();
+        deadline.setHours(0, 0, 0, 0);
+        now.setHours(0, 0, 0, 0);
+
+        // Calculate difference in time
+        const timeDiff = deadline.getTime() - now.getTime();
+        const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+        if (daysDiff > 0 && !boolVal) {
+            // If the deadline is in the future
+            return (
+                <>In progress</>
+            );
+        } else if (daysDiff > 0 && boolVal) {
+            return (
+                <div className='text-sm text-[#2ecc71] flex gap-1 items-center'>
+                        Completed
+              </div>
+            )
+        }
+        
+        else {
+            return (
+                <div className='text-sm text-[#cc0000] flex gap-1 items-center'>
+                  Failed
                 </div>
             );
         }
@@ -141,7 +190,11 @@ const Goals: React.FC = () => {
                             className='bg-[#313131] p-3 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
                             Create Goal <span className='text-md'><FaPlus /></span>
                         </div>
-                        <div className='bg-[#313131] p-4 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
+                        <div
+                            onClick={() => {
+                                nav('/user/goals/templates')
+                            }}
+                            className='bg-[#313131] p-4 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
                             <LuLayoutTemplate />
                         </div>
                     </div>
@@ -149,16 +202,16 @@ const Goals: React.FC = () => {
                         {
                             fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
                                 <div
+                                    onClick={() => {
+                                        nav(`/user/goals/templates/${user?.uid}/${itm?.created_at}`)
+                                    }}
                                     key={idx}
                                     className='w-full max-w-[300px] bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden'>
-
-
 
                                     <div className='flex h-[110px] items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
                                         <div
                                             style={{ backgroundColor: determineDate(itm?.deadline) }}
                                             className={`w-[2px] h-full`}>
-
                                         </div>
 
                                         <div className='flex flex-col p-3'>
@@ -169,10 +222,11 @@ const Goals: React.FC = () => {
                                                 <BiCategory />{itm?.category}
                                             </div>
                                             <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                <MdOutlineQueryStats /> {itm?.is_done ? "Completed" : "In progress"}
+                                                <MdOutlineQueryStats />
+                                                {isFailed(itm?.deadline, itm?.is_done)}
                                             </div>
 
-                                            {checkDeadlineMet(itm?.deadline)} 
+                                            {checkDeadlineMet(itm?.deadline)}
                                         </div>
                                     </div>
 
@@ -180,7 +234,7 @@ const Goals: React.FC = () => {
                                         <div>
                                             {itm?.sub_tasks.filter((itmz) => itmz.is_done).length}
                                             /
-                                            {itm?.sub_tasks.filter((itmz) => !itmz.is_done).length}
+                                            {itm?.sub_tasks.length}
                                         </div>
 
 
