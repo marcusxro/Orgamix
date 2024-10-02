@@ -115,16 +115,13 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer }) => {
     };
 
     const editHabit = (index: number) => {
-        if (habits[index]) { // Check if the habit exists at the index
+        if (habits[index]) { 
             const habitToEdit = habits[index];
-            setNewHabit(habitToEdit.habit); // Populate input with the current habit
-            setEditingIndexHabit(index);    // Set the index to the habit being edited
+            setNewHabit(habitToEdit.habit); 
+            setEditingIndexHabit(index);   
             setHabitRep(habitToEdit.repeat)
         }
     };
-
-
-
     const updateHabit = () => {
         if (editingIndexHabit === null || editingIndexHabit === undefined) return;
 
@@ -186,6 +183,17 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer }) => {
             setLoading(false)
             return
         }
+
+
+        const selectedDate = new Date(deadline);
+        const currentDate = new Date();
+
+        if (selectedDate < currentDate) {
+            alert("The selected date has already passed.");
+            setLoading(false); // Reset loading state before returning
+            return; // Exit the function if the date has passed
+        }
+
 
         try {
             const { error } = await supabase.from("goals")
