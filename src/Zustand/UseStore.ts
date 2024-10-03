@@ -7,6 +7,14 @@ interface AppState {
     editTask: boolean | null;
     setEditTask: (params: boolean) => void;
     removeValue: () => void;
+
+    showCreate: string | null;
+    setShowCreate: (params: string) => void;
+
+
+    createdAt: string | null;
+    setCreatedAt: (params: string) => void;
+
 }
 
 // Create a single Zustand store with combined state and actions
@@ -16,6 +24,13 @@ const useStore = create<AppState>((set) => ({
     removeValue: () => set({ showNotif: null }),
     editTask: false,
     setEditTask: (params: boolean) => set({ editTask: params }),
+
+    showCreate: "",
+    setShowCreate: (params: string) => set({ showCreate: params }),
+
+    createdAt: "",
+    setCreatedAt: (params: string) => set({ createdAt: params }),
+
 }));
 
 export default useStore;

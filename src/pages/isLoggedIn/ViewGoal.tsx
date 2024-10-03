@@ -242,7 +242,7 @@ const ViewGoal: React.FC = () => {
 
 
     const [isOpenDate, setIsOpenDate] = useState<boolean>(false)
-    const [openDateVal, setOpenDateVal] = useState<string>("")
+
 
     function isRenew(deadlineString: string) {
         const deadline = new Date(deadlineString);
@@ -367,11 +367,26 @@ const ViewGoal: React.FC = () => {
     const [subTaskEdit, setSubTaskEdit] = useState<string>('')
     const [subTaskIdx, setSubTaskIdx] = useState<number | null>(null)
 
+    const [habitEdit, setHabitEdit] = useState<string>('')
+
+    const [isHabitDel, setIsHabitDel] = useState<number | null>(null)
+    const [isOpenEditOfHabit, setIsOpenHabit] = useState<number | null>(null)
+    const [repHabitEdit, setHabitDate] = useState<string>("")
 
     function getValue(params: string, idx: number) {
         setSubTaskEdit(params || '')
         setSubTaskIdx(idx)
     }
+
+
+
+
+    function getValueOfHabit(params: string, idx: number, dateOfHabit: string) {
+        setHabitEdit(params || '')
+        setIsOpenHabit(idx)
+        setHabitDate(dateOfHabit || '')
+    }
+
 
 
     async function renameTask(idx: number) {
@@ -401,7 +416,7 @@ const ViewGoal: React.FC = () => {
 
                 const updatedSubTasks = task.sub_tasks.map((subTask: subtaskType, index: number) => {
                     if (index === idx) {
-                        return { ...subTask, subGoal: subTaskEdit };
+                        return { ...subTask, subGoal: subTaskEdit};
                     }
                     return subTask;
                 });
@@ -431,6 +446,64 @@ const ViewGoal: React.FC = () => {
             return null;
         }
     }
+
+
+    async function renameHabit(idx: number) {
+        if (!habitEdit || !repHabitEdit) return;
+
+        try {
+            const { data: habits, error } = await supabase
+                .from('goals')
+                .select('habits')
+                .eq('id', fetchedData && fetchedData[0]?.id)
+                .eq('userid', user?.uid)
+                .single();
+
+            if (error) throw error;
+
+            if (habits) {
+                if (idx < 0 || idx >= habits.habits.length) {
+                    console.error("Index out of bounds for habits array.");
+                    return null;
+                }
+
+                // Update the habit at the specified index
+                const updatedHabits = habits.habits.map((habitItem: habitsType, index: number) => {
+                    if (index === idx) {
+                        return { ...habitItem, habit: habitEdit, repeat: repHabitEdit}; // Correctly update the habit
+                    }
+                    return habitItem; //return unchanged
+                });
+
+                const { data: updatedTask, error: updateError } = await supabase
+                    .from('goals')
+                    .update({
+                        habits: updatedHabits, //save the changes
+                    })
+                    .eq('id', fetchedData && fetchedData[0]?.id)
+                    .eq('userid', user?.uid);
+
+                if (updateError) {
+                    console.error('Update error:', updateError.message || updateError);
+                } else {
+                    console.log('Updated task data:', updatedTask);
+                    setIsOpenHabit(null);
+                }
+
+                return updatedTask;
+            } else {
+                console.error('No task found with the given ID.');
+                return null;
+            }
+        } catch (error: any) {
+            console.error('Error updating habit:', error.message || error);
+            return null;
+        }
+    }
+
+
+
+
 
     const [isDeleteTask, setIsDeleteTask] = useState<number | null>(null)
 
@@ -482,6 +555,58 @@ const ViewGoal: React.FC = () => {
             return null;
         }
     }
+
+
+    async function deleteHabit(idx: number) {
+
+        try {
+            const { data: habits, error } = await supabase
+                .from('goals')
+                .select('habits')
+                .eq('id', fetchedData && fetchedData[0]?.id)
+                .eq('userid', user?.uid)
+                .single();
+
+
+            if (error) throw error;
+
+            if (habits) {
+                if (idx < 0 || idx >= habits.habits.length) {
+                    console.error("Index out of bounds for sub_tasks array.");
+                    return null;
+                }
+
+                const updatedHabits = habits.habits.filter((_: any, index: number) => index !== idx);
+
+
+                const { data: updatedTask, error: updateError } = await supabase
+                    .from('goals')
+                    .update({
+                        habits: updatedHabits,
+                    })
+                    .eq('id', fetchedData && fetchedData[0]?.id)
+                    .eq('userid', user?.uid);
+
+                if (updateError) {
+                    console.error('Update error:', updateError.message || updateError);
+                } else {
+                    console.log('Updated task data:', updatedTask);
+                    setIsHabitDel(null); // Reset sub-task index if needed
+                }
+
+                return updatedTask;
+
+            } else {
+                console.error('No task found with the given created_at ID.');
+                return null;
+            }
+        } catch (error: any) {
+            console.error('Error updating sub_task:', error.message || error);
+            return null;
+        }
+    }
+
+
     return (
         <div className='w-full h-full'>
             <header className='p-3 flex items-center h-auto pb-2 justify-between border-b-[#535353] border-b-[1px] overflow-auto'>
@@ -570,7 +695,7 @@ const ViewGoal: React.FC = () => {
                                                 fetchedData != null && fetchedData[0]?.sub_tasks?.map((itm: subtaskType, idx: number) => (
                                                     <div
                                                         key={idx}
-                                                        className={`${itm?.is_done && 'bg-[#535353]'} flex flex-col gap-2  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]`}>
+                                                        className={`${itm?.is_done && 'bg-[#535353]'} overflow-hidden flex flex-col gap-2  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]`}>
                                                         <div>
                                                             {
                                                                 subTaskIdx === idx ?
@@ -693,14 +818,97 @@ const ViewGoal: React.FC = () => {
                                                 fetchedData != null && fetchedData[0]?.habits?.map((itm: habitsType, idx: number) => (
                                                     <div
                                                         key={idx}
-                                                        className='flex gap-1  items-center justify-between bg-[#203296] text-[#fff] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
+                                                        className='flex gap-1 flex-col overflow-auto  items-start justify-between bg-[#203296] text-[#fff] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
                                                         <div>
                                                             <div className={`text-md font-bold break-all`}>
-                                                                {itm?.habit}
+                                                                {
+                                                                    idx === isOpenEditOfHabit ?
+                                                                        <input
+                                                                            value={habitEdit}
+                                                                            maxLength={50}
+                                                                            onChange={(e) => { setHabitEdit(e.target.value) }}
+                                                                            placeholder='Rename your task'
+                                                                            className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] '
+                                                                            type="text" />
+                                                                        :
+                                                                        itm?.habit
+                                                                }
                                                             </div>
                                                             <p className={`  text-sm text-[#888]`}>
-                                                                {itm?.repeat}
+
+                                                                {
+                                                                    idx === isOpenEditOfHabit
+                                                                        ?
+                                                                        <select
+                                                                            value={repHabitEdit}
+                                                                            onChange={(e) => { setHabitDate(e.target.value) }}
+                                                                            className='p-3 rounded-lg bg-[#111111] outline-none mt-2 border-[#535353] border-[1px] w-full text-[#888]'
+                                                                            name="" id="">
+                                                                            <option value="">Repetition</option>
+                                                                            <option value="daily">Daily</option>
+                                                                            <option value="weekly">Weekly</option>
+                                                                            <option value="monthly">Monthly</option>
+                                                                            <option value="yearly">Yearly</option>
+                                                                            <option value="weekday">Every Weekday (Mon-Fri)</option>
+                                                                            <option value="weekend">Every Weekend</option>
+                                                                            <option value="bi-weekly">Bi-weekly</option>
+                                                                            <option value="quarterly">Quarterly</option>
+                                                                            <option value="never">Never</option>
+                                                                        </select>
+                                                                        :
+                                                                        itm?.repeat
+                                                                }
                                                             </p>
+                                                        </div>
+
+                                                        <div className='mt-2 flex gap-2'>
+                                                            {
+                                                                idx === isOpenEditOfHabit ?
+                                                                    (
+                                                                        <>
+                                                                            <div
+                                                                                onClick={() => { setIsOpenHabit(null) }}
+                                                                                className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                Cancel
+                                                                            </div>
+                                                                            <div
+                                                                                onClick={() => { renameHabit(idx) }}
+                                                                                className='flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                Save
+                                                                            </div>
+                                                                        </>
+                                                                    )
+                                                                    :
+                                                                    idx === isHabitDel ?
+                                                                        (
+                                                                            <>
+                                                                                <div
+                                                                                    onClick={() => { setIsHabitDel(null) }}
+                                                                                    className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                    Cancel
+                                                                                </div>
+                                                                                <div
+                                                                                    onClick={() => { deleteHabit(idx) }}
+                                                                                    className='flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                    Delete
+                                                                                </div>
+                                                                            </>
+                                                                        )
+                                                                        :
+
+                                                                        <>
+                                                                            <div
+                                                                                onClick={() => { getValueOfHabit(itm?.habit, idx, itm?.repeat) }}
+                                                                                className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                Edit
+                                                                            </div>
+                                                                            <div
+                                                                                onClick={() => { setIsHabitDel(idx) }}
+                                                                                className='flex gap-1 items-center text-center text-red-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                Delete
+                                                                            </div>
+                                                                        </>
+                                                            }
                                                         </div>
 
                                                     </div>
@@ -755,7 +963,7 @@ const ViewGoal: React.FC = () => {
                                         <div className='flex items-start'>
                                             <div
                                                 className='flex gap-1  items-center justify-between bg-[#5e1414]  border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
-                                                <MdDelete />  Delete habit
+                                                <MdDelete />  Delete goal
                                             </div>
                                         </div>
                                     </div>

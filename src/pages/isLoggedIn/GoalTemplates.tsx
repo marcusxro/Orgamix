@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IoChevronBackOutline } from "react-icons/io5";
 import NoUserProfile from '../../assets/UserNoProfile.jpg'
@@ -6,13 +6,57 @@ import { LuLayoutDashboard } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import Marquee from 'react-fast-marquee'
 import { MdPublish } from "react-icons/md";
+import CreateGoals from '../../comps/System/CreateGoals';
+import ChooseMethod from '../../comps/System/ChooseMethod';
+import useStore from '../../Zustand/UseStore';
+import ImportGoals from '../../comps/System/ImportGoals';
 
 const GoalTemplates: React.FC = () => {
     const nav = useNavigate()
+    const [isOpenCreate, setIsOpenCreate] = useState<boolean>(false)
+    const [goalListener, setGoalListener] = useState<boolean>(false)
+
+    const { showCreate, setShowCreate }: any = useStore()
+
+
+    useEffect(() => {
+        console.log("this is at template", showCreate)
+    }, [showCreate])
 
 
     return (
         <div className='w-full h-full'>
+
+            {
+                isOpenCreate &&
+                <div
+                    onClick={() => { setIsOpenCreate(prevClick => !prevClick) }}
+                    className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
+                    <ChooseMethod closer={setIsOpenCreate} />
+                    {/* <CreateGoals listener={setGoalListener} purpose='Modal' closer={setIsOpenCreate} location="template" /> */}
+                </div>
+            }
+            {
+                showCreate === "Create" &&
+                <div
+                    onClick={() => { setShowCreate("") }}
+                    className='ml-auto positioners flex items-center justify-end p-3 w-full h-full'>
+                    <CreateGoals listener={setGoalListener} purpose='Modal' closer={setShowCreate} location="template" />
+                </div>
+
+            }
+
+            {
+                showCreate === "Import" &&
+                <div
+                    onClick={() => { setShowCreate("") }}
+                    className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
+                    <ImportGoals />
+                </div>
+            }
+
+
+
             <header className='p-3 flex items-center h-auto pb-2 justify-between border-b-[#535353] border-b-[1px] overflow-auto'>
                 <div className='flex items-center h-auto pb-2 justify-between w-full max-w-[1200px] mx-auto'>
                     <div className='flex gap-3 items-center'>
@@ -21,9 +65,9 @@ const GoalTemplates: React.FC = () => {
                                 className='w-full h-full'
                                 src={NoUserProfile} alt="" />
                         </div>
-                        <div 
-                        onClick={() => {nav(-1)}}
-                        className='flex gap-1 hover:bg-[#535353] items-center bg-[#313131] 
+                        <div
+                            onClick={() => { nav(-1) }}
+                            className='flex gap-1 hover:bg-[#535353] items-center bg-[#313131] 
                         border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3'><IoChevronBackOutline /> Back</div>
                     </div>
                     <div className='flex gap-3 items-center'>
@@ -78,6 +122,7 @@ const GoalTemplates: React.FC = () => {
                 <div className='flex items-start mt-4 gap-2 justify-between flex-col md:flex-row'>
                     <div className='flex gap-3 items-center'>
                         <div
+                            onClick={() => { setIsOpenCreate(prevCLick => !prevCLick) }}
                             className='flex gap-1 items-center bg-[#476d4a] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 md:p-2 px-3 hover:bg-[#535353]'>
                             <span className='hidden md:block'>Create a Template</span> <MdPublish />
                         </div>

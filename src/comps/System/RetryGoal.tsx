@@ -75,7 +75,7 @@ const RetryGoal: React.FC<closerType> = ({ closer }) => {
         <div
             onClick={(e) => { e.stopPropagation() }}
             className='w-full max-w-[550px] bg-[#313131]  z-[5000] relative
-            rounded-lg p-3 h-full max-h-[600px] border-[#535353] border-[1px] justify-between flex flex-col overflow-auto'>
+            rounded-lg p-3 h-full max-h-[300px] border-[#535353] border-[1px] justify-between flex flex-col overflow-auto'>
             <div>
 
                 <div className='text-xl font-bold'>

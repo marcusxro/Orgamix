@@ -10,6 +10,7 @@ import { MdOutlineQueryStats } from "react-icons/md";
 import { MdDateRange } from "react-icons/md";
 import { LuLayoutTemplate } from "react-icons/lu";
 import { useNavigate } from 'react-router-dom';
+import Loader from '../../comps/Loader';
 
 
 
@@ -42,6 +43,7 @@ const Goals: React.FC = () => {
     const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(true)
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
 
+
     const nav = useNavigate()
     const [user] = IsLoggedIn()
 
@@ -64,7 +66,6 @@ const Goals: React.FC = () => {
                 console.error('Error fetching data:', error);
             } else {
                 setFetchedData(data);
-                console.log(data)
             }
         } catch (err) {
             console.log(err);
@@ -151,26 +152,28 @@ const Goals: React.FC = () => {
         } else if (daysDiff > 0 && boolVal) {
             return (
                 <div className='text-sm text-[#2ecc71] flex gap-1 items-center'>
-                        Completed
-              </div>
+                    Completed
+                </div>
             )
         }
-        
+
         else {
             return (
                 <div className='text-sm text-[#cc0000] flex gap-1 items-center'>
-                  Failed
+                    Failed
                 </div>
             );
         }
     }
+
+
 
     return (
         <div>
             <Sidebar location='Goals' />
 
 
-            <div className={`ml-[86px] p-3 flex gap-3 h-[100dvh] mr-[0px] ${isOpenSidebar && "lg:mr-[370px]"}`}>
+            <div className={`ml-[86px] p-3 flex gap-3 h-[100dvh] mr-[0px] pb-9  ${isOpenSidebar && "lg:mr-[370px]"}`}>
                 <div className='w-full h-full'>
                     <div>
                         <div
@@ -198,63 +201,72 @@ const Goals: React.FC = () => {
                             <LuLayoutTemplate />
                         </div>
                     </div>
-                    <div className='flex flex-wrap gap-3 mt-2'>
+                    <div className='flex flex-wrap gap-3 mt-2 pb-5'>
                         {
-                            fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
-                                <div
-                                    onClick={() => {
-                                        nav(`/user/goals/templates/${user?.uid}/${itm?.created_at}`)
-                                    }}
-                                    key={idx}
-                                    className='w-full max-w-[300px] bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden'>
+                            fetchedData === null ?
+                            <div className='w-[20px] h-[20px]'>
+                                <Loader />
+                            </div>
+                            :
+                        <>
+                            {
+                                fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
+                                    <div
+                                        onClick={() => {
+                                            nav(`/user/goals/templates/${user?.uid}/${itm?.created_at}`)
+                                        }}
+                                        key={idx}
+                                        className='w-full max-w-[300px] bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden'>
 
-                                    <div className='flex h-[110px] items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
-                                        <div
-                                            style={{ backgroundColor: determineDate(itm?.deadline) }}
-                                            className={`w-[2px] h-full`}>
+                                        <div className='flex h-[110px] items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
+                                            <div
+                                                style={{ backgroundColor: determineDate(itm?.deadline) }}
+                                                className={`w-[2px] h-full`}>
+                                            </div>
+
+                                            <div className='flex flex-col p-3'>
+                                                <div className='font-bold mb-1'>
+                                                    {itm?.title}
+                                                </div>
+                                                <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                    <BiCategory />{itm?.category}
+                                                </div>
+                                                <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                    <MdOutlineQueryStats />
+                                                    {isFailed(itm?.deadline, itm?.is_done)}
+                                                </div>
+
+                                                {checkDeadlineMet(itm?.deadline)}
+                                            </div>
                                         </div>
 
-                                        <div className='flex flex-col p-3'>
-                                            <div className='font-bold mb-1'>
-                                                {itm?.title}
-                                            </div>
-                                            <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                <BiCategory />{itm?.category}
-                                            </div>
-                                            <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                <MdOutlineQueryStats />
-                                                {isFailed(itm?.deadline, itm?.is_done)}
+                                        <div className='flex justify-between items-center p-3 text-[#888] gap-2'>
+                                            <div>
+                                                {itm?.sub_tasks.filter((itmz) => itmz.is_done).length}
+                                                /
+                                                {itm?.sub_tasks.length}
                                             </div>
 
-                                            {checkDeadlineMet(itm?.deadline)}
+
+                                            <div>
+                                                {itm?.created_at
+                                                    ? moment(parseInt(itm?.created_at.toString())).format('MMMM Do YYYY')
+                                                    : 'No Creation date'}
+                                            </div>
                                         </div>
+
+
                                     </div>
-
-                                    <div className='flex justify-between items-center p-3 text-[#888] gap-2'>
-                                        <div>
-                                            {itm?.sub_tasks.filter((itmz) => itmz.is_done).length}
-                                            /
-                                            {itm?.sub_tasks.length}
-                                        </div>
-
-
-                                        <div>
-                                            {itm?.created_at
-                                                ? moment(parseInt(itm?.created_at.toString())).format('MMMM Do YYYY')
-                                                : 'No Creation date'}
-                                        </div>
-                                    </div>
-
-
-                                </div>
-                            ))
+                                ))
+                            }
+                        </>
                         }
                     </div>
                 </div>
                 {
                     isOpenSidebar &&
                     <div className='ml-auto stickyPostion hidden lg:block'>
-                        <CreateGoals listener={setGoalListener} purpose="Sidebar" closer={setIsOpenModal} />
+                        <CreateGoals listener={setGoalListener} purpose="Sidebar" closer={setIsOpenModal} location="goals" />
                     </div>
                 }
 
@@ -265,7 +277,7 @@ const Goals: React.FC = () => {
                             setIsOpenModal(prevClick => !prevClick)
                         }}
                         className='ml-auto positioners flex items-end justify-end w-full h-full lg:hidden'>
-                        <CreateGoals listener={setGoalListener} purpose="Modal" closer={setIsOpenModal} />
+                        <CreateGoals listener={setGoalListener} purpose="Modal" closer={setIsOpenModal} location='goals' />
                     </div>
                 }
 

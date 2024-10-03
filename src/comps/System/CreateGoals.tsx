@@ -4,6 +4,7 @@ import { FaPlus } from "react-icons/fa6";
 import { RxUpdate } from "react-icons/rx";
 import { supabase } from '../../supabase/supabaseClient';
 import Loader from '../Loader';
+import useStore from '../../Zustand/UseStore';
 
 
 interface SubTasksType {
@@ -20,11 +21,12 @@ interface HabitsType {
 interface listenerType {
     listener: React.Dispatch<React.SetStateAction<boolean>>;
     purpose: string;
-    closer: React.Dispatch<React.SetStateAction<boolean>>
+    closer: React.Dispatch<React.SetStateAction<boolean>>;
+    location: string
 }
 
 
-const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer }) => {
+const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, location }) => {
     const [user] = IsLoggedIn()
     const [loading, setLoading] = useState<boolean>(false)
     const [title, setTitle] = useState<string>("")
@@ -34,6 +36,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer }) => {
     const [subTasks, setSubTasks] = useState<SubTasksType[] | null>([])
     const [newSubTask, setNewSubTask] = useState<string>('');
     const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track which task is being edited
+    const { showCreate, setShowCreate}: any = useStore()
 
 
     const [habits, setHabits] = useState<HabitsType[]>([]);
@@ -145,6 +148,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer }) => {
 
     async function createNewGoal() {
 
+        if(location != 'goals') return
 
         setLoading(true)
 
@@ -399,7 +403,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer }) => {
                     <div className='w-full  flex rounded-lg overflow-hidden mt-2 border-[#535353] border-[1px]'>
                         <div
                         onClick={() => {
-                            closer(prevs=>!prevs)
+                            closer(prevs=>!prevs); setShowCreate(!showCreate)
                         }}
                             className='bg-[#583c3c] flex items-center justify-center w-full border-r-[#535353] border-r-[1px]  p-3 text-center cursor-pointer  hover:bg-[#535353] '>Cancel</div>
                         <div
