@@ -260,7 +260,7 @@ const ViewGoal: React.FC = () => {
                     onClick={() => { setIsOpenDate(prevs => !prevs) }}
                     className='flex items-start mt-2'>
                     <div
-                        className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
+                        className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
                         Retry Goal
                     </div>
                 </div>
@@ -416,7 +416,7 @@ const ViewGoal: React.FC = () => {
 
                 const updatedSubTasks = task.sub_tasks.map((subTask: subtaskType, index: number) => {
                     if (index === idx) {
-                        return { ...subTask, subGoal: subTaskEdit};
+                        return { ...subTask, subGoal: subTaskEdit };
                     }
                     return subTask;
                 });
@@ -470,7 +470,7 @@ const ViewGoal: React.FC = () => {
                 // Update the habit at the specified index
                 const updatedHabits = habits.habits.map((habitItem: habitsType, index: number) => {
                     if (index === idx) {
-                        return { ...habitItem, habit: habitEdit, repeat: repHabitEdit}; // Correctly update the habit
+                        return { ...habitItem, habit: habitEdit, repeat: repHabitEdit }; // Correctly update the habit
                     }
                     return habitItem; //return unchanged
                 });
@@ -619,16 +619,16 @@ const ViewGoal: React.FC = () => {
                         </div>
                         <div
                             onClick={() => { nav(-1) }}
-                            className='flex gap-1 hover:bg-[#535353] items-center bg-[#313131] 
+                            className='flex gap-1 hover:bg-[#222222]  items-center bg-[#313131] 
                         border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3'><IoChevronBackOutline /> Back</div>
                     </div>
                     <div className='flex gap-3 items-center'>
                         <div
-                            className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
+                            className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
                             Dashboard <LuLayoutDashboard />
                         </div>
                         <div
-                            className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 md:p-2 px-3 hover:bg-[#535353]'>
+                            className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 md:p-2 px-3 hover:bg-[#222222] '>
                             <span className='hidden md:block'>Settings</span> <IoSettingsOutline />
                         </div>
                     </div>
@@ -695,7 +695,7 @@ const ViewGoal: React.FC = () => {
                                                 fetchedData != null && fetchedData[0]?.sub_tasks?.map((itm: subtaskType, idx: number) => (
                                                     <div
                                                         key={idx}
-                                                        className={`${itm?.is_done && 'bg-[#535353]'} overflow-hidden flex flex-col gap-2  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]`}>
+                                                        className={`${itm?.is_done && 'bg-[#535353]'} overflow-hidden flex flex-col gap-2  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] `}>
                                                         <div>
                                                             {
                                                                 subTaskIdx === idx ?
@@ -704,7 +704,7 @@ const ViewGoal: React.FC = () => {
                                                                         maxLength={50}
                                                                         onChange={(e) => { setSubTaskEdit(e.target.value) }}
                                                                         placeholder='Rename your task'
-                                                                        className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] '
+                                                                        className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
                                                                         type="text" />
                                                                     :
                                                                     <div className={`${itm?.is_done && 'line-through'} text-md font-bold break-all`}>
@@ -725,7 +725,7 @@ const ViewGoal: React.FC = () => {
                                                                     (<>
                                                                         <div
                                                                             onClick={() => { setSubTaskIdx(null) }}
-                                                                            className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                            className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
 
                                                                             Cancel
                                                                         </div>
@@ -734,7 +734,7 @@ const ViewGoal: React.FC = () => {
                                                                             onClick={() => {
                                                                                 renameTask(idx)
                                                                             }}
-                                                                            className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                            className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
 
                                                                             Save
                                                                         </div>
@@ -745,7 +745,7 @@ const ViewGoal: React.FC = () => {
                                                                             <>
                                                                                 <div
                                                                                     onClick={() => { setIsDeleteTask(null) }}
-                                                                                    className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                    className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353]'>
 
                                                                                     Cancel
                                                                                 </div>
@@ -754,7 +754,7 @@ const ViewGoal: React.FC = () => {
                                                                                     onClick={() => {
                                                                                         deleteTask(idx)
                                                                                     }}
-                                                                                    className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                    className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
 
                                                                                     Delete
                                                                                 </div>
@@ -766,7 +766,7 @@ const ViewGoal: React.FC = () => {
                                                                                 onClick={() => {
                                                                                     markSubTasksAsDone(idx, itm?.is_done ? false : true)
                                                                                 }}
-                                                                                className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
                                                                                 {
                                                                                     itm?.is_done ?
                                                                                         <div className='text-[#cc0000]'>
@@ -778,12 +778,12 @@ const ViewGoal: React.FC = () => {
                                                                             </div>
                                                                             <div
                                                                                 onClick={() => { getValue(itm?.subGoal, idx) }}
-                                                                                className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353]'>
                                                                                 EDIT
                                                                             </div>
                                                                             <div
                                                                                 onClick={() => { setIsDeleteTask(idx) }}
-                                                                                className='flex gap-1 items-center text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='flex gap-1 items-center text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353]'>
                                                                                 DELETE
                                                                             </div>
                                                                         </>
@@ -803,7 +803,7 @@ const ViewGoal: React.FC = () => {
                                                 />
                                                 <div
                                                     onClick={() => { addNewSubTask("task") }} // Call the function to add the new task
-                                                    className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 px-3 hover:bg-[#535353] ml-2'>
+                                                    className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 px-3 hover:bg-[#222222]  ml-2'>
                                                     <FaPlus />
                                                 </div>
                                             </div>
@@ -818,7 +818,7 @@ const ViewGoal: React.FC = () => {
                                                 fetchedData != null && fetchedData[0]?.habits?.map((itm: habitsType, idx: number) => (
                                                     <div
                                                         key={idx}
-                                                        className='flex gap-1 flex-col overflow-auto  items-start justify-between bg-[#203296] text-[#fff] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
+                                                        className='flex gap-1 flex-col overflow-auto  items-start justify-between bg-[#203296] text-[#fff] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
                                                         <div>
                                                             <div className={`text-md font-bold break-all`}>
                                                                 {
@@ -828,7 +828,7 @@ const ViewGoal: React.FC = () => {
                                                                             maxLength={50}
                                                                             onChange={(e) => { setHabitEdit(e.target.value) }}
                                                                             placeholder='Rename your task'
-                                                                            className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] '
+                                                                            className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
                                                                             type="text" />
                                                                         :
                                                                         itm?.habit
@@ -868,12 +868,12 @@ const ViewGoal: React.FC = () => {
                                                                         <>
                                                                             <div
                                                                                 onClick={() => { setIsOpenHabit(null) }}
-                                                                                className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                 Cancel
                                                                             </div>
                                                                             <div
                                                                                 onClick={() => { renameHabit(idx) }}
-                                                                                className='flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                 Save
                                                                             </div>
                                                                         </>
@@ -884,12 +884,12 @@ const ViewGoal: React.FC = () => {
                                                                             <>
                                                                                 <div
                                                                                     onClick={() => { setIsHabitDel(null) }}
-                                                                                    className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                    className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                     Cancel
                                                                                 </div>
                                                                                 <div
                                                                                     onClick={() => { deleteHabit(idx) }}
-                                                                                    className='flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                    className='hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                     Delete
                                                                                 </div>
                                                                             </>
@@ -899,12 +899,12 @@ const ViewGoal: React.FC = () => {
                                                                         <>
                                                                             <div
                                                                                 onClick={() => { getValueOfHabit(itm?.habit, idx, itm?.repeat) }}
-                                                                                className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                 Edit
                                                                             </div>
                                                                             <div
                                                                                 onClick={() => { setIsHabitDel(idx) }}
-                                                                                className='flex gap-1 items-center text-center text-red-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='hover:bg-[#535353] flex gap-1 items-center text-center text-red-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                 Delete
                                                                             </div>
                                                                         </>
@@ -944,7 +944,7 @@ const ViewGoal: React.FC = () => {
                                             </div>
                                             <div
                                                 onClick={() => { addNewSubTask("habit") }} // Call the function to add the new task
-                                                className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3  px-3 hover:bg-[#535353] ml-2'>
+                                                className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3  px-3 hover:bg-[#222222]  ml-2'>
                                                 <FaPlus />
                                             </div>
                                         </div>
@@ -962,7 +962,7 @@ const ViewGoal: React.FC = () => {
 
                                         <div className='flex items-start'>
                                             <div
-                                                className='flex gap-1  items-center justify-between bg-[#5e1414]  border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
+                                                className='flex gap-1  items-center justify-between bg-[#5e1414]  border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
                                                 <MdDelete />  Delete goal
                                             </div>
                                         </div>

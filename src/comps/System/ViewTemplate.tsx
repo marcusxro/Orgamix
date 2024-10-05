@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import useStore from '../../Zustand/UseStore'
 import { supabase } from '../../supabase/supabaseClient'
-import IsLoggedIn from '../../firebase/IsLoggedIn'
+import IsLoggedIn from '../../firebase/IsLoggedIn';
 import { FaPlus } from "react-icons/fa6";
 import { GoTasklist } from "react-icons/go";
 import { GiDna2 } from "react-icons/gi";
 import Loader from '../Loader';
-
 
 interface subtaskType {
     is_done: boolean;
@@ -17,6 +16,7 @@ interface habitsType {
     repeat: string;
     habit: string;
 }
+
 interface dataType {
     userid: string;
     id: number;
@@ -28,102 +28,20 @@ interface dataType {
     sub_tasks: subtaskType[];
     habits: habitsType[];
     deadline: string;
+    authorUid: string;
+    download_count: number
 }
 
-const UploadImport = () => {
-    const { createdAt, setCreatedAt, setShowCreate } = useStore()
-    const [user] = IsLoggedIn()
+const ViewTemplate = () => {
+
+    const { templateID, setTemplateID } = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
+    const [loading, setLoading] = useState<boolean>(false)
     const [title, setTitle] = useState<string>('');
     const [description, setDesc] = useState<string>('');
     const [category, setCat] = useState<string>('');
-    const [loading, setLoading] = useState<boolean>(false)
-
-    const handleHabitInputChange = (e: any) => {
-        setNewHabit(e.target.value);
-    };
-
-
-    useEffect(() => {
-        if (fetchedData && fetchedData.length > 0 && !title && !description && !category) {
-            setTitle(fetchedData[0].title || '');
-            setDesc(fetchedData[0].description || '');
-            setCat(fetchedData[0].category || '');
-        }
-    }, [fetchedData]);
-
-    useEffect(() => {
-        if (user) {
-            getGoalByIds()
-
-            const subscription = supabase
-                .channel('public:goals')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, (payload) => {
-                    console.log('Realtime event:', payload);
-                    handleRealtimeEvent(payload);
-                })
-                .subscribe();
-            return () => {
-                subscription.unsubscribe();
-            };
-        }
-    }, [user])
-
-
-    const handleRealtimeEvent = (payload: any) => {
-        switch (payload.eventType) {
-            case 'INSERT':
-                setFetchedData((prevData) =>
-                    prevData ? [...prevData, payload.new] : [payload.new]
-                );
-                break;
-            case 'UPDATE':
-                setFetchedData((prevData) =>
-                    prevData
-                        ? prevData.map((item) =>
-                            item.id === payload.new.id ? payload.new : item
-                        )
-                        : [payload.new]
-                );
-                break;
-            case 'DELETE':
-                console.log("DELETED")
-                setFetchedData((prevData) =>
-                    prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
-                );
-                break;
-            default:
-                break;
-        }
-    };
-
-
-    async function getGoalByIds() {
-        try {
-            const { data, error } = await supabase
-                .from('goals')
-                .select('*')
-                .eq('userid', user?.uid)
-                .eq('created_at', createdAt)
-
-            if (error) {
-                console.log(error)
-            } else {
-                setFetchedData(data)
-            }
-        }
-        catch (err) {
-            console.log(err)
-        }
-    }
-
-
-    useEffect(() => {
-        console.log(title)
-    }, [title])
-
-
-
+    const [user] = IsLoggedIn()
+    const [deadlineVal, setDeadlineVal] = useState<string>('')
     const [subTaskEdit, setSubTaskEdit] = useState<string>('')
     const [subTaskIdx, setSubTaskIdx] = useState<number | null>(null)
     const [newSubTask, setNewSubTask] = useState('');
@@ -138,7 +56,13 @@ const UploadImport = () => {
     const [repHabit, setRepHabit] = useState('');
     const [newHabit, setNewHabit] = useState('');
 
-
+    useEffect(() => {
+        if (fetchedData && fetchedData.length > 0 && !title && !description && !category) {
+            setTitle(fetchedData[0].title || '');
+            setDesc(fetchedData[0].description || '');
+            setCat(fetchedData[0].category || '');
+        }
+    }, [fetchedData]);
 
     function getValue(params: string, idx: number) {
         setSubTaskEdit(params || '')
@@ -148,6 +72,11 @@ const UploadImport = () => {
 
     const handleInputChange = (e: any) => {
         setNewSubTask(e.target.value);
+    };
+
+
+    const handleHabitInputChange = (e: any) => {
+        setNewHabit(e.target.value);
     };
 
 
@@ -379,68 +308,133 @@ const UploadImport = () => {
     };
 
 
-    async function passToTemplates() {
-        setLoading(true)
 
-        if(loading) return
-        if(!fetchedData) return
 
-        try {
 
-            if (fetchedData) {
-                const updatedTasks = fetchedData[0]?.sub_tasks.map((goals: subtaskType) => {
-                        return { ...goals, is_done: false}; 
-                
-                });
 
-                const { error } = await supabase
-                    .from('templates')
-                    .insert({
-                        title: title,
-                        description: description,
-                        category: category,
-                        is_done: false,
-                        created_at: Date.now(),
-                        sub_tasks: updatedTasks,
-                        habits: fetchedData[0]?.habits,
-                        authorUid: user?.uid,
-                        userid: "",
-                        download_count: 0,
-                        deadline: ""
-                    })
 
-                if (error) {
-                    console.log(error)
-                    setLoading(false)
+    useEffect(() => {
+        if (user && templateID != '') {
+            getTemplateByID()
+            const subscription = supabase
+                .channel('public:templates')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'templates' }, (payload) => {
+                    console.log('Realtime event:', payload);
+                    handleRealtimeEvent(payload);
+                })
+                .subscribe();
+            return () => {
+                subscription.unsubscribe();
+            };
 
-                } else {
-                    console.log("Data saved")
-                    setLoading(false)
-                    setShowCreate("")
-                    setCreatedAt("")
-                }
-            }
         }
-        catch (err) {
-            console.log(err)
-            setLoading(false)
+    }, [user, templateID])
+
+
+    const handleRealtimeEvent = (payload: any) => {
+        switch (payload.eventType) {
+            case 'INSERT':
+                setFetchedData((prevData) =>
+                    prevData ? [...prevData, payload.new] : [payload.new]
+                );
+                break;
+            case 'UPDATE':
+                setFetchedData((prevData) =>
+                    prevData
+                        ? prevData.map((item) =>
+                            item.id === payload.new.id ? payload.new : item
+                        )
+                        : [payload.new]
+                );
+                break;
+            case 'DELETE':
+                console.log("DELETED")
+                setFetchedData((prevData) =>
+                    prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
+                );
+                break;
+            default:
+                break;
+        }
+    };
+
+    async function getTemplateByID() {
+        try {
+            const { data, error } = await supabase
+                .from('templates')
+                .select('*')
+                .eq('created_at', templateID)
+
+            if (error) {
+                console.error('Error fetching data:', error);
+            } else {
+                setFetchedData(data);
+            }
+        } catch (err) {
+            console.log(err);
         }
     }
 
+    async function downloadGoal() {
+        if (!fetchedData) return;
+        if (deadlineVal === "") return;
+    
+        try {
+            // Update download_count
+            const { data: updateData, error: updateError } = await supabase
+                .from('templates')
+                .update({
+                    download_count: (fetchedData[0]?.download_count || 0) + 1, // Increment the current count
+                })
+                .eq('created_at', templateID);
+    
+            if (updateError) {
+                console.error('Error updating download_count:', updateError);
+                return; // Exit if update fails
+            } else {
+                console.log("Updated download count:", updateData);
+            }
+    
+            // Insert new goal
+            const { data: insertData, error: insertError } = await supabase
+                .from('goals')
+                .insert({
+                    title: fetchedData[0]?.title,
+                    category: fetchedData[0]?.category,
+                    is_done: false,
+                    created_at: new Date(), // Use ISO format for timestamps
+                    userid: user?.uid,
+                    deadline: deadlineVal,
+                    description: fetchedData[0]?.description,
+                    sub_tasks: fetchedData[0]?.sub_tasks,
+                    habits: fetchedData[0]?.habits
+                });
+    
+            if (insertError) {
+                console.error('Error inserting new goal:', insertError);
+            } else {
+                console.log('Inserted new goal:', insertData);
+                setTemplateID("")
+            }
+    
+        } catch (err) {
+            console.error('Error in downloadGoal function:', err);
+        }
+    }
+    
 
     return (
         <div
             onClick={(e) => { e.stopPropagation() }}
             className='w-full max-w-[550px] bg-[#313131]  z-[5000] relative
-    rounded-lg p-3 h-full max-h-[800px] border-[#535353] border-[1px] justify-between flex flex-col overflow-auto'>
-
+    rounded-lg p-3 h-full max-h-[800px] border-[#535353] border-[1px] 
+    justify-between flex flex-col overflow-auto'>
             <div className='overflow-auto h-full flex flex-col justify-start'>
                 <div>
-                    <div className='text-xl font-bold'>Finishing touches</div>
-                    <p className='text-sm text-[#888] mt-1'>Before your upload you goal, make sure that everything is set!</p>
+                    <div className='text-xl font-bold'>Make it yours!</div>
 
                     <p className='text-sm text-[#888] my-2'>
-                        Please note that once your template is published, all associated subtasks will be marked as "In progress" to ensure users begin with a clean slate.
+                        Just make a few changes based on your preference, and make it yours!
                     </p>
 
                 </div>
@@ -484,6 +478,14 @@ const UploadImport = () => {
                         <option value="Volunteering">Volunteering</option>
                         <option value="Family">Family</option>
                     </select>
+                    <div className='flex flex-col gap-2'>
+                        <div>Deadline</div>
+                        <input
+                            value={deadlineVal}
+                            onChange={(e) => {setDeadlineVal(e.target.value)}}
+                            className='p-3 rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  text-[#888]'
+                            type="date" />
+                    </div>
                 </div>
 
                 <div className='mt-4'>
@@ -731,35 +733,30 @@ const UploadImport = () => {
 
             </div>
 
-            <div className='w-full flex gap-3 mt-2'>
-                <div
-                    onClick={() => { (!loading && setShowCreate("Import"))}}
-                    className='p-3 rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  text-[#888] cursor-pointer hover:bg-[#222222]'>
-                    Back
-                </div>
+   
 
-                <div className='w-full flex border-[#535353] border-[1px] overflow-hidden rounded-lg'>
+                <div className='w-full flex border-[#535353] border-[1px] overflow-hidden rounded-lg mt-2'>
                     <div
-                        onClick={() => { (!loading && setShowCreate(""))}}
+                        onClick={() => { (!loading && setTemplateID("")) }}
                         className='p-3 bg-[#111111] outline-none  text-center border-r-[#535353] border-r-[1px] cursor-pointer text-[#888] w-full hover:bg-[#222222]'>
                         Cancel
                     </div>
-                    <div 
-                    onClick={() => {passToTemplates()}}
-                    className={`${loading && 'bg-[#535353] flex items-center justify-center'} p-3 bg-[#111111] outline-none  text-center text-[#888] w-full cursor-pointer hover:bg-[#222222]`}>
+                    <div
+                        onClick={() => { downloadGoal() }}
+                        className={`${loading && 'bg-[#535353] flex items-center justify-center'} p-3 bg-[#111111] outline-none  text-center text-[#888] w-full cursor-pointer hover:bg-[#222222]`}>
                         {
                             loading ?
-                            <div className='w-[20px] h-[20px]'>
-                                <Loader />
-                            </div>
-                            :
-                            "Save"
+                                <div className='w-[20px] h-[20px]'>
+                                    <Loader />
+                                </div>
+                                :
+                                "Download"
                         }
                     </div>
                 </div>
-            </div>
+   
         </div>
     )
 }
 
-export default UploadImport
+export default ViewTemplate

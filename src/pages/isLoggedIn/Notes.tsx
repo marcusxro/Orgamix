@@ -155,7 +155,7 @@ const Notes = () => {
                                         }}
                                         key={idx}
                                         className='w-full max-w-[150px] h-full max-h-[150px] overflow-auto
-                                    flex items-start justify-start flex-col bg-[#313131] p-3 border-[#535353] border-[1px] cursor-pointer rounded-lg text-3xl hover:bg-[#535353]'>
+                                    flex items-start justify-start flex-col bg-[#313131] p-3 border-[#535353] border-[1px] cursor-pointer rounded-lg text-3xl hover:bg-[#222222] '>
                                         <div className='font-bold text-sm'>
                                             {itm?.title}
                                         </div>

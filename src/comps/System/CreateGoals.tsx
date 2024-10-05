@@ -26,7 +26,7 @@ interface listenerType {
 }
 
 
-const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, location }) => {
+const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => {
     const [user] = IsLoggedIn()
     const [loading, setLoading] = useState<boolean>(false)
     const [title, setTitle] = useState<string>("")
@@ -36,7 +36,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
     const [subTasks, setSubTasks] = useState<SubTasksType[] | null>([])
     const [newSubTask, setNewSubTask] = useState<string>('');
     const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track which task is being edited
-    const { showCreate, setShowCreate}: any = useStore()
+    const { setShowCreate }: any = useStore()
 
 
     const [habits, setHabits] = useState<HabitsType[]>([]);
@@ -118,10 +118,10 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
     };
 
     const editHabit = (index: number) => {
-        if (habits[index]) { 
+        if (habits[index]) {
             const habitToEdit = habits[index];
-            setNewHabit(habitToEdit.habit); 
-            setEditingIndexHabit(index);   
+            setNewHabit(habitToEdit.habit);
+            setEditingIndexHabit(index);
             setHabitRep(habitToEdit.repeat)
         }
     };
@@ -148,8 +148,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
 
     async function createNewGoal() {
 
-        if(location != 'goals') return
-
+        console.log("CLICKED")
         setLoading(true)
 
         if (loading) {
@@ -198,36 +197,71 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
             return; // Exit the function if the date has passed
         }
 
-
         try {
-            const { error } = await supabase.from("goals")
-                .insert({
-                    title: title,
-                    category: category,
-                    is_done: false,
-                    created_at: Date.now(),
-                    userid: user?.uid,
-                    deadline: deadline,
-                    description: description,
-                    sub_tasks: subTasks,
-                    habits: habits
-                })
+            if (purpose === "Modals") {
+                const { error } = await supabase
+                    .from("templates")
+                    .insert({
+                        title: title,
+                        category: category,
+                        is_done: false,
+                        created_at: Date.now(),
+                        authorUid: user?.uid,
+                        userid: "",
+                        deadline: "",
+                        description: description,
+                        sub_tasks: subTasks,
+                        habits: habits,
+                        download_count: 0,
+                    })
 
-            if (error) {
-                console.error('Error creating new goal:', error.message);
-                setLoading(false)
-                return;
+                if (error) {
+                    console.error('Error creating new goal:', error.message);
+                    setLoading(false)
+                    return;
+                } else {
+                    setTitle("")
+                    setDeadline("")
+                    setDescription("")
+                    setHabits([])
+                    listener(Prevs => !Prevs)
+                    setSubTasks(null)
+                    setLoading(false)
+                }
+
+                console.log('Goal successfully created');
             } else {
-                setTitle("")
-                setDeadline("")
-                setDescription("")
-                setHabits([])
-                listener(Prevs => !Prevs)
-                setSubTasks(null)
-                setLoading(false)
+                const { error } = await supabase
+                    .from("goals")
+                    .insert({
+                        title: title,
+                        category: category,
+                        is_done: false,
+                        created_at: Date.now(),
+                        userid: user?.uid,
+                        deadline: deadline,
+                        description: description,
+                        sub_tasks: subTasks,
+                        habits: habits
+                    })
+
+                if (error) {
+                    console.error('Error creating new goal:', error.message);
+                    setLoading(false)
+                    return;
+                } else {
+                    setTitle("")
+                    setDeadline("")
+                    setDescription("")
+                    setHabits([])
+                    listener(Prevs => !Prevs)
+                    setSubTasks(null)
+                    setLoading(false)
+                }
+
+                console.log('Goal successfully created');
             }
 
-            console.log('Goal successfully created');
         }
         catch (err) {
             setLoading(false)
@@ -240,9 +274,9 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
     }, [habits])
 
     return (
-        <div 
-        onClick={(e) => {e.stopPropagation()}}
-        className='w-[350px] h-full bg-[#313131] z-[5000]
+        <div
+            onClick={(e) => { e.stopPropagation() }}
+            className='w-[350px] h-full bg-[#313131] z-[5000]
              rounded-lg p-3 border-[#535353] border-[1px] flex flex-col justify-between'>
             <div className='pb-2'>
                 <div className='text-xl font-bold'>Create Goal</div>
@@ -254,12 +288,14 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
             <div className='h-full overflow-auto'>
                 <div className='mt-6 flex flex-col gap-3'>
                     <input
+                        maxLength={40}
                         value={title}
                         onChange={(e) => { setTitle(e.target.value) }}
                         className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
                         type="text" placeholder='Title' />
 
                     <textarea
+
                         value={description}
                         onChange={(e) => { setDescription(e.target.value) }}
                         maxLength={150}
@@ -342,7 +378,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
                     <div className='w-full h-auto mt-4 flex flex-col gap-3'>
                         <div className='flex gap-3'>
                             <input
-
+                                maxLength={40}
                                 className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
                                 type="text"
                                 value={newHabit}
@@ -399,12 +435,12 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
             </div>
 
             {
-                purpose === 'Modal' ?
+                purpose === 'Modal' || purpose === 'Modals' ?
                     <div className='w-full  flex rounded-lg overflow-hidden mt-2 border-[#535353] border-[1px]'>
                         <div
-                        onClick={() => {
-                            closer(prevs=>!prevs); setShowCreate(!showCreate)
-                        }}
+                            onClick={() => {
+                                closer(prevs => !prevs); setShowCreate("")
+                            }}
                             className='bg-[#583c3c] flex items-center justify-center w-full border-r-[#535353] border-r-[1px]  p-3 text-center cursor-pointer  hover:bg-[#535353] '>Cancel</div>
                         <div
                             onClick={() => { createNewGoal() }}

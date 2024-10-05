@@ -52,3 +52,10 @@
   height: 100%;
   z-index: 20000000;
 }
+
+
+.toRight {
+  position: absolute;
+  right: 0;
+  top: 0;
+}

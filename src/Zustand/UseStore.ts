@@ -1,4 +1,3 @@
-// src/store/useStore.ts
 import { create } from 'zustand';
 
 interface AppState {
@@ -11,13 +10,14 @@ interface AppState {
     showCreate: string | null;
     setShowCreate: (params: string) => void;
 
-
     createdAt: string | null;
     setCreatedAt: (params: string) => void;
 
+    templateID: string | null;
+    setTemplateID: (params: string) => void;
+
 }
 
-// Create a single Zustand store with combined state and actions
 const useStore = create<AppState>((set) => ({
     showNotif: false,
     setShowNotif: (params: boolean) => set({ showNotif: params }),
@@ -30,6 +30,10 @@ const useStore = create<AppState>((set) => ({
 
     createdAt: "",
     setCreatedAt: (params: string) => set({ createdAt: params }),
+
+    templateID: "",
+    setTemplateID: (params: string) => set({ templateID: params }),
+
 
 }));
 

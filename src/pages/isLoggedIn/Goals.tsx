@@ -51,9 +51,46 @@ const Goals: React.FC = () => {
     useEffect(() => {
         if (user) {
             fetchGoalsByID()
+            const subscription = supabase
+      .channel('public:goals')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, (payload) => {
+        console.log('Realtime event:', payload);
+        handleRealtimeEvent(payload);
+      })
+      .subscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
         }
     }, [GoalListener, user])
 
+    const handleRealtimeEvent = (payload: any) => {
+        switch (payload.eventType) {
+          case 'INSERT':
+            setFetchedData((prevData) =>
+              prevData ? [...prevData, payload.new] : [payload.new]
+            );
+            break;
+          case 'UPDATE':
+            setFetchedData((prevData) =>
+              prevData
+                ? prevData.map((item) =>
+                    item.id === payload.new.id ? payload.new : item
+                  )
+                : [payload.new]
+            );
+            break;
+          case 'DELETE':
+            console.log("DELETED")
+            setFetchedData((prevData) =>
+              prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
+            );
+            break;
+          default:
+            break;
+        }
+      };
+    
 
     async function fetchGoalsByID() {
         try {
@@ -216,7 +253,7 @@ const Goals: React.FC = () => {
                                             nav(`/user/goals/templates/${user?.uid}/${itm?.created_at}`)
                                         }}
                                         key={idx}
-                                        className='w-full max-w-[300px] bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden'>
+                                        className='w-full max-w-[300px] bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>
 
                                         <div className='flex h-[110px] items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
                                             <div

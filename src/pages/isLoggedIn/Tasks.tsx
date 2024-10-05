@@ -394,7 +394,7 @@ const Tasks: React.FC = () => {
                                         taskData && taskData.length > 0 ? (
                                             taskData.map((itm: taskDataType, idx: number) => (
                                                 <div
-                                                    className='bg-[#313131] overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
+                                                    className='bg-[#313131] hover:bg-[#222222]  overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
                                                     key={idx}>
                                                     <div className='font-bold'>
                                                         {itm?.title}

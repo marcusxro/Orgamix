@@ -5,7 +5,7 @@ import { supabase } from '../../supabase/supabaseClient';
 import { BiCategory } from "react-icons/bi";
 import { MdOutlineQueryStats } from "react-icons/md";
 import { MdDateRange } from "react-icons/md";
-import { create } from 'zustand';
+
 
 interface subtaskType {
     is_done: boolean;
@@ -32,7 +32,7 @@ interface dataType {
 
 const ImportGoals: React.FC = () => {
 
-    const { showCreate, setShowCreate, createdAt, setCreatedAt}: any = useStore()
+    const { showCreate, setShowCreate, createdAt, setCreatedAt }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [originalData, setoriginalData] = useState<dataType[] | null>(null);
     const [isEq, setIsEq] = useState<number | null>(null)
@@ -44,10 +44,8 @@ const ImportGoals: React.FC = () => {
         setSearchVal(params)
     }
 
-    useEffect(() => {
-        setCreatedAt("")
-    }, [])
-        
+
+
     useEffect(() => {
         if (fetchedData && user) {
             // If searchVal is empty, reset to the full array
@@ -198,106 +196,102 @@ const ImportGoals: React.FC = () => {
 
 
     function handleGoEdit() {
-        if(!isEq) return
+        if (!isEq) return
         setCreatedAt(isEq)
-        setShowCreate("")
+        setShowCreate("Upload")
 
     }
 
 
-    useEffect(() => {
-        if(createdAt) console.log(createdAt)
-    }, [createdAt])
-
-
-    
 
     return (
         <div
             onClick={(e) => { e.stopPropagation() }}
             className='w-full max-w-[740px] bg-[#313131]  z-[5000] relative
             rounded-lg p-3 h-full max-h-[800px] border-[#535353] border-[1px] 
-            justify-between flex flex-col overflow-auto'>
+            justify-between flex flex-col '>
 
-            <div className='h-full flex flex-col'>
-                <div className='font-bold text-xl'>
-                    Share Your Goals
-                </div>
-                {createdAt}
-                <p className='text-sm text-[#888]'>
-                    Publicly share your goals to inspire others and stay accountable!
-                </p>
+            <div className='h-full flex flex-col justify-between gap-3'>
+            <div>
+                        <div className='font-bold text-xl'>
+                            Share Your Goals
+                        </div>
+                        <p className='text-sm text-[#888]'>
+                            Publicly share your goals to inspire others and stay accountable!
+                        </p>
+                        <div className='flex items-start mt-3 justify-start'>
+                            <input
+                                value={searchVal}
+                                onChange={(e) => { handleInput(e.target.value) }}
+                                className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                                placeholder='Search your goal title'
+                                type="text"
+                            />
+                        </div>
+                    </div>
 
+                <div className='h-full overflow-auto'>
 
-                <div className='flex items-start mt-3 justify-start'>
-                    <input
-                        value={searchVal}
-                        onChange={(e) => { handleInput(e.target.value) }}
-                        className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
-                        placeholder='Search your goal title'
-                        type="text"
-                    />
-                </div>
-
-                <div
-                    className='w-full h-full max-h-[540px] mt-5 grid grid-cols-1
+                    <div
+                        className='w-full h-full  mt-5 grid grid-cols-1
                     sm:grid-cols-2 lg:grid-cols-3 gap-3 overflow-auto'>
-                    {
-                        fetchedData != null && fetchedData.map((itm: dataType, idx) => (
-                            <div
-                                onClick={() => { handleToggle(itm?.created_at, isEq === itm?.created_at ? true : false) }}
-                                key={idx}
-                                className={`${isEq === itm?.created_at && 'bg-[#222222]'} bg-[#313131] h-[180px] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222] `}>
-                                {!fetchedData && "No result"}
+                        {
+                            fetchedData != null && fetchedData.map((itm: dataType, idx) => (
+                                <div
+                                    onClick={() => { handleToggle(itm?.created_at, isEq === itm?.created_at ? true : false) }}
+                                    key={idx}
+                                    className={`${isEq && isEq === itm?.created_at && 'bg-[#111010]'} bg-[#313131] h-[180px] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222] `}>
+                                    {!fetchedData && "No result"}
 
-                                <div className='flex h-[110px] items-start justify-start border-b-[#535353] border-b-[1px]'>
-                                    <div
-                                        style={{ backgroundColor: determineDate(itm?.deadline) }}
-                                        className={`w-[2px] h-full`}>
+                                    <div className='flex h-[110px] items-start justify-start border-b-[#535353] border-b-[1px]'>
+                                        <div
+                                            style={{ backgroundColor: determineDate(itm?.deadline) }}
+                                            className={`w-[2px] h-full`}>
+                                        </div>
+
+                                        <div className='flex flex-col p-3'>
+                                            <div className='font-bold mb-1'>
+                                                {itm?.title}
+                                            </div>
+                                            <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                <BiCategory />{itm?.category}
+                                            </div>
+                                            <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                <MdOutlineQueryStats />
+                                                {isFailed(itm?.deadline, itm?.is_done)}
+                                            </div>
+
+                                            {checkDeadlineMet(itm?.deadline)}
+                                        </div>
                                     </div>
-
-                                    <div className='flex flex-col p-3'>
-                                        <div className='font-bold mb-1'>
-                                            {itm?.title}
+                                    <div className='p-3'>
+                                        <div>
+                                            {itm?.sub_tasks.length > 1 ? "Tasks" : "Task"}: {itm?.sub_tasks.length}
                                         </div>
-                                        <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                            <BiCategory />{itm?.category}
+                                        <div>
+                                            {itm?.habits.length > 1 ? "Habits" : "Habit"}: {itm?.habits.length}
                                         </div>
-                                        <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                            <MdOutlineQueryStats />
-                                            {isFailed(itm?.deadline, itm?.is_done)}
-                                        </div>
-
-                                        {checkDeadlineMet(itm?.deadline)}
                                     </div>
                                 </div>
-                                <div className='p-3'>
-                                    <div>
-                                        {itm?.sub_tasks.length > 1 ? "Tasks" : "Task"}: {itm?.sub_tasks.length}
-                                    </div>
-                                    <div>
-                                        {itm?.habits.length > 1 ? "Habits" : "Habit"}: {itm?.habits.length}
-                                    </div>
-                                </div>
-                            </div>
-                        ))
-                    }
+                            ))
+                        }
+                    </div>
                 </div>
+                <div className='w-full max-h-[40px] h-full rounded-lg border-[#535353] border-[1px] flex overflow-hidden'>
 
-            </div>
-
-            <div className='w-full rounded-lg border-[#535353] border-[1px] flex overflow-hidden'>
-
-                <div
-                    onClick={() => { setShowCreate("") }}
-                    className='p-2 bg-[#111111] border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222] '>
-                    Close</div>
-                <div
-                    onClick={() => { handleGoEdit() }}
-                    className={`${!isEq && 'bg-[#535353]'} p-2 bg-[#111111] text-center w-full cursor-pointer hover:bg-[#222222] `}>
-                    Continue
+                    <div
+                        onClick={() => { setShowCreate("") }}
+                        className='p-2 bg-[#111111] border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222] '>
+                        Close</div>
+                    <div
+                        onClick={() => { handleGoEdit() }}
+                        className={`${!isEq && 'bg-[#535353]'} p-2 bg-[#111111] text-center w-full cursor-pointer hover:bg-[#222222] `}>
+                        Continue
+                    </div>
                 </div>
             </div>
+
+
         </div>
     )
 }
