@@ -57,7 +57,7 @@ const ViewTemplate = () => {
     const [newHabit, setNewHabit] = useState('');
 
     useEffect(() => {
-        if (fetchedData && fetchedData.length > 0 && !title && !description && !category) {
+        if (fetchedData && fetchedData.length > 0 && !title && !description && !category && !deadlineVal) {
             setTitle(fetchedData[0].title || '');
             setDesc(fetchedData[0].description || '');
             setCat(fetchedData[0].category || '');
@@ -407,13 +407,13 @@ const ViewTemplate = () => {
             const { data: insertData, error: insertError } = await supabase
                 .from('goals')
                 .insert({
-                    title: fetchedData[0]?.title,
-                    category: fetchedData[0]?.category,
+                    title: title,
+                    category: category,
                     is_done: false,
                     created_at: Date.now(), // Use ISO format for timestamps
                     userid: user?.uid,
                     deadline: deadlineVal,
-                    description: fetchedData[0]?.description,
+                    description: description,
                     sub_tasks: fetchedData[0]?.sub_tasks,
                     habits: fetchedData[0]?.habits
                 });
@@ -431,6 +431,11 @@ const ViewTemplate = () => {
     }
 
 
+
+    useEffect(() => {
+        console.log(title)
+    }, [title])
+
     return (
         <div
             onClick={(e) => { e.stopPropagation() }}
@@ -447,19 +452,23 @@ const ViewTemplate = () => {
                 </div>
 
                 <div className='mt-3 flex flex-col gap-2 h-auto'>
+
                     <input
                         value={title}
                         onChange={(e) => { setTitle(e.target.value) }}
                         placeholder='Title'
+                        maxLength={50}
                         className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
                         type="text" />
-
-                    <textarea
-                        value={description}
-                        onChange={(e) => { setDesc(e.target.value) }}
-                        className='p-2 rounded-lg resize-none h-full max-h-[300px] bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
-                        placeholder='Description'
-                    ></textarea>
+                    <div className='h-full min-h-[150px] flex'>
+                        <textarea
+                            value={description}
+                            onChange={(e) => { setDesc(e.target.value) }}
+                            className='p-2 rounded-lg resize-none h-full  bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
+                            placeholder='Description'
+                            maxLength={300}
+                        ></textarea>
+                    </div>
                     <select
                         value={category}
                         onChange={(e) => { setCat(e.target.value) }}

@@ -14,6 +14,7 @@ import { GiDna2 } from "react-icons/gi";
 import { MdDelete } from "react-icons/md";
 import moment from 'moment';
 import RetryGoal from '../../comps/System/RetryGoal';
+import DeleteGoal from '../../comps/System/DeleteGoal';
 
 interface subtaskType {
     is_done: boolean;
@@ -38,16 +39,36 @@ interface dataType {
 }
 
 
+interface ParamsType {
+    time: string | undefined;
+    uid: string | undefined;
+}
+
 
 const ViewGoal: React.FC = () => {
     const nav = useNavigate()
     const [user] = IsLoggedIn()
     const params = useParams()
+
+
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [newSubTask, setNewSubTask] = useState('');
-
+    const [isEdit, setIsEdit] = useState<number | null>(null)
     const [newHabit, setNewHabit] = useState('');
     const [repHabit, setRepHabit] = useState('');
+
+    const [renameGoal, setRenameGoal] = useState<string>("")
+    const [editDescription, setEditDesc] = useState<string>("")
+    const [editDate, setEditDate] = useState<string>("")
+
+    const [isDelete, setIsDelete] = useState<boolean>(false)
+
+    function editVals(goal: string, desc: string, newDate: string) {
+        setRenameGoal(goal || '')
+        setEditDesc(desc || '')
+        setEditDate(newDate || '')
+    }
+
 
 
     const handleInputChange = (e: any) => {
@@ -60,11 +81,11 @@ const ViewGoal: React.FC = () => {
         setNewHabit(e.target.value);
     };
 
+    console.log(params)
+
 
     const addNewSubTask = async (params: string) => {
         console.log("Parameters received:", params); // Log params
-
-
 
         const newSubTaskObj = {
             is_done: false,
@@ -258,7 +279,7 @@ const ViewGoal: React.FC = () => {
             return (
                 <div
                     onClick={() => { setIsOpenDate(prevs => !prevs) }}
-                    className='flex items-start mt-2'>
+                    className='selectionNone flex items-start mt-2'>
                     <div
                         className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
                         Retry Goal
@@ -605,11 +626,61 @@ const ViewGoal: React.FC = () => {
             return null;
         }
     }
+    async function editDocument() {
+        if (renameGoal === "" || editDate === "" || editDescription === "") return
 
+
+
+        const selectedDate = new Date(editDate);
+        const currentDate = new Date();
+
+        if (selectedDate < currentDate) {
+            alert("The selected date has already passed.");
+            return; // Exit the function if the date has passed
+        }
+
+
+        try {
+            const { data, error } = await supabase
+                .from('goals')
+                .update({
+                    title: renameGoal,
+                    description: editDescription,
+                    deadline: editDate
+                })
+                .eq('userid', params?.uid)
+                .eq('created_at', params?.time)
+
+            if (error) {
+                console.log(error)
+            } else {
+                console.log(data)
+                console.log("edited")
+                setRenameGoal("")
+                setEditDesc("")
+                setEditDate("")
+                setIsEdit(null)
+            }
+
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
 
     return (
         <div className='w-full h-full'>
-            <header className='p-3 flex items-center h-auto pb-2 justify-between border-b-[#535353] border-b-[1px] overflow-auto'>
+
+            {
+                isDelete &&
+                <div
+                    onClick={() => { setIsDelete(prevClick => !prevClick); }}
+                    className='selectionNone ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
+                    <DeleteGoal titleOfGoal={fetchedData && fetchedData[0]?.title} closer={setIsDelete} />
+                </div>
+            }
+
+            <header className='selectionNone p-3 flex items-center h-auto pb-2 justify-between border-b-[#535353] border-b-[1px] overflow-auto'>
                 <div className='flex items-center h-auto pb-2 justify-between w-full max-w-[1200px] mx-auto'>
                     <div className='flex gap-3 items-center'>
                         <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
@@ -619,7 +690,7 @@ const ViewGoal: React.FC = () => {
                         </div>
                         <div
                             onClick={() => { nav(-1) }}
-                            className='flex gap-1 hover:bg-[#222222]  items-center bg-[#313131] 
+                            className='selectionNone flex gap-1 hover:bg-[#222222]  items-center bg-[#313131] 
                         border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3'><IoChevronBackOutline /> Back</div>
                     </div>
                     <div className='flex gap-3 items-center'>
@@ -636,7 +707,7 @@ const ViewGoal: React.FC = () => {
             </header>
 
             {
-                user && fetchedData != null ?
+                user?.uid === params.uid && fetchedData != null ?
                     (isFailed(fetchedData[0]?.deadline, fetchedData[0]?.is_done) === "Failed") ?
                         <div className='mt-3 mx-auto max-w-[1200px] p-3'>
                             <div className='flex flex-col gap-2'>
@@ -649,11 +720,12 @@ const ViewGoal: React.FC = () => {
                                 <p className='text-sm text-[#888] w-full max-w-[500px]'>
                                     {checkDeadlineMet(fetchedData != null && fetchedData[0]?.deadline)}
                                 </p>
+
                                 {
                                     isOpenDate &&
                                     <div
                                         onClick={() => { setIsOpenDate(prevDate => !prevDate) }}
-                                        className='ml-auto positioners w-full h-full flex justify-center items-center z-30 p-3'>
+                                        className='selectionNone ml-auto positioners w-full h-full flex justify-center items-center z-30 p-3'>
                                         <RetryGoal closer={setIsOpenDate} />
                                     </div>
                                 }
@@ -671,16 +743,82 @@ const ViewGoal: React.FC = () => {
                             <>
                                 <div className='mt-3 mx-auto max-w-[1200px] flex min-h-[90dvh] flex-col  justify-between  p-3'>
                                     <div>
-                                        <div className='flex flex-col gap-2'>
-                                            <div className='text-xl font-bold'>
-                                                {fetchedData && fetchedData[0]?.title}
+                                        <div className='flex h-auto flex-col gap-2'>
+                                            {
+                                                isEdit === fetchedData[0]?.created_at ?
+                                                    <div className='w-full max-w-[400px]'>
+                                                        <input
+                                                            value={renameGoal}
+                                                            maxLength={50}
+                                                            onChange={(e) => { setRenameGoal(e.target.value) }}
+                                                            placeholder='Rename your goal'
+                                                            className='p-3 rounded-lg bg-[#111111] w-full outline-none border-[#535353] border-[1px]'
+                                                            type="text" />
+                                                    </div>
+                                                    :
+                                                    <div className='text-xl font-bold'>
+                                                        {fetchedData && fetchedData[0]?.title}
+                                                    </div>
+                                            }
+                                            {
+                                                isEdit === fetchedData[0]?.created_at ?
+                                                    <div className='w-full max-w-[400px] h-full min-h-[200px] flex'>
+                                                        <textarea
+                                                            value={editDescription}
+                                                            maxLength={300}
+                                                            onChange={(e) => { setEditDesc(e.target.value) }}
+                                                            className='p-3 rounded-lg w-full h-100 resize-none bg-[#111111] outline-none border-[#535353] border-[1px]'
+                                                            placeholder='Description'></textarea>
+                                                    </div>
+                                                    :
+                                                    <p className='text-sm text-[#888] w-full max-w-[500px]'>
+                                                        {fetchedData && fetchedData[0]?.description}
+                                                    </p>
+                                            }
+                                            {
+                                                isEdit === fetchedData[0]?.created_at ?
+                                                    <div className='w-full max-w-[150px]'>
+                                                        <input
+                                                            value={editDate}
+                                                            maxLength={50}
+                                                            onChange={(e) => { setEditDate(e.target.value) }}
+                                                            className='p-3 rounded-lg bg-[#111111] w-full outline-none border-[#535353] border-[1px]'
+                                                            type="date" />
+                                                    </div>
+                                                    :
+
+                                                    <p className='text-sm text-[#888] w-full max-w-[500px]'>
+                                                        {checkDeadlineMet(fetchedData != null && fetchedData[0]?.deadline)}
+                                                    </p>
+                                            }
+
+                                            <div className='flex items-start gap-2'>
+
+                                                {
+                                                    (isEdit !== null && isEdit === fetchedData[0]?.created_at) ?
+                                                        <>
+                                                            <div
+                                                                onClick={() => { setIsEdit(null) }}
+                                                                className='selectionNone flex gap-1 items-center text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
+                                                                Cancel
+                                                            </div>
+                                                            <div
+                                                                onClick={() => { editDocument() }}
+                                                                className='selectionNone flex text-green-500 gap-1 items-center text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
+                                                                Save
+                                                            </div>
+                                                        </>
+                                                        :
+                                                        <div
+                                                            onClick={() => { setIsEdit(fetchedData && fetchedData[0]?.created_at); editVals(fetchedData[0]?.title, fetchedData[0]?.description, fetchedData[0]?.deadline) }}
+                                                            className='selectionNone flex gap-1 items-center text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
+                                                            EDIT
+                                                        </div>
+                                                }
+
+
                                             </div>
-                                            <p className='text-sm text-[#888] w-full max-w-[500px]'>
-                                                {fetchedData && fetchedData[0]?.description}
-                                            </p>
-                                            <p className='text-sm text-[#888] w-full max-w-[500px]'>
-                                                {checkDeadlineMet(fetchedData != null && fetchedData[0]?.deadline)}
-                                            </p>
+
                                             <div className='flex gap-3 justify-between'>
                                                 {isRenew(fetchedData != null && fetchedData[0]?.deadline)}
                                             </div>
@@ -725,7 +863,7 @@ const ViewGoal: React.FC = () => {
                                                                     (<>
                                                                         <div
                                                                             onClick={() => { setSubTaskIdx(null) }}
-                                                                            className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
+                                                                            className='selectionNone flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
 
                                                                             Cancel
                                                                         </div>
@@ -734,7 +872,7 @@ const ViewGoal: React.FC = () => {
                                                                             onClick={() => {
                                                                                 renameTask(idx)
                                                                             }}
-                                                                            className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
+                                                                            className='selectionNone flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
 
                                                                             Save
                                                                         </div>
@@ -745,7 +883,7 @@ const ViewGoal: React.FC = () => {
                                                                             <>
                                                                                 <div
                                                                                     onClick={() => { setIsDeleteTask(null) }}
-                                                                                    className='flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353]'>
+                                                                                    className='selectionNone flex gap-1 items-center text-red-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353]'>
 
                                                                                     Cancel
                                                                                 </div>
@@ -754,7 +892,7 @@ const ViewGoal: React.FC = () => {
                                                                                     onClick={() => {
                                                                                         deleteTask(idx)
                                                                                     }}
-                                                                                    className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
+                                                                                    className='selectionNone flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
 
                                                                                     Delete
                                                                                 </div>
@@ -766,7 +904,7 @@ const ViewGoal: React.FC = () => {
                                                                                 onClick={() => {
                                                                                     markSubTasksAsDone(idx, itm?.is_done ? false : true)
                                                                                 }}
-                                                                                className='flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
+                                                                                className='selectionNone flex gap-1 items-center text-green-500 text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353] '>
                                                                                 {
                                                                                     itm?.is_done ?
                                                                                         <div className='text-[#cc0000]'>
@@ -778,12 +916,12 @@ const ViewGoal: React.FC = () => {
                                                                             </div>
                                                                             <div
                                                                                 onClick={() => { getValue(itm?.subGoal, idx) }}
-                                                                                className='flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353]'>
+                                                                                className='selectionNone flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353]'>
                                                                                 EDIT
                                                                             </div>
                                                                             <div
                                                                                 onClick={() => { setIsDeleteTask(idx) }}
-                                                                                className='flex gap-1 items-center text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353]'>
+                                                                                className='selectionNone flex gap-1 items-center text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 hover:bg-[#535353]'>
                                                                                 DELETE
                                                                             </div>
                                                                         </>
@@ -803,7 +941,7 @@ const ViewGoal: React.FC = () => {
                                                 />
                                                 <div
                                                     onClick={() => { addNewSubTask("task") }} // Call the function to add the new task
-                                                    className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 px-3 hover:bg-[#222222]  ml-2'>
+                                                    className='selectionNone flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 px-3 hover:bg-[#222222]  ml-2'>
                                                     <FaPlus />
                                                 </div>
                                             </div>
@@ -818,7 +956,7 @@ const ViewGoal: React.FC = () => {
                                                 fetchedData != null && fetchedData[0]?.habits?.map((itm: habitsType, idx: number) => (
                                                     <div
                                                         key={idx}
-                                                        className='flex gap-1 flex-col overflow-auto  items-start justify-between bg-[#203296] text-[#fff] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
+                                                        className='flex gap-1 flex-col overflow-auto  items-start justify-between bg-[#1a1a1a] text-[#fff] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
                                                         <div>
                                                             <div className={`text-md font-bold break-all`}>
                                                                 {
@@ -868,12 +1006,12 @@ const ViewGoal: React.FC = () => {
                                                                         <>
                                                                             <div
                                                                                 onClick={() => { setIsOpenHabit(null) }}
-                                                                                className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='selectionNone hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                 Cancel
                                                                             </div>
                                                                             <div
                                                                                 onClick={() => { renameHabit(idx) }}
-                                                                                className='hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='selectionNone hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                 Save
                                                                             </div>
                                                                         </>
@@ -884,12 +1022,12 @@ const ViewGoal: React.FC = () => {
                                                                             <>
                                                                                 <div
                                                                                     onClick={() => { setIsHabitDel(null) }}
-                                                                                    className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                    className='selectionNone hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                     Cancel
                                                                                 </div>
                                                                                 <div
                                                                                     onClick={() => { deleteHabit(idx) }}
-                                                                                    className='hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                    className='selectionNone hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                     Delete
                                                                                 </div>
                                                                             </>
@@ -899,12 +1037,12 @@ const ViewGoal: React.FC = () => {
                                                                         <>
                                                                             <div
                                                                                 onClick={() => { getValueOfHabit(itm?.habit, idx, itm?.repeat) }}
-                                                                                className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='selectionNone hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                 Edit
                                                                             </div>
                                                                             <div
                                                                                 onClick={() => { setIsHabitDel(idx) }}
-                                                                                className='hover:bg-[#535353] flex gap-1 items-center text-center text-red-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                                className='selectionNone hover:bg-[#535353] flex gap-1 items-center text-center text-red-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
                                                                                 Delete
                                                                             </div>
                                                                         </>
@@ -950,34 +1088,45 @@ const ViewGoal: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className='mt-7 flex gap-3 justify-between bg-[#111111] p-3 rounded-lg items-center'>
-                                        <div>
-                                            <div className='font-bold'>Date created</div>
-                                            <div className='mt-1 text-[#888] text-sm'>{fetchedData &&
-                                                fetchedData[0]?.created_at
-                                                ? moment(parseInt(fetchedData[0]?.created_at.toString())).format('MMMM Do YYYY')
-                                                : 'No Creation date'
-                                            }</div>
-                                        </div>
 
-                                        <div className='flex items-start'>
-                                            <div
-                                                className='flex gap-1  items-center justify-between bg-[#5e1414]  border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
-                                                <MdDelete />  Delete goal
-                                            </div>
-                                        </div>
-                                    </div>
 
 
                                 </div>
                             </>
+
+
                         </>
                     :
+
                     <div className='p-3 flex items- h-full justify-center'>
                         <div className='w-[30px] h-[30px]'>
                             <Loader />
                         </div>
                     </div>
+            }
+
+            {
+                fetchedData &&
+                <div className='mx-auto max-w-[1200px] flex flex-col  justify-between  p-3'>
+                    <div className='mt-7 flex gap-3 justify-between bg-[#111111] p-3 rounded-lg items-center'>
+                        <div>
+                            <div className='font-bold'>Date created</div>
+                            <div className='mt-1 text-[#888] text-sm'>{fetchedData &&
+                                fetchedData[0]?.created_at
+                                ? moment(parseInt(fetchedData[0]?.created_at.toString())).format('MMMM Do YYYY')
+                                : 'No Creation date'
+                            }</div>
+                        </div>
+
+                        <div className='flex items-start'>
+                            <div
+                                onClick={() => { setIsDelete(prev => !prev) }}
+                                className='selectionNone flex gap-1  items-center justify-between bg-[#5e1414]  border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
+                                <MdDelete />  Delete goal
+                            </div>
+                        </div>
+                    </div>
+                </div>
             }
 
         </div>

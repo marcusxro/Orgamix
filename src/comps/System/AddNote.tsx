@@ -35,10 +35,10 @@ const combinedModules = {
 };
 interface AddNoteProps {
     purpose: string;
-    closeMobile : React.Dispatch<React.SetStateAction<boolean>>;
+    closeMobile: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile  }) => {
+const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
 
     const [user] = IsLoggedIn()
 
@@ -53,7 +53,7 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile  }) => {
     async function createNote() {
         setLoading(true)
 
-        if(loading) {
+        if (loading) {
             return
         }
 
@@ -90,9 +90,9 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile  }) => {
 
 
     return (
-        <div 
-        onClick={(e) => {e.stopPropagation()}}
-        className='w-full max-w-[550px] bg-[#313131]  z-[5000] relative
+        <div
+            onClick={(e) => { e.stopPropagation() }}
+            className='w-full max-w-[550px] bg-[#313131]  z-[5000] relative
              rounded-lg p-3 h-full border-[#535353] border-[1px] flex flex-col gap-3 overflow-auto'>
 
             <div className='mb-2'>
@@ -108,18 +108,18 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile  }) => {
                 type="text" placeholder='title'
                 className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
             />
-              <div className='flex flex-col gap-1 '>
-                    <select
-                        value={category}
-                        onChange={(e) => { setcategory(e.target.value) }}
-                        className='p-2 rounded-lg bg-[#111111] border-[#535353] border-[1px] text-[#888]'>
-                        <option value="">Choose Category</option>
-                        <option value="Work">Work</option>
-                        <option value="Personal">Personal</option>
-                        <option value="School">School</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
+            <div className='flex flex-col gap-1 '>
+                <select
+                    value={category}
+                    onChange={(e) => { setcategory(e.target.value) }}
+                    className='p-2 rounded-lg bg-[#111111] border-[#535353] border-[1px] text-[#888]'>
+                    <option value="">Choose Category</option>
+                    <option value="Work">Work</option>
+                    <option value="Personal">Personal</option>
+                    <option value="School">School</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
             <div className='w-full h-[30%]'>
                 <ReactQuill
                     theme='snow'
@@ -133,33 +133,36 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile  }) => {
             <div>
 
 
-              
+
 
             </div>
             <div className='mt-auto'>
-                <div
-                    onClick={() => { createNote() }}
-                    className={`${loading && 'bg-[#535353] '} bg-[#111111] flex items-center justify-center  p-3 rounded-lg text-center cursor-pointer
-                     border-[#535353] border-[1px] hover:bg-[#535353] `}>
-                   {
-                    loading ?
-                    <div className='w-[20px] h-[20px] m-1'>
-                        <Loader />
-                    </div>
-                    :
-                    'Add Note'
-                   }
-                </div>
-
                 {
                     purpose === 'modal' &&
                     <div
-                        onClick={() => closeMobile (false) }
+                        onClick={() => closeMobile(false)}
                         className={` bg-[#684444] mt-2 flex items-center justify-center  p-3 rounded-lg text-center cursor-pointer
                      border-[#535353] border-[1px] hover:bg-[#535353] `}>
                         Close
                     </div>
                 }
+
+                <div
+                    onClick={() => { createNote() }}
+                    className={`${loading && 'bg-[#535353] '} bg-[#111111] mt-2 flex items-center justify-center  p-3 rounded-lg text-center cursor-pointer
+                     border-[#535353] border-[1px] hover:bg-[#535353] `}>
+                    {
+                        loading ?
+                            <div className='w-[20px] h-[20px] m-1'>
+                                <Loader />
+                            </div>
+                            :
+                            'Add Note'
+                    }
+                </div>
+
+
+
             </div>
 
 

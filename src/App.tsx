@@ -11,6 +11,7 @@ import VisitNote from './comps/System/VisitNote';
 import Goals from './pages/isLoggedIn/Goals';
 import GoalTemplates from './pages/isLoggedIn/GoalTemplates';
 import ViewGoal from './pages/isLoggedIn/ViewGoal';
+import ScrollToTop from './comps/ScrollToTop';
 
 
 
@@ -18,6 +19,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <ScrollToTop />
         <Routes>
           <Route path='/' element={<Homepage />} />
           <Route path='/sign-in' element={<SignIn />} />

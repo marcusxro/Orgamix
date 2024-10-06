@@ -290,7 +290,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
             <div className='h-full overflow-auto'>
                 <div className='mt-6 flex flex-col gap-3'>
                     <input
-                        maxLength={40}
+                        maxLength={50}
                         value={title}
                         onChange={(e) => { setTitle(e.target.value) }}
                         className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full'

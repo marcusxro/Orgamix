@@ -42,55 +42,71 @@ const Goals: React.FC = () => {
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(true)
     const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
-
-
+    const [searchVal, setSearchVal] = useState<string>("")
+    const [originalData, setOriginalData] = useState<dataType[] | null>(null); // To store unfiltered data
     const nav = useNavigate()
     const [user] = IsLoggedIn()
+
+    useEffect(() => {
+        if (user && searchVal && originalData) {
+            // Perform search on the original data
+            const searchResults = originalData.filter(
+                (item) =>
+                    item.title.toLowerCase().includes(searchVal.toLowerCase()) ||
+                    item.description.toLowerCase().includes(searchVal.toLowerCase())
+            );
+            setFetchedData(searchResults);
+        } else if (!searchVal && originalData) {
+            // If searchVal is empty, reset to original data
+            setFetchedData(originalData);
+        }
+    }, [searchVal, originalData]);
+
 
 
     useEffect(() => {
         if (user) {
             fetchGoalsByID()
             const subscription = supabase
-      .channel('public:goals')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, (payload) => {
-        console.log('Realtime event:', payload);
-        handleRealtimeEvent(payload);
-      })
-      .subscribe();
-    return () => {
-      subscription.unsubscribe();
-    };
+                .channel('public:goals')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, (payload) => {
+                    console.log('Realtime event:', payload);
+                    handleRealtimeEvent(payload);
+                })
+                .subscribe();
+            return () => {
+                subscription.unsubscribe();
+            };
         }
     }, [GoalListener, user])
 
     const handleRealtimeEvent = (payload: any) => {
         switch (payload.eventType) {
-          case 'INSERT':
-            setFetchedData((prevData) =>
-              prevData ? [...prevData, payload.new] : [payload.new]
-            );
-            break;
-          case 'UPDATE':
-            setFetchedData((prevData) =>
-              prevData
-                ? prevData.map((item) =>
-                    item.id === payload.new.id ? payload.new : item
-                  )
-                : [payload.new]
-            );
-            break;
-          case 'DELETE':
-            console.log("DELETED")
-            setFetchedData((prevData) =>
-              prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
-            );
-            break;
-          default:
-            break;
+            case 'INSERT':
+                setFetchedData((prevData) =>
+                    prevData ? [...prevData, payload.new] : [payload.new]
+                );
+                break;
+            case 'UPDATE':
+                setFetchedData((prevData) =>
+                    prevData
+                        ? prevData.map((item) =>
+                            item.id === payload.new.id ? payload.new : item
+                        )
+                        : [payload.new]
+                );
+                break;
+            case 'DELETE':
+                console.log("DELETED")
+                setFetchedData((prevData) =>
+                    prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
+                );
+                break;
+            default:
+                break;
         }
-      };
-    
+    };
+
 
     async function fetchGoalsByID() {
         try {
@@ -103,6 +119,7 @@ const Goals: React.FC = () => {
                 console.error('Error fetching data:', error);
             } else {
                 setFetchedData(data);
+                setOriginalData(data)
             }
         } catch (err) {
             console.log(err);
@@ -222,81 +239,92 @@ const Goals: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className='mt-4 flex items-start gap-2'>
-                        <div
-                            onClick={() => {
-                                setIsOpenSidebar(prevClick => !prevClick); setIsOpenModal(prevClick => !prevClick)
-                            }}
-                            className='bg-[#313131] p-3 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
-                            Create Goal <span className='text-md'><FaPlus /></span>
+                    <div className='mt-4 flex flex-col md:flex-row items-start gap-2'>
+                        <div className='flex gap-2'>
+                            <div
+                                onClick={() => {
+                                    setIsOpenSidebar(prevClick => !prevClick); setIsOpenModal(prevClick => !prevClick)
+                                }}
+                                className='bg-[#313131] p-3 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
+                                Create Goal <span className='text-md'><FaPlus /></span>
+                            </div>
+                            <div
+                                onClick={() => {
+                                    nav('/user/goals/templates')
+                                }}
+                                className='bg-[#313131] p-4 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
+                                <LuLayoutTemplate />
+                            </div>
                         </div>
-                        <div
-                            onClick={() => {
-                                nav('/user/goals/templates')
-                            }}
-                            className='bg-[#313131] p-4 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
-                            <LuLayoutTemplate />
-                        </div>
+
+                        <input
+                            value={searchVal}
+                            onChange={(e) => { setSearchVal(e.target.value) }}
+                            className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                            placeholder='Search your goal title'
+                            type="text"
+                        />
                     </div>
                     <div className='flex flex-wrap gap-3 mt-2 pb-5'>
+                        {fetchedData?.length === 0 && "No result :("}
                         {
                             fetchedData === null ?
-                            <div className='w-[20px] h-[20px]'>
-                                <Loader />
-                            </div>
-                            :
-                        <>
-                            {
-                                fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
-                                    <div
-                                        onClick={() => {
-                                            nav(`/user/goals/templates/${user?.uid}/${itm?.created_at}`)
-                                        }}
-                                        key={idx}
-                                        className='w-full max-w-[300px] bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>
-
-                                        <div className='flex h-[110px] items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
+                                <div className='w-[20px] h-[20px]'>
+                                    <Loader />
+                                </div>
+                                :
+                                <>
+                                    {
+                                        fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
                                             <div
-                                                style={{ backgroundColor: determineDate(itm?.deadline) }}
-                                                className={`w-[2px] h-full`}>
-                                            </div>
+                                                onClick={() => {
+                                                    nav(`/user/goals/templates/${user?.uid}/${itm?.created_at}`)
+                                                }}
+                                                key={idx}
+                                                className='w-full max-w-[300px] bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>
 
-                                            <div className='flex flex-col p-3'>
-                                                <div className='font-bold mb-1'>
-                                                    {itm?.title.length >= 20 ? itm?.title.slice(0, 20) + "..." : itm?.title}
+                                                <div className='flex h-[110px] items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
+                                                    <div
+                                                        style={{ backgroundColor: determineDate(itm?.deadline) }}
+                                                        className={`w-[2px] h-full`}>
+                                                    </div>
+
+                                                    <div className='flex flex-col p-3'>
+                                                        <div className='font-bold mb-1'>
+                                                            {itm?.title.length >= 20 ? itm?.title.slice(0, 20) + "..." : itm?.title}
+                                                        </div>
+                                                        <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                            <BiCategory />{itm?.category}
+                                                        </div>
+                                                        <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                            <MdOutlineQueryStats />
+                                                            {isFailed(itm?.deadline, itm?.is_done)}
+                                                        </div>
+
+                                                        {checkDeadlineMet(itm?.deadline)}
+                                                    </div>
                                                 </div>
-                                                <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                    <BiCategory />{itm?.category}
+
+                                                <div className='flex justify-between items-center p-3 text-[#888] gap-2'>
+                                                    <div>
+                                                        {itm?.sub_tasks.filter((itmz) => itmz.is_done).length}
+                                                        /
+                                                        {itm?.sub_tasks.length}
+                                                    </div>
+
+
+                                                    <div>
+                                                        {itm?.created_at
+                                                            ? moment(parseInt(itm?.created_at.toString())).format('MMMM Do YYYY')
+                                                            : 'No Creation date'}
+                                                    </div>
                                                 </div>
-                                                <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                    <MdOutlineQueryStats />
-                                                    {isFailed(itm?.deadline, itm?.is_done)}
-                                                </div>
 
-                                                {checkDeadlineMet(itm?.deadline)}
+
                                             </div>
-                                        </div>
-
-                                        <div className='flex justify-between items-center p-3 text-[#888] gap-2'>
-                                            <div>
-                                                {itm?.sub_tasks.filter((itmz) => itmz.is_done).length}
-                                                /
-                                                {itm?.sub_tasks.length}
-                                            </div>
-
-
-                                            <div>
-                                                {itm?.created_at
-                                                    ? moment(parseInt(itm?.created_at.toString())).format('MMMM Do YYYY')
-                                                    : 'No Creation date'}
-                                            </div>
-                                        </div>
-
-
-                                    </div>
-                                ))
-                            }
-                        </>
+                                        ))
+                                    }
+                                </>
                         }
                     </div>
                 </div>

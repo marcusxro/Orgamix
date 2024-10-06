@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
+.selectionNone{
+  user-select: none; /* Prevents text selection */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  touch-action: manipulation; /* Prevents touch actions like zooming */
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -59,3 +68,4 @@
   right: 0;
   top: 0;
 }
+

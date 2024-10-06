@@ -54,8 +54,6 @@ const ForgotPassword = () => {
                     <div className='border-[1px] border-[#414141] mt-[10px]'>
 
                     </div>
-
-
                     <div className='centeredItem'>
                         or
                     </div>
