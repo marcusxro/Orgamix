@@ -263,7 +263,7 @@ const Goals: React.FC = () => {
 
                                             <div className='flex flex-col p-3'>
                                                 <div className='font-bold mb-1'>
-                                                    {itm?.title}
+                                                    {itm?.title.length >= 20 ? itm?.title.slice(0, 20) + "..." : itm?.title}
                                                 </div>
                                                 <div className='text-[#888] text-sm flex gap-1 items-center'>
                                                     <BiCategory />{itm?.category}

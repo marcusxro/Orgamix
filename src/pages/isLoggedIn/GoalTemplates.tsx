@@ -20,6 +20,7 @@ import { FaEllipsisH } from "react-icons/fa";
 import { MdOutlineFileDownload } from "react-icons/md";
 import GetAuthor from '../../comps/System/GetAuthor';
 import ViewTemplate from '../../comps/System/ViewTemplate';
+import ReportGoal from '../../comps/System/ReportGoal';
 
 
 
@@ -54,12 +55,20 @@ const GoalTemplates: React.FC = () => {
     const [isOpenCreate, setIsOpenCreate] = useState<boolean>(false)
     const [goalListener, setGoalListener] = useState<boolean>(false)
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
-    const { showCreate, setShowCreate, templateID,  setTemplateID }: any = useStore()
+    const [findTemplate, setFindTemplate] = useState<string>("")
+    const { showCreate, setShowCreate, templateID, setTemplateID }: any = useStore()
+    const [searchVal, setSearchVal] = useState<string>("")
+    const [originalData, setOriginalData] = useState<dataType[] | null>(null); // To store unfiltered data
+    const [isReport, setIsReport] = useState<number | null>(null)
+    const [goalToReport, setGoalToReport] = useState<any>(null);
+
+
     const [user] = IsLoggedIn()
 
     useEffect(() => {
         if (user) {
             fetchGoalsByID()
+
             const subscription = supabase
                 .channel('public:templates')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'templates' }, (payload) => {
@@ -71,7 +80,23 @@ const GoalTemplates: React.FC = () => {
                 subscription.unsubscribe();
             };
         }
-    }, [goalListener, user])
+    }, [goalListener, user, findTemplate])
+
+    useEffect(() => {
+        if (user && searchVal && originalData) {
+            // Perform search on the original data
+            const searchResults = originalData.filter(
+                (item) =>
+                    item.title.toLowerCase().includes(searchVal.toLowerCase()) ||
+                    item.description.toLowerCase().includes(searchVal.toLowerCase())
+            );
+            setFetchedData(searchResults);
+        } else if (!searchVal && originalData) {
+            // If searchVal is empty, reset to original data
+            setFetchedData(originalData);
+        }
+    }, [searchVal, originalData]);
+
 
 
     const handleRealtimeEvent = (payload: any) => {
@@ -100,19 +125,25 @@ const GoalTemplates: React.FC = () => {
                 break;
         }
     };
-
     async function fetchGoalsByID() {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('templates')
                 .select('*')
-                .order('download_count', { ascending: false }); // Sort by download_count in descending order
+                .order('download_count', { ascending: false });
 
+            // Apply the category filter only if findTemplate is not empty
+            if (findTemplate !== '') {
+                query = query.eq('category', findTemplate);
+            }
+
+            const { data, error } = await query;
 
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
                 setFetchedData(data);
+                setOriginalData(data); // Store the original data to preserve it for search filtering
             }
         } catch (err) {
             console.log(err);
@@ -157,6 +188,8 @@ const GoalTemplates: React.FC = () => {
     }, [isDelete])
 
 
+
+
     return (
         <div
             onClick={() => { setViewEllip(null) }}
@@ -164,7 +197,7 @@ const GoalTemplates: React.FC = () => {
             {
                 isOpenCreate &&
                 <div
-                    onClick={() => { setIsOpenCreate(prevClick => !prevClick) }}
+                    onClick={() => { setIsOpenCreate(prevClick => !prevClick); }}
                     className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
                     <ChooseMethod closer={setIsOpenCreate} />
                 </div>
@@ -178,12 +211,12 @@ const GoalTemplates: React.FC = () => {
                 </div>
 
             }
-   {
+            {
                 templateID != "" &&
                 <div
                     onClick={() => { setTemplateID("") }}
                     className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
-                        <ViewTemplate />
+                    <ViewTemplate />
                 </div>
 
             }
@@ -207,7 +240,14 @@ const GoalTemplates: React.FC = () => {
                 </div>
             }
 
-
+            {
+                isReport != null &&
+                <div
+                    onClick={() => { setIsReport(null) }}
+                    className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
+                    <ReportGoal closer={setIsReport} contentObj={goalToReport} />
+                </div>
+            }
 
             <header className='p-3 flex items-center h-auto pb-2 justify-between border-b-[#535353] border-b-[1px] overflow-auto'>
                 <div className='flex items-center h-auto pb-2 justify-between w-full max-w-[1200px] mx-auto'>
@@ -279,11 +319,12 @@ const GoalTemplates: React.FC = () => {
                             <span className='hidden md:block'>Create a Template</span> <MdPublish />
                         </div>
                         <select
-                            // value={category}
-                            // onChange={(e) => { setCategory(e.target.value) }}
+                            value={findTemplate}
+                            onChange={(e) => { setFindTemplate(e.target.value) }}
                             className='p-3 rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  text-[#888]'
                             name="" id="">
                             <option value="">Find template by:</option>
+                            <option value="">All</option>
                             <option value="Work">Work</option>
                             <option value="Personal">Personal</option>
                             <option value="Fitness">Fitness</option>
@@ -306,6 +347,8 @@ const GoalTemplates: React.FC = () => {
                     </div>
 
                     <input
+                        value={searchVal}
+                        onChange={(e) => { setSearchVal(e.target.value) }}
                         className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full max-w-[300px]  text-[#888]'
                         type="text" placeholder='Search (e.g., Sofware Engineering)' />
                 </div>
@@ -320,10 +363,16 @@ const GoalTemplates: React.FC = () => {
                             :
                             <>
                                 {
+                                    fetchedData.length === 0 &&
+                                    <div>
+                                        <div>No result :(</div>
+                                    </div>
+                                }
+                                {
                                     fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
                                         <div
                                             onClick={() => {
-                                                nav(`/user/goals/templates/${user?.uid}/${itm?.created_at}`)
+                                                setTemplateID(itm?.created_at)
                                             }}
                                             key={idx}
                                             className='w-full  bg-[#313131] border-[#535353] relative border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>
@@ -335,25 +384,29 @@ const GoalTemplates: React.FC = () => {
                                                 <div className='flex flex-col p-3 w-full'>
                                                     {
                                                         viewEllip === idx && isDelete === null &&
-                                                            (<div
-                                                                onClick={(e) => { e.stopPropagation() }}
-                                                                className=' bg-[#111111] border-[#535353] border-[1px] flex flex-col toRight overflow-hidden rounded-md'>
-                                                                <div className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>View</div>
-                                                                <div className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Report</div>
-                                                                {itm?.authorUid != user?.uid &&
-                                                                    <div
-                                                                        onClick={() => {
-                                                                            setTemplateID(itm?.created_at)
-                                                                        }}
-                                                                        className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Download</div>}
-                                                                {itm?.authorUid === user?.uid &&
-                                                                    <div
-                                                                        onClick={() => { setIsDelete(idx) }}
-                                                                        className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Delete</div>}
+                                                        (<div
+                                                            onClick={(e) => { e.stopPropagation() }}
+                                                            className=' bg-[#111111] border-[#535353] border-[1px] flex flex-col toRight overflow-hidden rounded-md'>
+                                                            <div
+                                                                onClick={() => {
+                                                                    setTemplateID(itm?.created_at)
+                                                                }}
+                                                                className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>View</div>
+                                                            <div
+                                                                onClick={() => {
+                                                                    setIsReport(itm?.created_at);
+                                                                    setGoalToReport(itm)
+                                                                }}
+                                                                className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Report</div>
+
+                                                            {itm?.authorUid === user?.uid &&
                                                                 <div
-                                                                    onClick={() => { setViewEllip(null) }}
-                                                                    className='px-2 py-1 border-b-[#535353] border-b-[1px] text-red-500 hover:bg-[#222222]'>Close</div>
-                                                            </div>)                       
+                                                                    onClick={() => { setIsDelete(idx) }}
+                                                                    className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Delete</div>}
+                                                            <div
+                                                                onClick={() => { setViewEllip(null) }}
+                                                                className='px-2 py-1 border-b-[#535353] border-b-[1px] text-red-500 hover:bg-[#222222]'>Close</div>
+                                                        </div>)
                                                     }
                                                     {
                                                         isDelete === idx && itm?.authorUid === user?.uid && viewEllip === idx &&
@@ -391,7 +444,21 @@ const GoalTemplates: React.FC = () => {
                                                         <GetAuthor authorUid={itm?.authorUid} />
                                                     </div>
                                                     <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                        <MdOutlineFileDownload /> {itm?.download_count}
+                                                        <MdOutlineFileDownload /> {itm?.download_count}  <p>
+                                                            {itm?.download_count >= 1000 ? (
+                                                                <span className="label label-top-choice">🌟 Top Download</span>
+                                                            ) : itm?.download_count >= 500 ? (
+                                                                <span className="label label-highly-rated">⭐ Highly Rated</span>
+                                                            ) : itm?.download_count >= 300 ? (
+                                                                <span className="label label-best-choice">🔥 Best User Choice</span>
+                                                            ) : itm?.download_count >= 100 ? (
+                                                                <span className="label label-trending">📈 Trending Now</span>
+                                                            ) : itm?.download_count >= 50 ? (
+                                                                <span className="label label-popular">✨ Popular</span>
+                                                            ) : (
+                                                                <span className="label label-default"></span>
+                                                            )}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>

@@ -374,11 +374,19 @@ const ViewTemplate = () => {
             console.log(err);
         }
     }
+    const [errorText, setErrorText] = useState<string>("")
 
     async function downloadGoal() {
         if (!fetchedData) return;
-        if (deadlineVal === "") return;
-    
+
+        const currentDate = new Date();
+        const deadlineDate = new Date(deadlineVal);
+
+        if (!deadlineVal || deadlineDate < currentDate) {
+            setErrorText("Deadline is either empty or a past date.");
+            return;
+        }
+
         try {
             // Update download_count
             const { data: updateData, error: updateError } = await supabase
@@ -387,14 +395,14 @@ const ViewTemplate = () => {
                     download_count: (fetchedData[0]?.download_count || 0) + 1, // Increment the current count
                 })
                 .eq('created_at', templateID);
-    
+
             if (updateError) {
                 console.error('Error updating download_count:', updateError);
                 return; // Exit if update fails
             } else {
                 console.log("Updated download count:", updateData);
             }
-    
+
             // Insert new goal
             const { data: insertData, error: insertError } = await supabase
                 .from('goals')
@@ -402,26 +410,26 @@ const ViewTemplate = () => {
                     title: fetchedData[0]?.title,
                     category: fetchedData[0]?.category,
                     is_done: false,
-                    created_at: new Date(), // Use ISO format for timestamps
+                    created_at: Date.now(), // Use ISO format for timestamps
                     userid: user?.uid,
                     deadline: deadlineVal,
                     description: fetchedData[0]?.description,
                     sub_tasks: fetchedData[0]?.sub_tasks,
                     habits: fetchedData[0]?.habits
                 });
-    
+
             if (insertError) {
                 console.error('Error inserting new goal:', insertError);
             } else {
                 console.log('Inserted new goal:', insertData);
                 setTemplateID("")
             }
-    
+
         } catch (err) {
             console.error('Error in downloadGoal function:', err);
         }
     }
-    
+
 
     return (
         <div
@@ -432,8 +440,7 @@ const ViewTemplate = () => {
             <div className='overflow-auto h-full flex flex-col justify-start'>
                 <div>
                     <div className='text-xl font-bold'>Make it yours!</div>
-
-                    <p className='text-sm text-[#888] my-2'>
+                    <p className='text-sm text-[#888] mb-2'>
                         Just make a few changes based on your preference, and make it yours!
                     </p>
 
@@ -482,10 +489,16 @@ const ViewTemplate = () => {
                         <div>Deadline</div>
                         <input
                             value={deadlineVal}
-                            onChange={(e) => {setDeadlineVal(e.target.value)}}
+                            onChange={(e) => { setDeadlineVal(e.target.value) }}
                             className='p-3 rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  text-[#888]'
                             type="date" />
                     </div>
+                    {
+                        errorText != '' &&
+                        <div className='text-sm text-red-500'>
+                            {errorText}
+                        </div>
+                    }
                 </div>
 
                 <div className='mt-4'>
@@ -733,28 +746,28 @@ const ViewTemplate = () => {
 
             </div>
 
-   
 
-                <div className='w-full flex border-[#535353] border-[1px] overflow-hidden rounded-lg mt-2'>
-                    <div
-                        onClick={() => { (!loading && setTemplateID("")) }}
-                        className='p-3 bg-[#111111] outline-none  text-center border-r-[#535353] border-r-[1px] cursor-pointer text-[#888] w-full hover:bg-[#222222]'>
-                        Cancel
-                    </div>
-                    <div
-                        onClick={() => { downloadGoal() }}
-                        className={`${loading && 'bg-[#535353] flex items-center justify-center'} p-3 bg-[#111111] outline-none  text-center text-[#888] w-full cursor-pointer hover:bg-[#222222]`}>
-                        {
-                            loading ?
-                                <div className='w-[20px] h-[20px]'>
-                                    <Loader />
-                                </div>
-                                :
-                                "Download"
-                        }
-                    </div>
+
+            <div className='w-full flex border-[#535353] border-[1px] overflow-hidden rounded-lg mt-2'>
+                <div
+                    onClick={() => { (!loading && setTemplateID("")) }}
+                    className='p-3 bg-[#111111] outline-none  text-center border-r-[#535353] border-r-[1px] cursor-pointer text-[#888] w-full hover:bg-[#222222]'>
+                    Cancel
                 </div>
-   
+                <div
+                    onClick={() => { downloadGoal() }}
+                    className={`${loading && 'bg-[#535353] flex items-center justify-center'} p-3 bg-[#111111] outline-none  text-center text-[#888] w-full cursor-pointer hover:bg-[#222222]`}>
+                    {
+                        loading ?
+                            <div className='w-[20px] h-[20px]'>
+                                <Loader />
+                            </div>
+                            :
+                            "Download"
+                    }
+                </div>
+            </div>
+
         </div>
     )
 }

@@ -240,10 +240,10 @@ const ImportGoals: React.FC = () => {
                                 <div
                                     onClick={() => { handleToggle(itm?.created_at, isEq === itm?.created_at ? true : false) }}
                                     key={idx}
-                                    className={`${isEq && isEq === itm?.created_at && 'bg-[#111010]'} bg-[#313131] h-[180px] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222] `}>
+                                    className={`${isEq && isEq === itm?.created_at ? 'bg-[#111010]' : 'bg-[#313131]'}  h-[200px] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222] `}>
                                     {!fetchedData && "No result"}
-
-                                    <div className='flex h-[110px] items-start justify-start border-b-[#535353] border-b-[1px]'>
+                                    
+                                    <div className='flex h-[135px] items-start justify-start border-b-[#535353] border-b-[1px]'>
                                         <div
                                             style={{ backgroundColor: determineDate(itm?.deadline) }}
                                             className={`w-[2px] h-full`}>

@@ -170,11 +170,6 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
             return;
         }
 
-        if (!deadline) {
-            console.log('Deadline is required');
-            setLoading(false)
-            return;
-        }
 
         if (!description.trim()) {
             console.log('Description is required');
@@ -231,6 +226,13 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
 
                 console.log('Goal successfully created');
             } else {
+
+                if (!deadline) {
+                    console.log('Deadline is required');
+                    setLoading(false)
+                    return;
+                }
+
                 const { error } = await supabase
                     .from("goals")
                     .insert({
@@ -298,7 +300,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
 
                         value={description}
                         onChange={(e) => { setDescription(e.target.value) }}
-                        maxLength={150}
+                        maxLength={300}
                         placeholder='Description'
                         className='resize-none w-full h-[150px] rounded-lg p-3 bg-[#111111] outline-none border-[#535353] border-[1px]'></textarea>
 
