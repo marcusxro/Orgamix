@@ -10,7 +10,7 @@ import { BiCategory } from "react-icons/bi";
 import { useNavigate } from 'react-router-dom';
 import useStore from '../../Zustand/UseStore';
 import Loader from '../../comps/Loader';
-
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface fetchedDataType {
     id: number;
@@ -151,53 +151,62 @@ const Notes = () => {
                                     </div>
                                     :
 
-                                    fetchedData && fetchedData?.map((itm: fetchedDataType, idx: number) => (
-                                        <div
-                                            onClick={() => {
-                                                nav(`/user/notes/${itm?.userid}/${itm?.createdat}`)
-                                            }}
-                                            key={idx}
-                                            className='w-full max-w-[150px] h-full max-h-[150px] overflow-auto
+                                    <AnimatePresence>
+                                        {
+                                            fetchedData && fetchedData?.map((itm: fetchedDataType, idx: number) => (
+                                                <motion.div
+                                                layout
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 10 }}
+                                                transition={{ duration: 0.3 }}
+                                                    onClick={() => {
+                                                        nav(`/user/notes/${itm?.userid}/${itm?.createdat}`)
+                                                    }}
+                                                    key={idx}
+                                                    className='w-full max-w-[150px] h-full max-h-[150px] overflow-auto
                                     flex items-start justify-start flex-col bg-[#313131] p-3 border-[#535353] border-[1px] cursor-pointer rounded-lg text-3xl hover:bg-[#222222] '>
-                                            <div className='font-bold text-sm'>
-                                                {itm?.title}
-                                            </div>
-                                            <div className='text-sm text-[#888] mt-2 flex items-center gap-1'>
-                                                <CiCalendarDate />
-                                                <span className='text-[10px]'>
-                                                    {itm?.createdat
-                                                        ? moment(parseInt(itm.createdat)).format('MMMM Do YYYY')
-                                                        : 'No Deadline'}
-                                                </span>
-                                            </div>
-                                            <div className='text-sm text-[#888] flex items-center gap-1'>
-                                                <BiCategory />
+                                                    <div className='font-bold text-sm'>
+                                                        {itm?.title}
+                                                    </div>
+                                                    <div className='text-sm text-[#888] mt-2 flex items-center gap-1'>
+                                                        <CiCalendarDate />
+                                                        <span className='text-[10px]'>
+                                                            {itm?.createdat
+                                                                ? moment(parseInt(itm.createdat)).format('MMMM Do YYYY')
+                                                                : 'No Deadline'}
+                                                        </span>
+                                                    </div>
+                                                    <div className='text-sm text-[#888] flex items-center gap-1'>
+                                                        <BiCategory />
 
-                                                <span className='text-[10px]'>
-                                                    {itm?.category}
-                                                </span>
-                                            </div>
+                                                        <span className='text-[10px]'>
+                                                            {itm?.category}
+                                                        </span>
+                                                    </div>
 
-                                            <div className='mt-auto w-full border-[#535353] border-[1px]  rounded-lg overflow-hidden flex'>
-                                                {
-                                                    itm?.id === action ?
-                                                        <>
-                                                            <div
-                                                                onClick={(e) => { e.stopPropagation(); deleteTask(itm?.id) }}
-                                                                className='text-sm bg-[#111111] border-r-[#535353] border-r-[1px]  hover:bg-[#292929] text-red-500 w-full  p-1 text-center'>Delete</div>
+                                                    <div className='mt-auto w-full border-[#535353] border-[1px]  rounded-lg overflow-hidden flex'>
+                                                        {
+                                                            itm?.id === action ?
+                                                                <>
+                                                                    <div
+                                                                        onClick={(e) => { e.stopPropagation(); deleteTask(itm?.id) }}
+                                                                        className='text-sm bg-[#111111] border-r-[#535353] border-r-[1px]  hover:bg-[#292929] text-red-500 w-full  p-1 text-center'>Delete</div>
 
-                                                            <div
-                                                                onClick={(e) => { e.stopPropagation(); setAction(null) }}
-                                                                className='text-sm bg-[#111111] text-green-500 w-full  p-1 text-center hover:bg-[#292929] hover:border-[#111111] '>Cancel</div>
-                                                        </>
-                                                        :
-                                                        <div
-                                                            onClick={(e) => { e.stopPropagation(); setAction(itm?.id) }}
-                                                            className='text-sm bg-[#111111] text-green-500 w-full  p-1 text-center hover:bg-[#292929]'>Actions</div>
-                                                }
-                                            </div>
-                                        </div>
-                                    ))
+                                                                    <div
+                                                                        onClick={(e) => { e.stopPropagation(); setAction(null) }}
+                                                                        className='text-sm bg-[#111111] text-green-500 w-full  p-1 text-center hover:bg-[#292929] hover:border-[#111111] '>Cancel</div>
+                                                                </>
+                                                                :
+                                                                <div
+                                                                    onClick={(e) => { e.stopPropagation(); setAction(itm?.id) }}
+                                                                    className='text-sm bg-[#111111] text-green-500 w-full  p-1 text-center hover:bg-[#292929]'>Actions</div>
+                                                        }
+                                                    </div>
+                                                </motion.div>
+                                            ))
+                                        }
+                                    </AnimatePresence>
 
                             }
                         </div>

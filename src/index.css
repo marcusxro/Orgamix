@@ -10,7 +10,19 @@
   -moz-user-select: none; /* Firefox */
   touch-action: manipulation; /* Prevents touch actions like zooming */
 }
+.touchedPage {
+  touch-action: none; /* Prevent default touch behaviors that might interfere */
+}
+body {
+  touch-action: auto; /* Enable default touch interactions, allowing scrolling */
+}
 
+.border-custom {
+  border-style: dashed;
+  border-width: 4px;
+  border-color: #535353; /* Tailwind's gray-500 */
+  border-radius: 8px;
+}
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -35,6 +47,13 @@
   top: 0;
   z-index: 20000000;
   left: 0;
+  background: rgba(41, 41, 41, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(223, 223, 223, 0.37);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.blurred{
   background: rgba(41, 41, 41, 0.25);
   box-shadow: 0 8px 32px 0 rgba(223, 223, 223, 0.37);
   backdrop-filter: blur(2px);

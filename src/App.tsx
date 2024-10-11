@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Homepage from './pages/Homepage';
 import SignIn from './pages/AuthPages/SignIn';
@@ -12,6 +12,8 @@ import Goals from './pages/isLoggedIn/Goals';
 import GoalTemplates from './pages/isLoggedIn/GoalTemplates';
 import ViewGoal from './pages/isLoggedIn/ViewGoal';
 import ScrollToTop from './comps/ScrollToTop';
+import Projects from './pages/isLoggedIn/Projects';
+import Samp from './pages/isLoggedIn/Samp';
 
 
 
@@ -42,6 +44,11 @@ function App() {
 
           <Route path='/user/goals/templates/:uid/:time' element={<ViewGoal />} />
 
+
+
+          <Route path='/user/projects' element={<Projects />} />
+
+          <Route path='/user/projects/view/:uid/:time' element={<Samp />} />
 
         </Routes>
       </div>

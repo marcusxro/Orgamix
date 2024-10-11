@@ -16,6 +16,9 @@ interface AppState {
     templateID: string | null;
     setTemplateID: (params: string) => void;
 
+
+    openNew: boolean | null;
+    setOpenNew: (params: boolean) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -34,7 +37,8 @@ const useStore = create<AppState>((set) => ({
     templateID: "",
     setTemplateID: (params: string) => set({ templateID: params }),
 
-
+    openNew: false,
+    setOpenNew: (params: boolean) => set({ openNew: params }),
 }));
 
 export default useStore;

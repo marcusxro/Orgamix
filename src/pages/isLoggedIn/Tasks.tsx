@@ -13,6 +13,8 @@ import { IoMdAdd } from "react-icons/io";
 import ViewTask from '../../comps/System/ViewTask'
 import TaskSorter from '../../comps/System/TaskSorter'
 import Loader from '../../comps/Loader'
+import { motion, AnimatePresence } from 'framer-motion'
+
 
 interface taskDataType {
     title: string;
@@ -399,99 +401,107 @@ const Tasks: React.FC = () => {
                                         {
                                             taskData && taskData.length > 0 ? (
                                                 taskData.map((itm: taskDataType, idx: number) => (
-                                                    <div
-                                                        className='bg-[#313131] hover:bg-[#222222]  overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
-                                                        key={idx}>
-                                                        <div className='font-bold'>
-                                                            {itm?.title}
-                                                        </div>
-                                                        <p className='text-[#888] break-all'>{itm?.description != '' ? itm?.description : 'No Description'}</p>
+                                                    <AnimatePresence>
+                                                        <motion.div
+                                                            layout
 
-                                                        <div className='mt-auto pt-2 flex gap-4 text-[10px] md:text-sm'>
-                                                            {
-                                                                itm.deadline != '' &&
-                                                                <div className='flex gap-1 items-center justify-start'>
-                                                                    <div>
-                                                                        < CiCalendarDate />
+                                                            initial={{ opacity: 0, y: 10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, y: 10 }}
+                                                            transition={{ duration: 0.3 }}
+                                                            className='bg-[#313131] hover:bg-[#222222]  overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
+                                                            key={idx}>
+                                                            <div className='font-bold'>
+                                                                {itm?.title}
+                                                            </div>
+                                                            <p className='text-[#888] break-all'>{itm?.description != '' ? itm?.description : 'No Description'}</p>
+
+                                                            <div className='mt-auto pt-2 flex gap-4 text-[10px] md:text-sm'>
+                                                                {
+                                                                    itm.deadline != '' &&
+                                                                    <div className='flex gap-1 items-center justify-start'>
+                                                                        <div>
+                                                                            < CiCalendarDate />
+                                                                        </div>
+                                                                        <p className='text-[#888]'>{itm?.deadline != '' && itm?.deadline}</p>
                                                                     </div>
-                                                                    <p className='text-[#888]'>{itm?.deadline != '' && itm?.deadline}</p>
-                                                                </div>
-                                                            }
-                                                            {
-                                                                itm?.category != '' &&
-                                                                <div className='flex items-center gap-1 justify-start'>
-                                                                    <div className='w-[10px] h-[10px] bg-red-500'>
+                                                                }
+                                                                {
+                                                                    itm?.category != '' &&
+                                                                    <div className='flex items-center gap-1 justify-start'>
+                                                                        <div className='w-[10px] h-[10px] bg-red-500'>
 
+                                                                        </div>
+                                                                        <p className='text-[#888]'>{itm?.category != '' && itm?.category}</p>
                                                                     </div>
-                                                                    <p className='text-[#888]'>{itm?.category != '' && itm?.category}</p>
-                                                                </div>
-                                                            }
-                                                            {
-                                                                itm?.priority != '' &&
-                                                                <div className='hidden items-center gap-1 justify-start  md:flex'>
-                                                                    <div className='w-[10px] h-[10px] bg-yellow-500'>
+                                                                }
+                                                                {
+                                                                    itm?.priority != '' &&
+                                                                    <div className='hidden items-center gap-1 justify-start  md:flex'>
+                                                                        <div className='w-[10px] h-[10px] bg-yellow-500'>
 
+                                                                        </div>
+                                                                        <p className='text-[#888]'>{itm?.priority != '' && itm?.priority} priority</p>
                                                                     </div>
-                                                                    <p className='text-[#888]'>{itm?.priority != '' && itm?.priority} priority</p>
-                                                                </div>
-                                                            }
-                                                        </div>
+                                                                }
+                                                            </div>
 
-                                                        <div className='flex mt-2 w-full border-[#535353] border-[1px] overflow-hidden rounded-l-lg  rounded-r-lg'>
+                                                            <div className='flex mt-2 w-full border-[#535353] border-[1px] overflow-hidden rounded-l-lg  rounded-r-lg'>
 
 
-                                                            {
-                                                                actions === itm?.id ?
-                                                                    <>
-                                                                        <div
-                                                                            onClick={() => { deleteTask(itm?.id) }}
-                                                                            className='bg-[#111111] px-3 p-1 text-red-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Delete</div>
-                                                                        <div
-                                                                            onClick={() => { setedit(itm) }}
-                                                                            className='bg-[#111111] px-3 p-1 text-blue-500 
+                                                                {
+                                                                    actions === itm?.id ?
+                                                                        <>
+                                                                            <div
+                                                                                onClick={() => { deleteTask(itm?.id) }}
+                                                                                className='bg-[#111111] px-3 p-1 text-red-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Delete</div>
+                                                                            <div
+                                                                                onClick={() => { setedit(itm) }}
+                                                                                className='bg-[#111111] px-3 p-1 text-blue-500 
                                                                         hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Edit</div>
 
-                                                                        <div
-                                                                            onClick={() => { setActions(null) }}
-                                                                            className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Cancel</div>
-                                                                    </>
-                                                                    :
-                                                                    <>
-                                                                        <div
-                                                                            onClick={() => { setViewTask(itm) }}
-                                                                            className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
+                                                                            <div
+                                                                                onClick={() => { setActions(null) }}
+                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Cancel</div>
+                                                                        </>
+                                                                        :
+                                                                        <>
+                                                                            <div
+                                                                                onClick={() => { setViewTask(itm) }}
+                                                                                className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
 
-                                                                        <div
-                                                                            onClick={() => { setActions(itm?.id) }}
-                                                                            className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Actions</div>
-                                                                    </>
-                                                            }
-                                                        </div>
-                                                        <div className='w-full mt-2 flex rounded-l-lg rounded-r-lg overflow-hidden border-[#535353] border-[1px]'>
-                                                            {
-                                                                itm?.id === isComplete ?
+                                                                            <div
+                                                                                onClick={() => { setActions(itm?.id) }}
+                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Actions</div>
+                                                                        </>
+                                                                }
+                                                            </div>
+                                                            <div className='w-full mt-2 flex rounded-l-lg rounded-r-lg overflow-hidden border-[#535353] border-[1px]'>
+                                                                {
+                                                                    itm?.id === isComplete ?
 
-                                                                    <>
-                                                                        <div
-                                                                            onClick={() => { taskCompleted(itm?.id) }}
-                                                                            className='bg-[#111111] px-3 p-1 text-green-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Complete</div>
-                                                                        <div
-                                                                            onClick={() => { setIsComplete(null) }}
-                                                                            className='bg-[#111111] px-3 p-1 text-red-500 
+                                                                        <>
+                                                                            <div
+                                                                                onClick={() => { taskCompleted(itm?.id) }}
+                                                                                className='bg-[#111111] px-3 p-1 text-green-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Complete</div>
+                                                                            <div
+                                                                                onClick={() => { setIsComplete(null) }}
+                                                                                className='bg-[#111111] px-3 p-1 text-red-500 
                                                                         hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Cancel</div>
 
-                                                                    </>
-                                                                    :
-                                                                    <div
-                                                                        onClick={() => {
-                                                                            setIsComplete(itm?.id)
-                                                                        }}
-                                                                        className=' bg-[#111111]  p-1 rounded-lg text-center text-green-500 w-full'>
-                                                                        Complete
-                                                                    </div>
-                                                            }
-                                                        </div>
-                                                    </div>
+                                                                        </>
+                                                                        :
+                                                                        <div
+                                                                            onClick={() => {
+                                                                                setIsComplete(itm?.id)
+                                                                            }}
+                                                                            className=' bg-[#111111]  p-1 rounded-lg text-center text-green-500 w-full'>
+                                                                            Complete
+                                                                        </div>
+                                                                }
+                                                            </div>
+                                                        </motion.div>
+                                                    </AnimatePresence>
                                                 ))
                                             ) : (
                                                 <div>No tasks available</div>
@@ -503,99 +513,104 @@ const Tasks: React.FC = () => {
                                         {
                                             taskDataCompleted && taskDataCompleted.length > 0 ? (
                                                 taskDataCompleted.map((itm: taskDataType, idx: number) => (
-                                                    <div
-                                                        className='bg-[#313131] w-full  overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
-                                                        key={idx}>
-                                                        <div className='font-bold'>
-                                                            {itm?.title}
-                                                        </div>
-                                                        <p className='text-[#888] break-all'>{itm?.description != '' ? itm?.description : 'No Description'}</p>
+                                                    <AnimatePresence>
+                                                        <motion.div
+                                                            layout
+                                                            initial={{ opacity: 0, y: 10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, y: 10 }}
+                                                            transition={{ duration: 0.3 }}
+                                                            className='bg-[#313131] w-full  overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
+                                                            key={idx}>
+                                                            <div className='font-bold'>
+                                                                {itm?.title}
+                                                            </div>
+                                                            <p className='text-[#888] break-all'>{itm?.description != '' ? itm?.description : 'No Description'}</p>
 
-                                                        <div className='mt-auto pt-2 flex gap-4 text-[10px] md:text-sm'>
-                                                            {
-                                                                itm.deadline != '' &&
-                                                                <div className='flex gap-1 items-center justify-start'>
-                                                                    <div>
-                                                                        < CiCalendarDate />
+                                                            <div className='mt-auto pt-2 flex gap-4 text-[10px] md:text-sm'>
+                                                                {
+                                                                    itm.deadline != '' &&
+                                                                    <div className='flex gap-1 items-center justify-start'>
+                                                                        <div>
+                                                                            < CiCalendarDate />
+                                                                        </div>
+                                                                        <p className='text-[#888] '>{itm?.deadline != '' && itm?.deadline}</p>
                                                                     </div>
-                                                                    <p className='text-[#888] '>{itm?.deadline != '' && itm?.deadline}</p>
-                                                                </div>
-                                                            }
-                                                            {
-                                                                itm?.category != '' &&
-                                                                <div className='flex items-center gap-1 justify-start'>
-                                                                    <div className='w-[10px] h-[10px] bg-red-500'>
+                                                                }
+                                                                {
+                                                                    itm?.category != '' &&
+                                                                    <div className='flex items-center gap-1 justify-start'>
+                                                                        <div className='w-[10px] h-[10px] bg-red-500'>
 
+                                                                        </div>
+                                                                        <p className='text-[#888] '>{itm?.category != '' && itm?.category}</p>
                                                                     </div>
-                                                                    <p className='text-[#888] '>{itm?.category != '' && itm?.category}</p>
-                                                                </div>
-                                                            }
-                                                            {
-                                                                itm?.priority != '' &&
-                                                                <div className='flex items-center gap-1 justify-start'>
-                                                                    <div className='w-[10px] h-[10px] bg-yellow-500'>
+                                                                }
+                                                                {
+                                                                    itm?.priority != '' &&
+                                                                    <div className='flex items-center gap-1 justify-start'>
+                                                                        <div className='w-[10px] h-[10px] bg-yellow-500'>
 
+                                                                        </div>
+                                                                        <p className='text-[#888] '>{itm?.priority != '' && itm?.priority} priority</p>
                                                                     </div>
-                                                                    <p className='text-[#888] '>{itm?.priority != '' && itm?.priority} priority</p>
-                                                                </div>
-                                                            }
-                                                        </div>
+                                                                }
+                                                            </div>
 
-                                                        <div className='flex mt-2 w-full border-[#535353] border-[1px] overflow-hidden rounded-l-lg  rounded-r-lg'>
-
-
-                                                            {
-                                                                actions === itm?.id ?
-                                                                    <>
-                                                                        <div
-                                                                            onClick={() => { deleteTask(itm?.id) }}
-                                                                            className='bg-[#111111] px-3 p-1 text-red-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Delete</div>
-                                                                        <div
-                                                                            onClick={() => { setedit(itm) }}
-                                                                            className='bg-[#111111] px-3 p-1 text-blue-500 
+                                                            <div className='flex mt-2 w-full border-[#535353] border-[1px] overflow-hidden rounded-l-lg  rounded-r-lg'>
+                                                                {
+                                                                    actions === itm?.id ?
+                                                                        <>
+                                                                            <div
+                                                                                onClick={() => { deleteTask(itm?.id) }}
+                                                                                className='bg-[#111111] px-3 p-1 text-red-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Delete</div>
+                                                                            <div
+                                                                                onClick={() => { setedit(itm) }}
+                                                                                className='bg-[#111111] px-3 p-1 text-blue-500 
                                                                         hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Edit</div>
 
-                                                                        <div
-                                                                            onClick={() => { setActions(null) }}
-                                                                            className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Cancel</div>
-                                                                    </>
-                                                                    :
-                                                                    <>
-                                                                        <div
-                                                                            onClick={() => { setViewTask(itm) }}
-                                                                            className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
+                                                                            <div
+                                                                                onClick={() => { setActions(null) }}
+                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Cancel</div>
+                                                                        </>
+                                                                        :
+                                                                        <>
+                                                                            <div
+                                                                                onClick={() => { setViewTask(itm) }}
+                                                                                className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
 
-                                                                        <div
-                                                                            onClick={() => { setActions(itm?.id) }}
-                                                                            className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Actions</div>
-                                                                    </>
-                                                            }
-                                                        </div>
-                                                        <div className='w-full mt-2 flex rounded-l-lg rounded-r-lg overflow-hidden border-[#535353] border-[1px]'>
-                                                            {
-                                                                itm?.id === isComplete ?
+                                                                            <div
+                                                                                onClick={() => { setActions(itm?.id) }}
+                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Actions</div>
+                                                                        </>
+                                                                }
+                                                            </div>
+                                                            <div className='w-full mt-2 flex rounded-l-lg rounded-r-lg overflow-hidden border-[#535353] border-[1px]'>
+                                                                {
+                                                                    itm?.id === isComplete ?
 
-                                                                    <>
-                                                                        <div
-                                                                            onClick={() => { taskPending(itm?.id) }}
-                                                                            className='bg-[#111111] px-3 p-1 text-green-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Complete</div>
-                                                                        <div
-                                                                            onClick={() => { setIsComplete(null) }}
-                                                                            className='bg-[#111111] px-3 p-1 text-red-500 
+                                                                        <>
+                                                                            <div
+                                                                                onClick={() => { taskPending(itm?.id) }}
+                                                                                className='bg-[#111111] px-3 p-1 text-green-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Complete</div>
+                                                                            <div
+                                                                                onClick={() => { setIsComplete(null) }}
+                                                                                className='bg-[#111111] px-3 p-1 text-red-500 
                                                                         hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Cancel</div>
 
-                                                                    </>
-                                                                    :
-                                                                    <div
-                                                                        onClick={() => {
-                                                                            setIsComplete(itm?.id)
-                                                                        }}
-                                                                        className=' bg-[#111111]  p-1 rounded-lg text-center text-green-500 w-full'>
-                                                                        Pending
-                                                                    </div>
-                                                            }
-                                                        </div>
-                                                    </div>
+                                                                        </>
+                                                                        :
+                                                                        <div
+                                                                            onClick={() => {
+                                                                                setIsComplete(itm?.id)
+                                                                            }}
+                                                                            className=' bg-[#111111]  p-1 rounded-lg text-center text-green-500 w-full'>
+                                                                            Pending
+                                                                        </div>
+                                                                }
+                                                            </div>
+                                                        </motion.div>
+                                                    </AnimatePresence>
                                                 ))
                                             ) : (
                                                 <div>No tasks available</div>

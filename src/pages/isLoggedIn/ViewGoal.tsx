@@ -825,8 +825,19 @@ const ViewGoal: React.FC = () => {
                                         </div>
 
                                         <div className='flex flex-col gap-3 h-auto mt-4'>
-                                            <div className='text-xl font-bold flex items-center gap-2'>
-                                                <GoTasklist />  Tasks
+                                            <div className='flex gap-3 justify-between items-center'>
+                                                <div className='text-xl font-bold flex items-center gap-2'>
+                                                    <GoTasklist />  Tasks
+                                                </div>
+             
+                                                  <input
+                                                                        value={subTaskEdit}
+                                                                        maxLength={50}
+                                                                        onChange={(e) => { setSubTaskEdit(e.target.value) }}
+                                                                        placeholder='Search your task'
+                                                                        className='p-2 rounded-lg bg-[#111111] w-full max-w-[300px] outline-none border-[#535353] border-[1px]'
+                                                                        type="text" />
+                               
                                             </div>
 
                                             {

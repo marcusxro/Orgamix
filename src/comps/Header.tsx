@@ -11,10 +11,10 @@ const Header: React.FC = () => {
 
     return (
         <header className='flex gap-3 justify-between items-center px-[5%] py-4 border-b-[1px] border-b-[#414141]'>
-            <div className='w-[20px] h-[20px] cursor-pointer flex gap-[1px] items-center'>
+            <div className='w-[20px] h-[20px] cursor-pointer flex gap-2 items-center'>
                 <img src={OrgamixLogo} className='w-full h-full object-cover' alt="" />
                 <div className='font-bold'>
-                    RGAMIX
+                    ORGAMIX
                 </div>
             </div>
 
