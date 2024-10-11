@@ -93,7 +93,7 @@ interface dataType {
     invited_emails: null | invitedEmails[];
     updated_at: null | updatedAt[];
     is_favorite: boolean;
-    boards:  boardsType[]
+    boards: boardsType[]
 }
 
 
@@ -249,11 +249,11 @@ export default function Samp() {
         deadline: string;
         assigned_to: string; //uid basis
     }
-    
+
 
     async function onAddItem() {
         if (!itemName) return;
-    
+
         try {
             const newTask: tasksType = {
                 title: itemName,
@@ -265,7 +265,7 @@ export default function Samp() {
                 deadline: '',
                 assigned_to: '', // Set to the actual user ID if needed
             };
-    
+
             // Fetch the existing project to get the boards
             const { data: projectData, error: fetchError } = await supabase
                 .from("projects")
@@ -273,31 +273,31 @@ export default function Samp() {
                 .eq("created_by", user?.uid)
                 .eq("created_at", params?.time)
                 .single();
-    
+
             if (fetchError) {
                 console.log("Error fetching project:", fetchError);
                 return;
             }
-    
+
             const existingBoards: boardsType[] = projectData?.boards || [];
-    
+
             // Find the specific board to add the task to
             const boardIndex = existingBoards.findIndex(board => board.board_uid === currentContainerId);
             if (boardIndex === -1) {
                 console.log("Board not found!");
                 return;
             }
-    
+
             // Append the new task to the found board's tasks
             existingBoards[boardIndex].tasks.push(newTask);
-    
+
             // Update the boards array in the project
             const { error: updateError } = await supabase
                 .from("projects")
                 .update({ boards: existingBoards })
                 .eq("created_by", user?.uid)
                 .eq("created_at", params?.time);
-    
+
             if (updateError) {
                 console.log("Error updating tasks:", updateError);
             } else {
@@ -306,7 +306,7 @@ export default function Samp() {
 
             setShowAddItemModal(false);
             setItemName("")
-    
+
         } catch (err) {
             console.log("Error adding task:", err);
         }
@@ -457,11 +457,30 @@ export default function Samp() {
         }
     };
 
-    // This is the function that handles the sorting of the containers and items when the user is done dragging.
-    function handleDragEnd(event: DragEndEvent) {
-        const { active, over } = event;
 
-        // Handling Container Sorting
+    function findBoardContainingTask(taskId: string | number) {
+        if (!fetchedData) return
+        return fetchedData[0]?.boards.find((boards: boardsType) =>
+            boards.tasks.some(task => task.created_at === taskId)
+        );
+    }
+
+    function findBoardById(boardId: string | number) {
+        if (!fetchedData) return
+        return fetchedData[0]?.boards.find(board => board.board_uid === boardId);
+    }
+
+
+    // This is the function that handles the sorting of the containers and items when the user is done dragging.
+    async function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event;
+    
+        if (!fetchedData) return; // Check if fetchedData is available
+    
+        // Copying the fetchedData's boards
+        let newItems = [...fetchedData[0]?.boards];
+
+        // Handling Container (Board) Sorting
         if (
             active.id.toString().includes('container') &&
             over?.id.toString().includes('container') &&
@@ -469,109 +488,105 @@ export default function Samp() {
             over &&
             active.id !== over.id
         ) {
-            // Find the index of the active and over container
-            const activeContainerIndex = containers.findIndex(
-                (container) => container.id === active.id,
+            const activeContainerIndex = newItems.findIndex(
+                (container) => container.board_uid === active.id,
             );
-            const overContainerIndex = containers.findIndex(
-                (container) => container.id === over.id,
+            const overContainerIndex = newItems.findIndex(
+                (container) => container.board_uid === over.id,
             );
-            // Swap the active and over container
-            let newItems = [...containers];
+    
+            // Swap the active and over containers (boards)
             newItems = arrayMove(newItems, activeContainerIndex, overContainerIndex);
-            setContainers(newItems);
+    
+            // Update the fetchedData with the new board order
+            setFetchedData([{ ...fetchedData[0], boards: newItems }]);
         }
 
-        // Handling item Sorting
-        if (
-            active.id.toString().includes('item') &&
-            over?.id.toString().includes('item') &&
-            active &&
-            over &&
-            active.id !== over.id
-        ) {
-            // Find the active and over container
-            const activeContainer = findValueOfItems(active.id, 'item');
-            const overContainer = findValueOfItems(over.id, 'item');
 
-            // If the active or over container is not found, return
-            if (!activeContainer || !overContainer) return;
-            // Find the index of the active and over container
-            const activeContainerIndex = containers.findIndex(
-                (container) => container.id === activeContainer.id,
-            );
-            const overContainerIndex = containers.findIndex(
-                (container) => container.id === overContainer.id,
-            );
-            // Find the index of the active and over item
-            const activeitemIndex = activeContainer.items.findIndex(
-                (item) => item.id === active.id,
-            );
-            const overitemIndex = overContainer.items.findIndex(
-                (item) => item.id === over.id,
-            );
 
-            // In the same container
-            if (activeContainerIndex === overContainerIndex) {
-                let newItems = [...containers];
-                newItems[activeContainerIndex].items = arrayMove(
-                    newItems[activeContainerIndex].items,
-                    activeitemIndex,
-                    overitemIndex,
-                );
-                setContainers(newItems);
-            } else {
-                // In different containers
-                let newItems = [...containers];
-                const [removeditem] = newItems[activeContainerIndex].items.splice(
-                    activeitemIndex,
-                    1,
-                );
-                newItems[overContainerIndex].items.splice(
-                    overitemIndex,
-                    0,
-                    removeditem,
-                );
-                setContainers(newItems);
-            }
-        }
-        // Handling item dropping into Container
-        if (
-            active.id.toString().includes('item') &&
-            over?.id.toString().includes('container') &&
-            active &&
-            over &&
-            active.id !== over.id
-        ) {
-            // Find the active and over container
-            const activeContainer = findValueOfItems(active.id, 'item');
-            const overContainer = findValueOfItems(over.id, 'container');
+        console.log(newItems)
+        saveChangesToDB(newItems)
 
-            // If the active or over container is not found, return
-            if (!activeContainer || !overContainer) return;
-            // Find the index of the active and over container
-            const activeContainerIndex = containers.findIndex(
-                (container) => container.id === activeContainer.id,
-            );
-            const overContainerIndex = containers.findIndex(
-                (container) => container.id === overContainer.id,
-            );
-            // Find the index of the active and over item
-            const activeitemIndex = activeContainer.items.findIndex(
-                (item) => item.id === active.id,
-            );
+//       // Handling Task Sorting (within the same or between different boards)
+// if (
+//     (active.id.toString().includes('item') || active.id.toString().includes('container')) &&
+//         over?.id.toString().includes('container') &&
+//         active &&
+//         over &&
+//         active.id !== over.id
+// ) {
 
-            let newItems = [...containers];
-            const [removeditem] = newItems[activeContainerIndex].items.splice(
-                activeitemIndex,
-                1,
-            );
-            newItems[overContainerIndex].items.push(removeditem);
-            setContainers(newItems);
-        }
+//     const activeBoard = fetchedData[0]?.boards.find(board => board.board_uid === active.id);
+//     const overBoard = fetchedData[0]?.boards.find(board => board.board_uid === over.id);
+
+//     if (!activeBoard || !overBoard) return;
+//     console.log("AHAHJ")
+//     const activeBoardIndex = newItems.findIndex(
+//         (board) => board.board_uid === activeBoard.board_uid,
+//     );
+//     const overBoardIndex = newItems.findIndex(
+//         (board) => board.board_uid === overBoard.board_uid,
+//     );
+
+//     const activeTaskIndex = activeBoard.tasks.findIndex(
+//         (task) => task.created_at === active.id,
+//     );
+//     const overTaskIndex = overBoard.tasks.findIndex(
+//         (task) => task.created_at === over.id,
+//     ); // Define overTaskIndex here
+
+//     if (activeBoardIndex === overBoardIndex) {
+//         // Reorder tasks within the same board
+//         newItems[activeBoardIndex].tasks = arrayMove(
+//             newItems[activeBoardIndex].tasks,
+//             activeTaskIndex,
+//             overTaskIndex,
+//         );
+//     } else {
+//         // Move task between different boards
+//         const [removedTask] = newItems[activeBoardIndex].tasks.splice(
+//             activeTaskIndex,
+//             1,
+//         );
+//         newItems[overBoardIndex].tasks.splice(overTaskIndex, 0, removedTask);
+//     }
+
+//     // Update fetchedData with new board and task structure
+//     const updatedFetchedData = {
+//         ...fetchedData[0],
+//         boards: newItems,
+//     };
+
+
+//     setFetchedData([updatedFetchedData])
+
+// }
+
+        // Reset active item after sorting
         setActiveId(null);
     }
+    
 
+
+    async function saveChangesToDB(updatedContainers: boardsType[]) {
+        console.log("RUN")
+        try {
+            // Assuming "projects" table has containers and tasks stored
+            const { error } = await supabase
+                .from('projects')
+                .update({ boards: updatedContainers })
+                .eq('created_by', user?.uid)
+                .eq('created_at', params?.time);
+
+            if (error) {
+                console.log('Error saving updated order:', error);
+            } else {
+                console.log('Updated order saved successfully!');
+            }
+        } catch (err) {
+            console.log('Error during update:', err);
+        }
+    }
 
 
     function checkDeadlineMet(deadlineString: string | number): JSX.Element {
@@ -651,7 +666,7 @@ export default function Samp() {
                     </div>
 
                 </Modal>
-      
+
                 <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
                     <div className="flex flex-col w-full items-start gap-y-4">
                         <h1 className="text-gray-800 text-xl font-bold">Add Item</h1>
@@ -717,29 +732,43 @@ export default function Samp() {
                             onDragEnd={handleDragEnd}
                         >
 
-                            <SortableContext items={fetchedData && fetchedData[0]?.boards != null  ? fetchedData[0].boards.map((board: boardsType) => board.board_uid) : []}>
+                            <SortableContext items={fetchedData && fetchedData[0]?.boards != null ? fetchedData[0].boards.map((board: boardsType) => board.board_uid) : []}>
                                 {fetchedData && fetchedData[0].boards && fetchedData[0].boards.map((board: boardsType) => (
                                     <Container
-                                        id={board.board_uid} 
+                                        id={board.board_uid}
                                         title={board.title}
                                         titleColor={board?.titleColor}
-                                        key={board.board_uid} 
+                                        key={board.board_uid}
                                         itemLength={Array.isArray(board.tasks) ? board.tasks.length : 0} // Safely access length
                                         onAddItem={() => {
                                             setShowAddItemModal(true);
-                                            setCurrentContainerId(board.board_uid); 
+                                            setCurrentContainerId(board.board_uid);
                                         }}
                                     >
-                                        <SortableContext items={Array.isArray(board.tasks) ? board.tasks.map((task: tasksType) => task.created_at) : []}>
-                                            <div className="flex items-start flex-col p-2 gap-y-4">
-                                                {Array.isArray(board.tasks) && board.tasks.map((task) => (
-                                                    <Items title={task.title} id={task.created_at} key={task.created_at} /> 
-                                                ))}
-                                            </div>
-                                        </SortableContext>
+                                        {
+                                          board?.tasks &&
+                                          <SortableContext items={Array.isArray(board.tasks) ? board.tasks.map((task: tasksType) => task?.created_at) : []}>
+                                          <div
+                                           className="flex items-start flex-col p-2 gap-y-4">
+                                              {Array.isArray(board.tasks) && board.tasks.length > 0 ? (
+                                                  board.tasks.map((task: tasksType, idx: number) => (
+                                                      <Items
+                                                          title={task?.title}
+                                                          id={task?.created_at}
+                                                          key={task?.created_at || `task-${idx}`} // Use created_at as key or fallback to a unique string
+                                                      />
+                                                  ))
+                                              ) : (
+                                                  <p>No tasks available</p> // Handle case where tasks array is empty
+                                              )}
+                                          </div>
+                                      </SortableContext>
+                                        }
+                                       
                                     </Container>
                                 ))}
                             </SortableContext>
+
 
 
 
@@ -750,7 +779,7 @@ export default function Samp() {
                                 )}
                                 {/* Drag Overlay For Container */}
                                 {activeId && activeId.toString().includes('container') && (
-                                    <Container    titleColor={"fffff"} itemLength={0} id={activeId} title={findContainerTitle(activeId)}>
+                                    <Container titleColor={"fffff"} itemLength={0} id={activeId} title={findContainerTitle(activeId)}>
                                         {findContainerItems(activeId).map((i) => (
                                             <Items key={i.id} title={i.title} id={i.id} />
                                         ))}
