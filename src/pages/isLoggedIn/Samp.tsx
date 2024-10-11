@@ -651,7 +651,7 @@ export default function Samp() {
                     </div>
 
                 </Modal>
-                {/* Add Item Modal */}
+      
                 <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
                     <div className="flex flex-col w-full items-start gap-y-4">
                         <h1 className="text-gray-800 text-xl font-bold">Add Item</h1>
