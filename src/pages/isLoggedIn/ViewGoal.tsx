@@ -39,12 +39,6 @@ interface dataType {
 }
 
 
-interface ParamsType {
-    time: string | undefined;
-    uid: string | undefined;
-}
-
-
 const ViewGoal: React.FC = () => {
     const nav = useNavigate()
     const [user] = IsLoggedIn()

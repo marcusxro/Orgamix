@@ -6,7 +6,6 @@ import { supabase } from '../../../supabase/supabaseClient';
 import IsLoggedIn from '../../../firebase/IsLoggedIn';
 
 interface propsType{
-    location: string;
     isUid: string | undefined
 }
 
@@ -22,11 +21,11 @@ interface dataType {
 }
 
 
-const ProjectSidebar:React.FC<propsType> = ({location, isUid}) => {
+const ProjectSidebar:React.FC<propsType> = ({ isUid}) => {
 
     
     const {openNew, setOpenNew}:any = useStore() 
-
+    const { sidebarLoc, setSidebarLoc }: any = useStore()
 
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [user] = IsLoggedIn()
@@ -95,13 +94,17 @@ const ProjectSidebar:React.FC<propsType> = ({location, isUid}) => {
 
     return (
         <div className='sticky top-0 w-full h-auto md:h-screen border-r-[1px] border-r-[#414141] p-3'>
-        
+    
             <div className='h-full overflow-y-auto'>
                 <div className="border-b-[1px] border-b-[#414141] items-center flex flex-row gap-2 mb-2 md:flex-col md:items-start pb-3">
-                    <div className={`${location === 'home' && "bg-[#535353]"}  w-auto md:w-full flex items-center gap-2 md:text-lg px-3 py-1 text-left rounded-lg cursor-pointer`}>
+                    <div
+                                        onClick={() => {setSidebarLoc("Home")}}
+                     className={`${sidebarLoc === 'Home' && "bg-[#535353]"}  w-auto md:w-full flex items-center gap-2 md:text-lg px-3 py-1 text-left rounded-lg cursor-pointer`}>
                         <FaHome /> Home
                     </div>
-                    <div className={`${location === 'favs' && "bg-[#535353]"}  w-auto md:w-full  flex items-center gap-2 md:text-lg px-3 py-1 text-left rounded-lg cursor-pointer`}>
+                    <div
+                        onClick={() => {setSidebarLoc("Favs")}}
+                     className={`${sidebarLoc === 'Favs' && "bg-[#535353]"}  w-auto md:w-full  flex items-center gap-2 md:text-lg px-3 py-1 text-left rounded-lg cursor-pointer`}>
                         <FaRegStar /> Starred
                     </div>
                     <div

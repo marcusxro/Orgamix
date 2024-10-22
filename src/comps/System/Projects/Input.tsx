@@ -8,14 +8,14 @@ interface InputProps {
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   }
 
-const Input = ({ name, value, placeholder, onChange, colorVal }: InputProps) => {
+const Input = ({ name, value, placeholder, onChange }: InputProps) => {
   return (
     <input
-    style={{color: colorVal}}
       name={name}
       value={value}
       placeholder={placeholder}
       onChange={onChange}
+      maxLength={50}
       className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
       ></input>
   );

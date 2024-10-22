@@ -11,7 +11,7 @@ import { MdDateRange } from "react-icons/md";
 import { LuLayoutTemplate } from "react-icons/lu";
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../comps/Loader';
-import {motion, AnimatePresence} from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 
 interface subtaskType {
@@ -81,6 +81,10 @@ const Goals: React.FC = () => {
     }, [GoalListener, user])
 
     const handleRealtimeEvent = (payload: any) => {
+        const isCurrentUserProject = payload.new?.created_by === user?.uid || payload.old?.created_by === user?.uid;
+
+        if (!isCurrentUserProject) return;
+
         switch (payload.eventType) {
             case 'INSERT':
                 setFetchedData((prevData) =>
@@ -277,12 +281,11 @@ const Goals: React.FC = () => {
                                     {
                                         fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
                                             <motion.div
-                                            layout
-
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 10 }}
-                                            transition={{ duration: 0.3 }}
+                                                layout
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 10 }}
+                                                transition={{ duration: 0.3 }}
                                                 onClick={() => {
                                                     nav(`/user/goals/templates/${user?.uid}/${itm?.created_at}`)
                                                 }}

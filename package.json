@@ -20,6 +20,7 @@
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "dotenv": "^16.4.5",
+    "emoji-picker-react": "^4.12.0",
     "firebase": "^10.13.2",
     "focus-trap-react": "^10.3.0",
     "framer-motion": "^11.11.4",
@@ -36,6 +37,7 @@
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.26.2",
     "react-toastify": "^10.0.5",
+    "react-tooltip": "^5.28.0",
     "react-webcam": "^7.2.0",
     "uuid": "^10.0.0",
     "zustand": "^5.0.0-rc.2"

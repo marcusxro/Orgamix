@@ -13,7 +13,8 @@ const DeleteGoal: React.FC<titleType> = ({ titleOfGoal, closer }) => {
 
     const params = useParams()
 
-    const confirmText = "delete/" + titleOfGoal
+    const confirmText = "delete/" + titleOfGoal?.replace(/\s+/g, "");
+
     const [inputVal, setInputVal] = useState("")
     const [loading, setLoading] = useState(false)
 
@@ -67,7 +68,7 @@ const DeleteGoal: React.FC<titleType> = ({ titleOfGoal, closer }) => {
                     To ensure that deletions are intentional and well-considered, please copy the text below.
                 </p>
 
-                <div className='mt-4 text-red-500 bg-[#222222] p-3 rounded-lg'>
+                <div className='mt-4 text-red-500 bg-[#222222] p-3 rounded-lg pointer-events-auto'>
                     {confirmText}
                 </div>
 

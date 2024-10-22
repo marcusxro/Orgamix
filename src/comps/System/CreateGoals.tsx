@@ -221,6 +221,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
                     setHabits([])
                     listener(Prevs => !Prevs)
                     setSubTasks(null)
+                    setCategory("")
                     setLoading(false)
                 }
 
@@ -258,6 +259,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
                     setHabits([])
                     listener(Prevs => !Prevs)
                     setSubTasks(null)
+                    setCategory("")
                     setLoading(false)
                 }
 
@@ -280,6 +282,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
             onClick={(e) => { e.stopPropagation() }}
             className='w-[350px] h-full bg-[#313131] z-[5000]
              rounded-lg p-3 border-[#535353] border-[1px] flex flex-col justify-between'>
+                
             <div className='pb-2'>
                 <div className='text-xl font-bold'>Create Goal</div>
                 <p className='text-[#888] text-sm'>

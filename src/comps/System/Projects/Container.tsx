@@ -5,6 +5,12 @@ import clsx from 'clsx';
 import { Button } from '../Projects/Button';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import { TbDragDrop } from "react-icons/tb";
+import { IoSettingsOutline } from "react-icons/io5";
+import { Tooltip as ReactTooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
+import useStore from '../../../Zustand/UseStore';
+import IsLoggedIn from '../../../firebase/IsLoggedIn';
+
 
 
 interface ContainerProps {
@@ -39,7 +45,10 @@ const Container = ({
       type: 'container',
     },
   });
+  const { setSettingsBoard }:any = useStore()
+  const [user] = IsLoggedIn()
   return (
+
     <div
       {...attributes}
       ref={setNodeRef}
@@ -52,27 +61,61 @@ const Container = ({
         isDragging && 'opacity-50 border-dashed border-custom',
       )}
     >
-      <div 
-       style={{backgroundColor: titleColor}}
-      className="flex items-center justify-between p-3">
+      {isDragging}
+      <div
+        style={{ backgroundColor: titleColor }}
+        className="flex items-center gap-3 justify-between p-3">
+
         <div className="flex flex-col gap-y-1">
           <h1 className="text-white text-md"><span className='text-[#888] mr-3'>({itemLength})</span>
-            <span>{title}</span>
+            <span className='text-white mix-blend-difference break-all'>{title}</span>
           </h1>
           <p className="text-gray-400 text-sm">{description}</p>
         </div>
+
         <div className='gap-2 flex items-center'>
           <button
+            data-tooltip-id={`drop-${id}`}
             className='text-md px-3 py-[11px] touchedPage rounded-lg bg-[#222222] text-white hover:bg-[#353535]   border-[#535353] border-[1px]'
 
             {...listeners}
           >
+
+            <ReactTooltip
+              id={`drop-${id}`}
+              place="bottom"
+              variant="dark"
+              className='rounded-lg border-[#535353] border-[1px]'
+              content="Drag item"
+            />
+
             <TbDragDrop />
           </button>
           <Button
-          variant={"addItem"}
-           onClick={onAddItem}>
+            data-tooltip-id={`add-${id}`}
+            variant={"addItem"}
+            onClick={onAddItem}>
             +
+            <ReactTooltip
+              id={`add-${id}`}
+              place="bottom"
+              variant="dark"
+              className='rounded-lg border-[#535353] border-[1px]'
+              content="Add item"
+            />
+          </Button>
+          <Button
+            onClick={() => {setSettingsBoard(id)}}
+            data-tooltip-id={`set-${id}`}
+            variant={"addItem"}>
+            <IoSettingsOutline />
+            <ReactTooltip
+              id={`set-${id}`}
+              place="bottom"
+              className='rounded-lg border-[#535353] border-[1px]'
+              variant="dark"
+              content="Settings"
+            />
           </Button>
         </div>
       </div>

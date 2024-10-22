@@ -59,7 +59,7 @@ const Tasks: React.FC = () => {
 
             setSortVal(sortMethod)
         }
-    }, [isSort])
+    }, [isSort, localStorage])
 
 
 
@@ -105,6 +105,11 @@ const Tasks: React.FC = () => {
 
 
     const handleRealtimeEvent = (payload: any) => {
+        const isCurrentUserProject = payload.new?.created_by === user?.uid || payload.old?.created_by === user?.uid;
+
+        if (!isCurrentUserProject) return;
+
+        
         switch (payload.eventType) {
             case 'INSERT':
                 setTasksData((prevData) =>
@@ -515,7 +520,7 @@ const Tasks: React.FC = () => {
                                                 taskDataCompleted.map((itm: taskDataType, idx: number) => (
                                                     <AnimatePresence>
                                                         <motion.div
-                                                            layout
+                                                            layout  
                                                             initial={{ opacity: 0, y: 10 }}
                                                             animate={{ opacity: 1, y: 0 }}
                                                             exit={{ opacity: 0, y: 10 }}

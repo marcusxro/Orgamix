@@ -34,9 +34,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
 
 
 
-
     const [emailAdded, setEmailAdded] = useState<accountType[] | null>(null)
-
     const [loading, setLoading] = useState<boolean>(false)
 
     function addToArr(params: accountType) {
@@ -75,7 +73,6 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
     }, [params])
 
     useEffect(() => {
-
         if (email && user) {
             getAccounts();
         }

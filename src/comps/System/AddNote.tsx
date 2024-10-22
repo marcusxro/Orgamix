@@ -54,11 +54,13 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
         setLoading(true)
 
         if (loading) {
+            setLoading(false)
             return
         }
 
 
         if (!value || !title || !category) {
+            setLoading(false)
             return
         }
         try {
