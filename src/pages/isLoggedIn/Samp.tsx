@@ -6,7 +6,8 @@ import { MdOutlineViewKanban } from "react-icons/md";
 import { IoIosContact } from "react-icons/io";
 import { FaLinesLeaning } from "react-icons/fa6";
 import { BsCalendarDate } from "react-icons/bs";
-
+import { FaSort } from "react-icons/fa6";
+import { motion, AnimatePresence } from 'framer-motion'
 // DnD
 import {
     DndContext,
@@ -128,6 +129,7 @@ export default function Samp() {
     const { inviteToProject, setInviteToProject }: any = useStore()
     const { openKanbanSettings }: any = useStore()
     const { openKanbanChat }: any = useStore()
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         if (user) {
@@ -178,9 +180,8 @@ export default function Samp() {
     };
 
 
-
-
     async function getProjects() {
+
         try {
             const { data, error } = await supabase
                 .from('projects')
@@ -196,12 +197,9 @@ export default function Samp() {
             }
 
         } catch (err) {
-            console.log(err);
+            console.log(err)
         }
     }
-
-
-
 
     const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
     const [currentContainerId, setCurrentContainerId] = useState<UniqueIdentifier>();
@@ -209,8 +207,6 @@ export default function Samp() {
     const [itemName, setItemName] = useState('');
     const [showAddContainerModal, setShowAddContainerModal] = useState(false);
     const [showAddItemModal, setShowAddItemModal] = useState(false);
-
-
 
 
     async function onAddContainer() {
@@ -229,7 +225,6 @@ export default function Samp() {
         console.log("sdsd")
         try {
             const id = `container-${uuidv4()}`;
-
             const newData = {
                 title: containerName,
                 titleColor: colorVal,
@@ -238,7 +233,6 @@ export default function Samp() {
                 created_by: user?.uid,
                 tasks: []
             };
-
             // Fetch the existing project where boards need to be added
             const { data: projectData, error: fetchError } = await supabase
                 .from("projects")
@@ -250,9 +244,7 @@ export default function Samp() {
                 console.log("Error fetching project:", fetchError);
                 return;
             }
-
             const existingBoards = projectData?.boards || [];
-
             // Append the new board to the existing boards array
             const updatedBoards = [...existingBoards, newData];
 
@@ -298,7 +290,6 @@ export default function Samp() {
             return
         };
 
-
         if (!itemName) {
             setLoading(false)
             return
@@ -308,10 +299,7 @@ export default function Samp() {
             return
         };
 
-
-
         try {
-
             const newTask: tasksType = {
                 title: itemName,
                 created_at: Date.now(),
@@ -322,8 +310,6 @@ export default function Samp() {
                 deadline: workEnd,
                 assigned_to: assignee === "" ? "Everyone" : assignee,
             };
-
-
 
             // Fetch the existing project to get the boards
             const { data: projectData, error: fetchError } = await supabase
@@ -339,7 +325,6 @@ export default function Samp() {
             }
 
             const existingBoards: boardsType[] = projectData?.boards || [];
-
             // Find the specific board to add the task to
             const boardIndex = existingBoards.findIndex(board => board.board_uid === currentContainerId);
             if (boardIndex === -1) {
@@ -347,14 +332,10 @@ export default function Samp() {
                 setLoading(false)
                 return;
             }
-
             // Append the new task to the found board's tasks
             existingBoards[boardIndex].tasks.push(newTask);
 
             // Update the boards array in the project
-
-
-
 
             const { error: updateError } = await supabase
                 .from("projects")
@@ -576,8 +557,6 @@ export default function Samp() {
     async function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
 
-
-
         if (!fetchedData) return; // Check if fetchedData is available
 
         // Copying the fetchedData's boards
@@ -621,8 +600,6 @@ export default function Samp() {
             const overBoard = newItems.find((board) =>
                 board.tasks.some((task) => "task-" + task.created_at.toString() === over.id),
             );
-
-
 
             if (!activeBoard || !overBoard) return;
 
@@ -728,7 +705,30 @@ export default function Samp() {
             );
         }
     }
+    const [filteredData, setFilteredData] = useState<dataType[] | null>(null);
 
+    useEffect(() => {
+        if (!fetchedData) return;
+
+        const filtered = fetchedData.map(project => ({
+            ...project,
+            boards: project.boards
+                .filter(board =>
+                    board.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    board.tasks.some(task =>
+                        task.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                )
+                .map(board => ({
+                    ...board,
+                    tasks: board.tasks.filter(task =>
+                        task.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                }))
+        }));
+
+        setFilteredData(filtered);
+    }, [fetchedData, searchQuery]);
 
 
 
@@ -738,11 +738,12 @@ export default function Samp() {
             {
                 //closes the modal if its in private, and not included in shareable invited_emails
                 (fetchedData && fetchedData.length > 0 && (
-                    (fetchedData[0].is_shared !== "private" && fetchedData[0].is_shared === "public") ||
-                    (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.uid) ||
-                    (fetchedData[0].is_shared === "shareable" &&
-                    ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.uid) ||
-                    (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
+                    fetchedData[0]?.created_by === user?.uid ||
+                    (fetchedData[0]?.is_shared !== "private" && fetchedData[0]?.is_shared === "public") ||
+                    (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid) ||
+                    (fetchedData[0]?.is_shared === "shareable" &&
+                        ((fetchedData[0]?.invited_emails === null && fetchedData[0]?.created_by === user?.uid) ||
+                            (fetchedData[0]?.invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) && settingsTask != null && settingsTask != null &&
                 <EditTaskProject isAllowed={(findTaskAssignee((settingsTask.toString())) === user?.email ? true : false) ||
                     (findTaskAssignee((settingsTask.toString())) === "Everyone" && true) ||
@@ -751,13 +752,13 @@ export default function Samp() {
 
             }
             {
-                //closes the modal if its in private, and not included in shareable invited_emails
                 (fetchedData && fetchedData.length > 0 && (
-                    (fetchedData[0].is_shared !== "private" && fetchedData[0].is_shared === "public") ||
-                    (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.uid) ||
-                    (fetchedData[0].is_shared === "shareable" &&
-                    ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.uid) ||
-                    (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
+                    fetchedData[0]?.created_by === user?.uid ||
+                    (fetchedData[0]?.is_shared !== "private" && fetchedData[0]?.is_shared === "public") ||
+                    (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid) ||
+                    (fetchedData[0]?.is_shared === "shareable" &&
+                        ((fetchedData[0]?.invited_emails === null && fetchedData[0]?.created_by === user?.uid) ||
+                            (fetchedData[0]?.invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) &&
 
                 settingsBoard !== null && (
@@ -769,26 +770,26 @@ export default function Samp() {
                 <InviteToProjects />
             }
             {
-                //closes the modal if its in private, and not included in shareable invited_emails
                 (fetchedData && fetchedData.length > 0 && (
+                    fetchedData[0]?.created_by === user?.uid ||
                     (fetchedData[0].is_shared !== "private" && fetchedData[0].is_shared === "public") ||
                     (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.uid) ||
                     (fetchedData[0].is_shared === "shareable" &&
-                    ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.uid) ||
-                    (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
+                        ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.uid) ||
+                            (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) &&
                 openKanbanSettings &&
                 <ProjectSettings />
             }
             {
-
-                 //closes the modal if its in private, and not included in shareable invited_emails
-                 (fetchedData && fetchedData.length > 0 && (
+                (fetchedData && fetchedData.length > 0 && (
+                    fetchedData[0]?.created_by === user?.uid ||
                     (fetchedData[0].is_shared !== "private" && fetchedData[0].is_shared === "public") ||
                     (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.uid) ||
+
                     (fetchedData[0].is_shared === "shareable" &&
-                    ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.uid) ||
-                    (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
+                        ((fetchedData[0].invited_emails === null && fetchedData[0]?.created_by === user?.uid) ||
+                            (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) &&
                 openKanbanChat &&
                 <Chat />
@@ -967,11 +968,16 @@ export default function Samp() {
 
 
                 <div className="p-3 h-[60px] mt-[35px] border-b-[#535353] border-b-[1px] md:mt-0  flex items-center justify-between gap-y-2">
-                    <div className='text-md border-[#535353] border-[1px] p-2 text-[#888] rounded-md bg-[#111111]'>
-                        filter
+                    <div className='w-full max-w-[150px] mr-2  overflow-hidden'>
+                        <input
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder='⌕ Search (e.g tasks, boards)'
+                            className='text-sm flex gap-2 w-full items-center placeholder:text-[#888] border-[#535353] border-[1px] p-[8.5px] outline-none text-[#888] rounded-md bg-[#111111]'
+                            type="text" />
                     </div>
 
-                    <div className='flex gap-3 items-center'>
+                    <div className='flex gap-3 items-center '>
                         <Button
                             variant={"addBoard"}
                             onClick={() => setShowAddContainerModal(true)}>
@@ -1048,52 +1054,72 @@ export default function Samp() {
                                             onDragMove={handleDragMove}
                                             onDragEnd={handleDragEnd}>
 
-                                            <SortableContext items={fetchedData && fetchedData[0]?.boards != null ? fetchedData[0].boards.map((board: boardsType) => board.board_uid) : []}>
-                                                {user && fetchedData && fetchedData[0].boards && fetchedData[0].boards.map((board: boardsType) => (
-                                                    <Container
-                                                        id={board.board_uid}
-                                                        title={board.title}
-                                                        titleColor={board?.titleColor}
-                                                        key={board.board_uid}
-                                                        itemLength={Array.isArray(board.tasks) ? board.tasks.length : 0} // Safely access length
-                                                        onAddItem={() => {
-                                                            setShowAddItemModal(true);
-                                                            setCurrentContainerId(board.board_uid);
-                                                        }}>
+                                            <SortableContext items={filteredData && filteredData[0]?.boards != null ? filteredData[0].boards.map((board: boardsType) => board.board_uid) : []}>
+                                                <AnimatePresence>
+                                                    {
+                                                        filteredData && filteredData[0]?.boards.length === 0 && searchQuery &&
+                                                        <div className='text-sm text-[#888]'>No result</div>
+                                                    }
+                                                    {user && filteredData && filteredData[0].boards && filteredData[0].boards.map((board: boardsType) => (
+                                                        <motion.div
+                                                            key={board.board_uid}
+                                                            layout 
+                                                            initial={{ opacity: 0, y: 10 }} 
+                                                            animate={{ opacity: 1, y: 0 }} // Animate to visible position
+                                                            exit={{ opacity: 0, y: 10 }} // Animate out to hidden position
+                                                            transition={{ duration: 0.3, ease: 'easeInOut' }} // Adjust duration and easing
+                                                        >
 
-                                                        <div
-                                                            className='p-2 flex flex-col gap-2'>
-                                                            {Array.isArray(board.tasks) && board.tasks.length > 0 ? (
-                                                                board.tasks.map((task: tasksType, idx: number) => {
-                                                                    const deadline = findTaskDetails(`task-${task?.created_at}`, "deadline");
-                                                                    const type = findTaskDetails(`task-${task?.created_at}`, "type");
-                                                                    if (!user) return
-                                                                    let assignedTo = task?.assigned_to === user?.email
-                                                                    return (
-                                                                        <div className='px-2'>
-                                                                            <Items
-                                                                                title={task?.title}
-                                                                                id={`task-${task?.created_at}`}
-                                                                                start_work={task?.start_work}
-                                                                                deadline={checkDeadlineMetForTask(deadline)}
-                                                                                assigned_to={task?.assigned_to}
-                                                                                type={type}
-                                                                                priority={task?.priority}
-                                                                                key={idx}
-                                                                                isAssigned={
-                                                                                    task.assigned_to === "Everyone" ? true : (task?.assigned_to === user?.email)
-                                                                                }
-                                                                            />
-                                                                        </div>
-                                                                    );
-                                                                })
-                                                            ) : (
-                                                                <p className='px-2 text-sm text-[#888]'>No tasks available</p>
-                                                            )}
+                                                            <Container
+                                                                id={board.board_uid}
+                                                                title={board.title}
+                                                                titleColor={board?.titleColor}
+                                                                key={board.board_uid}
+                                                                itemLength={Array.isArray(board.tasks) ? board.tasks.length : 0} // Safely access length
+                                                                onAddItem={() => {
+                                                                    setShowAddItemModal(true);
+                                                                    setCurrentContainerId(board.board_uid);
+                                                                }}>
 
-                                                        </div>
-                                                    </Container>
-                                                ))}
+                                                                <div
+                                                                    className='p-2 flex flex-col gap-2'>
+                                                                    {Array.isArray(board.tasks) && board.tasks.length > 0 ? (
+                                                                        board.tasks.map((task: tasksType, idx: number) => {
+                                                                            const deadline = findTaskDetails(`task-${task?.created_at}`, "deadline");
+                                                                            const type = findTaskDetails(`task-${task?.created_at}`, "type");
+                                                                            if (!user) return
+                                                                            return (
+                                                                                <div
+                                                                                    className='px-2'
+
+                                                                                >
+                                                                                    <Items
+                                                                                        title={task?.title}
+                                                                                        id={`task-${task?.created_at}`}
+                                                                                        start_work={task?.start_work}
+                                                                                        deadline={checkDeadlineMetForTask(deadline)}
+                                                                                        assigned_to={task?.assigned_to}
+                                                                                        type={type}
+                                                                                        priority={task?.priority}
+                                                                                        key={idx}
+                                                                                        isAssigned={
+                                                                                            task.assigned_to === "Everyone" ? true : (task?.assigned_to === user?.email)
+                                                                                        }
+                                                                                    />
+                                                                                </div>
+                                                                            );
+                                                                        })
+                                                                    ) : (
+                                                                        <p className='px-2 text-sm text-[#888]'>No tasks available</p>
+                                                                    )}
+
+                                                                </div>
+
+                                                            </Container>
+                                                        </motion.div>
+
+                                                    ))}
+                                                </AnimatePresence>
                                             </SortableContext>
 
 
@@ -1150,7 +1176,7 @@ export default function Samp() {
                         (
                             <div className='p-3'>
                                 {
-                                    !fetchedData ?
+                                    !filteredData ?
                                         <div className='w-[20px] h-[20px]'>
                                             <Loader />
                                         </div>
@@ -1162,7 +1188,7 @@ export default function Samp() {
                                                     :
                                                     <>
                                                         {
-                                                            fetchedData.length === 0 ?
+                                                            filteredData.length === 0 ?
                                                                 <div>The project may have been deleted or does not exist.</div>
                                                                 :
                                                                 <div>NOT ALLOWED</div>

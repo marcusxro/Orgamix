@@ -31,8 +31,8 @@ const Visualizer: React.FC<dataType> = ({ boardsOBJ }) => {
 
     return (
         <div className="h-full max-h-[30px] w-full max-w-[400px] bg-black"> {/* Remove overflow-hidden */}
-            <div className="flex rounded-md  ">
-                {boardsOBJ.map((board) => {
+            <div className="flex rounded-md ">
+                {boardsOBJ.map((board, idx: number) => {
                     const taskCount = board.tasks.length;
                     const barWidth = totalTasks > 0 ? (taskCount / totalTasks) * 100 + 1 : 0; // Calculate percentage width
 
@@ -40,7 +40,7 @@ const Visualizer: React.FC<dataType> = ({ boardsOBJ }) => {
                         <>
                             <div
                                 data-tooltip-id={board?.board_uid}
-                                key={board.board_uid}
+                                key={board.board_uid || idx}
                                 className="flex cursor-pointer h-full group"
                                 style={{
                                     backgroundColor: board.titleColor,

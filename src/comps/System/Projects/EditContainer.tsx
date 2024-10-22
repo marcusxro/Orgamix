@@ -55,7 +55,7 @@ interface dataType {
     is_favorite: boolean;
     boards: boardsType[]
 }
-const EditContainer = () => {
+const EditContainer:React.FC = () => {
     const [user] = IsLoggedIn()
     const params = useParams()
     const { settingsBoard, setSettingsBoard }: any = useStore()
@@ -67,6 +67,7 @@ const EditContainer = () => {
     const [titleColor, setTitleColor] = useState<string>("")
     const [createdAt, setCreatedAt] = useState<number | null>(null)
     const [isDelete, setIsDelete] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
 
     useEffect(() => {
         if (user) {
@@ -157,17 +158,30 @@ const EditContainer = () => {
     
 
     async function editTask() {
+        setLoading(true)
 
-        if(!defData) return
-        console.log((defData[0]?.is_shared === "private") && (defData[0]?.created_by !== user?.uid))    
+        if(loading) {
+            setLoading(false)
+            return
+        }
+
+        if(!defData)  {
+            setLoading(false)
+            return
+        }
         
 
         if((defData[0]?.is_shared === "private") && (defData[0]?.created_by != user?.uid)) {
                setSettingsBoard(null)
+               setLoading(false)
                 return 
         } 
 
-        if(!itemName) return
+        if(!itemName) {
+            setLoading(false)
+            return
+        }
+        
         try {
             const { data, error } = await supabase
                 .from('projects')
@@ -176,6 +190,7 @@ const EditContainer = () => {
     
             if (error) {
                 console.error('Error fetching data:', error);
+                setLoading(false)
                 return;
             }
     
@@ -202,31 +217,45 @@ const EditContainer = () => {
                         .eq('created_at', params?.time);
     
                     if (updateError) {
+                        setLoading(false)
                         console.error('Error updating board:', updateError);
                     } else {
                         console.log('Board updated successfully');
+                        setLoading(false)
                         setFetchedData(updatedBoard); // Optionally update your local state
                         handleOutsideClick()
                     }
                 } else {
                     console.log('Board not found');
+                    setLoading(false)
                 }
             } else {
                 console.log('No data found for the given parameters.');
+                setLoading(false)
             }
         } catch (err) {
             console.log('Error in updating task:', err);
+            setLoading(false)
         }
     }
 
 
     async function deleteTask() {
+        setLoading(true)
 
-        if(!defData) return
+        if(loading) {
+            setLoading(false)
+            return
+        }
+        if(!defData)  {
+            setLoading(false)
+            return
+        }
 
         if(defData && defData.length > 0 && (
             (defData[0]?.is_shared === "private" && defData[0]?.created_by === user?.uid)) ) {
                 setSettingsBoard(null)
+                setLoading(false)
                 return
         } 
         
@@ -238,6 +267,7 @@ const EditContainer = () => {
     
             if (error) {
                 console.error('Error fetching data:', error);
+                setLoading(false)
                 return;
             }
     
@@ -253,18 +283,23 @@ const EditContainer = () => {
     
                     if (updateError) {
                         console.error('Error deleting board:', updateError);
+                        setLoading(false)
                     } else {
                         console.log('Board deleted successfully');
+                        setLoading(false)
                         handleOutsideClick()
                     }
                 } else {
                     console.log('Board not found');
+                    setLoading(false)
                 }
             } else {
                 console.log('No data found for the given parameters.');
+                setLoading(false)
             }
         } catch (err) {
             console.log('Error in deleting task:', err);
+            setLoading(false)
         }
     }
     
@@ -362,7 +397,15 @@ const EditContainer = () => {
                                                     variant={"withCancel"}
                                                         onClick={editTask}
                                                 >
-                                                    Edit</Button>
+                                                      {
+                                                    loading ? 
+                                                    <div className='w-[20px] h-[20px]'>
+                                                        <Loader />
+                                                    </div>
+                                                    :
+                                                    "Edit"
+                                                }
+                                                    </Button>
                                             </div>
                                         </>
                                     ) :
@@ -379,7 +422,15 @@ const EditContainer = () => {
                                                 variant={"withCancel"}
                                                 onClick={deleteTask}
                                             >
-                                                Delete</Button>
+                                                {
+                                                    loading ? 
+                                                    <div className='w-[20px] h-[20px]'>
+                                                        <Loader />
+                                                    </div>
+                                                    :
+                                                    "Delete"
+                                                }
+                                            </Button>
                                         </div>
                                     </>)
                             }

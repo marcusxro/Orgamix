@@ -11,7 +11,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-gray-900 text-white hover:bg-gray-800',
-        addBoard: 'gap-2 bg-[#111111] outline-none text-sm  border-[#535353] text-[#888] border-[1px] hover:bg-[#222222]',
+        addBoard: 'gap-2 bg-[#111111] outline-none text-sm  border-[#535353] text-[#888] border-[1px] hover:bg-[#222222] whitespace-nowrap',
         withCancel: 'bg-[#111111] w-full rounded-none outline-none text-sm text-[#888] hover:bg-[#222222]',
         withBorderRight: 'bg-[#111111] w-full border-r-[1px] border-r-[#535353]  rounded-none outline-none text-sm text-red-500 hover:bg-[#222222]',
         addItem: 'gap-3 bg-[#111111] outline-none text-sm  border-[#535353] text-[#888] border-[1px] hover:bg-[#222222]',

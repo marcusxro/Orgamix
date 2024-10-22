@@ -13,7 +13,6 @@ interface KanBanType {
     location: string;
 }
 interface MessageType {
-
     userEmail: any;
     userid: any;
     id: number; //timestamp
@@ -22,20 +21,11 @@ interface MessageType {
 }
 
 
-interface chatType {
-    bgColor: string;
-    chatTitle: string;
-    isMuted: boolean;
-}
-
-
-
 const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
     const nav = useNavigate()
 
     const { setOpenKanbanSettings }: any = useStore()
-    
-    const { setOpenKanbanChat }: any = useStore()
+    const {openKanbanChat, setOpenKanbanChat }: any = useStore()
     const params = useParams()
     const [chatArray, setChatArray] = useState<MessageType[] | null>(null)
     const [user] = IsLoggedIn()
@@ -62,7 +52,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
         } else {
             console.log("not loggedin")
         }
-    }, [user, params, chatListener]);
+    }, [user, params, chatListener, openKanbanChat]);
 
 
     const handleRealtimeEvent = (payload: any) => {
@@ -122,7 +112,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
 
 
     return (
-        <div className='sticky top-0 w-full    flex flex-row md:flex-col justify-between h-auto md:h-screen border-r-[1px] border-r-[#414141] '>
+        <div className='sticky top-0 w-full  z-[1000]  flex flex-row md:flex-col justify-between h-auto md:h-screen border-r-[1px] border-r-[#414141] '>
 
             <div className='h-full overflow-y-auto px-3 md py-2 border-b-[1px] bg-[#242424] md:bg-transparent border-b-[#414141] md:border-none items-center md:items-start pb-3  bg-red flex gap-3 w-full flex-row justify-between md:flex-col  '>
                 <div className="md:border-b-[1px]  md:border-b-[#414141] w-full pb-0 md:pb-3 items-center justify-start flex flex-row gap-2 md:flex-col md:items-start">

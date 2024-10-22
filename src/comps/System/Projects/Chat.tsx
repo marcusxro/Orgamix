@@ -11,6 +11,7 @@ import moment from 'moment';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { CiChat1 } from "react-icons/ci";
+import Loader from '../../Loader';
 interface MessageType {
 
     userEmail: any;
@@ -44,10 +45,9 @@ const Chat = () => {
     const [chatArray, setChatArray] = useState<MessageType[] | null>(null)
     const [chatText, setChatText] = useState<string>("")
     const [myAccount, setMyAccount] = useState<accountType | null>(null)
-
     const [isOpen, setIsOpen] = useState(false);
-
-
+    const [loading ,setLoading] = useState<boolean>(false)
+    const [isFetched, setIsFetched] = useState<boolean>(false)
     const toggleEmojiPicker = () => {
         if (isOpen) {
             setTimeout(() => {
@@ -139,10 +139,12 @@ const Chat = () => {
                 createSchemaIfChatsNull()
             } else {
                 setChats(data?.chats)
+                setIsFetched(true)
             }
 
             if (error) {
                 console.log(error)
+                setIsFetched(false)
             }
         }
         catch (err) {
@@ -240,18 +242,30 @@ const Chat = () => {
             // Scroll to the bottom when the chat container is available
             const timer = setTimeout(() => {
                 if (chatContainerRef.current) {
-                    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+                    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight - 20;
                 }
-            }, 10); // Small delay to ensure rendering is complete
+            }, 100); // Small delay to ensure rendering is complete
 
             return () => clearTimeout(timer); // Cleanup the timer
         }
-    }, [user, openKanbanChat, chats]); // Depend on user and chatArray to trigger on load or new messages
-
+    }, [user, openKanbanChat, chats, isFetched]);
+    
+    
 
     async function sendChat() {
-        if (!chatText) return;
-        if (!myAccount) return
+        setLoading(true)
+        if(loading) {
+            setLoading(false)
+            return
+        }
+        if (!chatText) {
+            setLoading(false)
+            return
+        };
+        if (!myAccount) {
+            setLoading(false)
+            return
+        }
 
 
         try {
@@ -260,10 +274,11 @@ const Chat = () => {
                 .from('projects')
                 .select('chatArr')
                 .eq('created_at', params?.time)
-                .single(); // Ensures we get a single result (not an array)
+                .single(); 
 
             if (error) {
                 console.log("Error fetching chats:", error);
+                setLoading(false)
                 return;
             }
             if (data && myAccount) {
@@ -286,26 +301,28 @@ const Chat = () => {
 
                 if (updateError) {
                     console.log("Error updating chatArr:", updateError);
+                    setLoading(false)
+                    return
                 } else {
                     isNearBottom()
-                    setChatText(""); // Clear the input field
+                    setChatText(""); 
+                    setLoading(false)
+                    return
                 }
             }
         } catch (err) {
             console.log("Error in sendChat:", err);
+            setLoading(false)
+            return
         }
     }
-
-
     async function getAccounts() {
         try {
             const { data, error } = await supabase
                 .from('accounts')
                 .select('*')
                 .eq('userid', user?.uid)
-                .single(); // Ensures we get a single result (not an array)
-
-
+                .single(); 
             if (data) {
                 setMyAccount(data)
             }
@@ -386,7 +403,7 @@ const Chat = () => {
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
                         exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
-                        className={`w-[550px] h-full bg-[#313131] z-[5000] max-h-[700px] rounded-lg  overflow-hidden border-[#535353] border-[1px]  flex flex-col justify-between`}
+                        className={`w-[550px] h-full bg-[#313131] z-[5000] max-h-[700px] rounded-lg  overflow-auto border-[#535353] border-[1px]  flex flex-col justify-between`}
                         onClick={(e) => e.stopPropagation()}>
 
                         <div className='h-auto flex gap-2 justify-between p-3 bg-[#222]  border-b-[#535353] border-b-[1px]'>
@@ -410,10 +427,10 @@ const Chat = () => {
                             <div className='h-full overflow-auto '>
                                 <div
                                     ref={chatContainerRef}
-                                    className='h-full max-h-[500px]  overflow-auto '>
+                                    className='h-full max-h-[500px] bg-red overflow-auto '>
                                     {
                                         chatArray != null && chatArray.length > 0 ?
-                                            <div className='h-full gap-3 flex flex-col pb-5'>
+                                            <div className='h-full gap-3 flex flex-col'>
                                                 {
                                                     chatArray.map((itm: MessageType, idx: number) => (
                                                         <motion.div
@@ -421,8 +438,7 @@ const Chat = () => {
                                                             initial={{ scale: 0.8, opacity: 0 }}  // Initial scale and opacity
                                                             animate={{ scale: 1, opacity: 1 }}    // Animate to full size and opacity
                                                             transition={{ duration: 0.3 }}          // Animation duration
-                                                            className={`${itm?.userid === user?.uid ? "ml-auto" : ""} flex gap-2 items-start justify-start`}
-                                                        >
+                                                            className={`${itm?.userid === user?.uid ? "ml-auto" : ""} flex gap-2 items-start justify-start`}>
                                                             {
                                                                 !(user?.uid === itm?.userid) && (!itm?.id.toString().includes('muted-')) &&
                                                                 <div className='w-[30px] h-[30px] rounded-full overflow-hidden'>
@@ -431,13 +447,10 @@ const Chat = () => {
                                                                         src={UserNoProfile} alt="" />
                                                                 </div>
                                                             }
-
                                                             <div className='flex flex-col gap-1 items-start justify-start'>
                                                                 {
-                                                                    <div className='text-sm text-[#888]'>
+                                                                    <div className={`${itm?.userid === user?.uid ? "text-right" : "text-left"} text-[10px] w-full text-[#888]`}>
                                                                         {!(user?.uid === itm?.userid) && (!itm?.id.toString().includes('muted-')) && itm?.userEmail + " • "}
-
-
                                                                         {
                                                                             (!itm?.id.toString().includes('muted-')) &&
                                                                             itm?.id
@@ -476,9 +489,16 @@ const Chat = () => {
                                     name="" id="" />
                                 <div className='flex flex-col gap-2'>
                                     <div
-                                        onClick={sendChat}
+                                        onClick={() => {!loading && sendChat()}}
                                         className={`${chatText ? ' bg-[#111]' : ' bg-[#222]'} h-full cursor-pointer p-1 w-[50px] flex items-center justify-center rounded-lg border-[#535353] border-[1px]`}>
-                                        <IoSend />
+                                        {
+                                            loading ?
+                                            <div className='w-[20px] h-[20px]'>
+                                                <Loader />
+                                            </div>
+                                            :
+                                                 <IoSend />
+                                        }
                                     </div>
                                     <div>
                                         <div
@@ -501,23 +521,20 @@ const Chat = () => {
                                         exit={{ opacity: 0 }}
                                         transition={{ duration: 0.3 }}
                                         onClick={() => {
-                                            // Set isOpen to false only after the animation completes
                                             setTimeout(() => {
                                                 setIsOpen(false);
-                                            }, 300); // Delay of 300ms for the animation duration
+                                            }, 300);
                                         }}
                                     >
                                         {/* EmojiPicker container with exit scale animation */}
                                         <motion.div
                                             onClick={(e) => {
-                                                e.stopPropagation(); // Prevent closing the picker when clicking inside
+                                                e.stopPropagation();
                                             }}
                                             initial={{ opacity: 0.5 }}
-                                            animate={{ opacity: .9,
-                                             }}
+                                            animate={{ opacity: .9}}
                                             exit={{ scale: 0.5, opacity: 0 }}
-                                            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}  // Smooth easing
-                                        >
+                                            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}> 
                                             <div className="dark-mode-emoji-picker scale-[0.9]">
                                                 <EmojiPicker onEmojiClick={onEmojiClick} theme={"dark" as Theme} />
                                             </div>

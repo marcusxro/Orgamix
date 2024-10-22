@@ -403,6 +403,7 @@ const InviteToProjects: React.FC = () => {
                                 min-h-[40px]
                                  flex rounded-lg overflow-hidden border-[#535353] border-[1px] mt-4'>
                                     <Button
+                                    onClick={handleOutsideClick}
                                         variant={"withBorderRight"}>
                                         Cancel
                                     </Button>
