@@ -147,14 +147,13 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
 
 
     async function createNewGoal() {
-
         console.log("CLICKED")
         setLoading(true)
-
+    
         if (loading) {
             return
         }
-
+    
         if (!user) {
             return
         }
@@ -163,41 +162,59 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
             setLoading(false)
             return;
         }
-
+    
         if (!category.trim()) {
             console.log('Category is required');
             setLoading(false)
             return;
         }
-
-
+    
         if (!description.trim()) {
             console.log('Description is required');
             setLoading(false)
             return;
         }
-
+    
         if (!subTasks) {
             setLoading(false)
             return
         }
-
-
+    
         const selectedDate = new Date(deadline);
         const currentDate = new Date();
-
+    
         if (selectedDate < currentDate) {
             alert("The selected date has already passed.");
             setLoading(false); // Reset loading state before returning
             return; // Exit the function if the date has passed
         }
-
+    
         try {
+            // Check for existing goals with the same title
+            const { data: existingGoals, error: fetchError } = await supabase
+                .from('goals')
+                .select('title')
+                .eq('userid', user?.uid)
+                .like('title', `${title}%`);
+    
+            if (fetchError) {
+                console.error('Error fetching existing goals:', fetchError.message);
+                setLoading(false);
+                return;
+            }
+    
+            // Determine the new title with an index if necessary
+            let newTitle = title;
+            if (existingGoals.length > 0) {
+                const index = existingGoals.length + 1;
+                newTitle = `${title} (${index})`; // Append the index to the title
+            }
+    
             if (purpose === "Modals") {
                 const { error } = await supabase
                     .from("templates")
                     .insert({
-                        title: title,
+                        title: newTitle,
                         category: category,
                         is_done: false,
                         created_at: Date.now(),
@@ -208,36 +225,36 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
                         sub_tasks: subTasks,
                         habits: habits,
                         download_count: 0,
-                    })
-
+                    });
+    
                 if (error) {
                     console.error('Error creating new goal:', error.message);
-                    setLoading(false)
+                    setLoading(false);
                     return;
                 } else {
-                    setTitle("")
-                    setDeadline("")
-                    setDescription("")
-                    setHabits([])
-                    listener(Prevs => !Prevs)
-                    setSubTasks(null)
-                    setCategory("")
-                    setLoading(false)
+                    setTitle("");
+                    setDeadline("");
+                    setDescription("");
+                    setHabits([]);
+                    listener((Prevs) => !Prevs);
+                    setSubTasks(null);
+                    setCategory("");
+                    setLoading(false);
                 }
-
+    
                 console.log('Goal successfully created');
             } else {
-
+    
                 if (!deadline) {
                     console.log('Deadline is required');
-                    setLoading(false)
+                    setLoading(false);
                     return;
                 }
-
+    
                 const { error } = await supabase
                     .from("goals")
                     .insert({
-                        title: title,
+                        title: newTitle,
                         category: category,
                         is_done: false,
                         created_at: Date.now(),
@@ -245,33 +262,32 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, }) => 
                         deadline: deadline,
                         description: description,
                         sub_tasks: subTasks,
-                        habits: habits
-                    })
-
+                        habits: habits,
+                    });
+    
                 if (error) {
                     console.error('Error creating new goal:', error.message);
-                    setLoading(false)
+                    setLoading(false);
                     return;
                 } else {
-                    setTitle("")
-                    setDeadline("")
-                    setDescription("")
-                    setHabits([])
-                    listener(Prevs => !Prevs)
-                    setSubTasks(null)
-                    setCategory("")
-                    setLoading(false)
+                    setTitle("");
+                    setDeadline("");
+                    setDescription("");
+                    setHabits([]);
+                    listener((Prevs) => !Prevs);
+                    setSubTasks(null);
+                    setCategory("");
+                    setLoading(false);
                 }
-
+    
                 console.log('Goal successfully created');
             }
-
-        }
-        catch (err) {
-            setLoading(false)
-            console.log(err)
+        } catch (err) {
+            setLoading(false);
+            console.log(err);
         }
     }
+    
 
     useEffect(() => {
         console.log(habits)

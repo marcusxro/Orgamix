@@ -67,7 +67,7 @@ const EditContainer:React.FC = () => {
     const [titleColor, setTitleColor] = useState<string>("")
     const [createdAt, setCreatedAt] = useState<number | null>(null)
     const [isDelete, setIsDelete] = useState<boolean>(false)
-    const [loading, setLoading] = useState<boolean>(false)
+    const {loading, setLoading}:any = useStore()
 
     useEffect(() => {
         if (user) {
@@ -75,12 +75,6 @@ const EditContainer:React.FC = () => {
 
         }
     }, [user])
-
-
-
-
-
-
     
     async function getTaskByID() {
         try {
@@ -241,10 +235,10 @@ const EditContainer:React.FC = () => {
 
 
     async function deleteTask() {
+
         setLoading(true)
 
         if(loading) {
-            setLoading(false)
             return
         }
         if(!defData)  {

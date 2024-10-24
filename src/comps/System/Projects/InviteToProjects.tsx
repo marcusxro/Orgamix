@@ -84,6 +84,8 @@ const InviteToProjects: React.FC = () => {
     const [fetchedData, setFetchedData] = useState<accountType[] | null>(null);
 
 
+    const [myAccount, setMyAccount] = useState<accountType[] | null>(null);
+
     const [user] = IsLoggedIn()
     const [emailAdded, setEmailAdded] = useState<invitedEmails[] | null>(null);
 
@@ -94,7 +96,7 @@ const InviteToProjects: React.FC = () => {
     const [privacySel, setPrivacySel] = useState<string | null>("")
     const [isExpand, setIsExpand] = useState<boolean>(false)
 
-    const [loading, setLoading] = useState<boolean>(false)
+    const { loading, setLoading }: any = useStore()
 
 
 
@@ -102,6 +104,10 @@ const InviteToProjects: React.FC = () => {
         if (email && user) {
             getAccounts();
         }
+        if (user) {
+            getMyAccount()
+        }
+
     }, [email, user]);
 
 
@@ -143,8 +149,6 @@ const InviteToProjects: React.FC = () => {
 
 
     async function getAccounts() {
-
-
         try {
             const { data, error } = await supabase
                 .from('accounts')
@@ -162,11 +166,31 @@ const InviteToProjects: React.FC = () => {
     }
 
 
+    async function getMyAccount() {
+        try {
+            const { data, error } = await supabase
+                .from('accounts')
+                .select('*')
+                .eq('userid', user?.uid);
+
+            if (error) {
+                console.error('Error fetching data:', error);
+            } else {
+                setMyAccount(data);
+            }
+        } catch (err) {
+            console.log('Error:', err);
+        }
+    }
+
+
     useEffect(() => {
         if (user) {
             getProjectByID()
         }
     }, [user, privacySel])
+
+
 
 
 
@@ -192,6 +216,16 @@ const InviteToProjects: React.FC = () => {
 
     async function saveEditData() {
         setLoading(true)
+        if (!myAccount) {
+            setLoading(false)
+            return
+        }
+
+        // if(privacySel === (prevData && prevData[0]?.is_shared)) {
+        //   setLoading(false)
+        //   setInviteToProject(false)
+        //   return
+        // }
 
         if (loading) {
             setLoading(false)
@@ -222,15 +256,115 @@ const InviteToProjects: React.FC = () => {
                 .eq('created_at', params?.time)
                 .eq('created_by', user?.uid);
 
-
             if (error) {
                 console.error('Error fetching data:', error);
                 setLoading(false)
             } else {
-                console.log("EDITED")
-                setIsExpand(false)
-                setLoading(false)
-                handleOutsideClick()
+                console.log("Project updated");
+
+                // Notify users if the privacy setting is changed to "private"
+                if (privacySel === "private" && emailAdded && emailAdded.length > 0) {
+                    // Loop through the invited email list and notify them
+                    for (const email of emailAdded) {
+                        const { error: notificationError } = await supabase
+                            .from('notification')
+                            .insert({
+                                uid: email?.userid,  // Notify this invited user
+                                content: `The project ${prevData && prevData[0]?.name} has been set to private by ${myAccount && myAccount[0]?.username}`,
+                                created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
+                                linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}`
+                            });
+
+                        if (notificationError) {
+                            console.error(`Error notifying ${email}:`, notificationError);
+                        } else {
+                            console.log(`Notification sent to ${email}`);
+                        }
+                    }
+                }
+
+                if (privacySel === "shareable" && emailAdded && emailAdded.length > 0) {
+                    const previousInvitedEmails = prevData?.[0]?.invited_emails || [];
+
+                    // Find the newly added emails
+                    const newlyAddedEmails = emailAdded.filter(email => !previousInvitedEmails.includes(email));
+
+                    const removedEmails = previousInvitedEmails.filter(email => !emailAdded.includes(email));
+
+                    console.log(previousInvitedEmails)
+                    console.log(removedEmails)
+                    console.log(emailAdded)
+
+                    for (const email of newlyAddedEmails) {
+                        // Fetch the user account using the email to get the `userid`, if not already in `emailAdded`
+                        const { data: userAccount, error: userError } = await supabase
+                            .from('accounts')  // Assuming you have an accounts table
+                            .select('userid')
+                            .eq('userid', email?.userid); // Replace with the actual field for email if necessary
+
+                        if (userError || !userAccount || userAccount.length === 0) {
+                            console.error(`Error fetching user account for ${email}:`, userError);
+                            continue;
+                        }
+
+                        const invitedUserId = userAccount[0]?.userid;
+
+                        // Insert notification for each newly invited user
+                        const { error: notificationError } = await supabase
+                            .from('notification')
+                            .insert({
+                                uid: invitedUserId,  // Notify this invited user by their `userid`
+                                content: `You have been invited to the project "${prevData && prevData[0]?.name}" by ${myAccount && myAccount[0]?.username}`,
+                                created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
+                                linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}`
+                            });
+
+                        if (notificationError) {
+                            console.error(`Error notifying ${email}:`, notificationError);
+                        } else {
+                            console.log(`Notification sent to ${email?.username}`);
+                        }
+                    }
+
+                    if (removedEmails.length > 0) {
+                        for (const email of removedEmails) {
+                            // Fetch the user account using the email to get the `userid`
+                            const { data: userAccount, error: userError } = await supabase
+                                .from('accounts')  // Assuming you have an accounts table
+                                .select('userid')
+                                .eq('userid', email?.userid); // Replace with the actual field for email if necessary
+
+                            if (userError || !userAccount || userAccount.length === 0) {
+                                console.error(`Error fetching user account for ${email}:`, userError);
+                                continue;
+                            }
+
+                            const removedUserId = userAccount[0]?.userid;
+
+                            // Insert notification for each removed user
+                            const { error: notificationError } = await supabase
+                                .from('notification')
+                                .insert({
+                                    uid: removedUserId,  // Notify this removed user by their `userid`
+                                    content: `You have been removed from the project "${prevData && prevData[0]?.name}" by ${myAccount && myAccount[0]?.username}`,
+                                    created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
+                                    linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}`
+                                });
+
+                            if (notificationError) {
+                                console.error(`Error notifying ${email}:`, notificationError);
+                            } else {
+                                console.log(`Notification sent to ${email?.email}`);
+                            }
+                        }
+                    }
+
+
+                }
+
+                setIsExpand(false);
+                setLoading(false);
+                handleOutsideClick();
             }
 
         }
@@ -254,7 +388,7 @@ const InviteToProjects: React.FC = () => {
         <AnimatePresence>
             {
                 inviteToProject && !isExiting &&
-                setPrevData != null &&
+                prevData != null &&
                 (
                     <>
                         <motion.div
@@ -379,7 +513,7 @@ const InviteToProjects: React.FC = () => {
                                                 email != '' && fetchedData != null && fetchedData.map((itm, idx: number) => (
                                                     <div className='bg-[#535353]  w-full max-h-[200px] h-full rounded-lg overflow-auto p-2'>
                                                         <div
-                                                            onClick={() => { addToArr(itm); console.log("CLICKED") }}
+                                                            onClick={() => { itm?.userid != user?.uid && addToArr(itm); console.log("CLICKED") }}
                                                             key={idx}
                                                             className='w-full flex items-center gap-3 cursor-pointer p-3 hover:bg-[#111111] rounded-lg'>
                                                             <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
@@ -388,7 +522,7 @@ const InviteToProjects: React.FC = () => {
                                                                     src={noUserProfile} alt="" />
                                                             </div>
                                                             <div className='flex flex-col'>
-                                                                <div className='font-bold text-sm'>{itm?.email.length >= 26 ? itm?.email.slice(0, 25) + "..." : itm?.email}</div>
+                                                                <div className={`${itm?.userid === user?.uid && "line-through"} font-bold text-sm`}>{itm?.userid === user?.uid && "(you) "}{itm?.email.length >= 26 ? itm?.email.slice(0, 25) + "..." : itm?.email}</div>
                                                                 <div className='text-[#888] text-sm'>{itm?.username}</div>
                                                             </div>
                                                         </div>
@@ -403,7 +537,7 @@ const InviteToProjects: React.FC = () => {
                                 min-h-[40px]
                                  flex rounded-lg overflow-hidden border-[#535353] border-[1px] mt-4'>
                                     <Button
-                                    onClick={handleOutsideClick}
+                                        onClick={handleOutsideClick}
                                         variant={"withBorderRight"}>
                                         Cancel
                                     </Button>

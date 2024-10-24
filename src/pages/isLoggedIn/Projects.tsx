@@ -15,21 +15,80 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Loader from '../../comps/Loader'
 
-interface dataType {
-    id: number;
-    description: string;
-    created_at: number,
-    name: string,
-    deadline: string,
-    is_shared: string,
-    created_by: string;
-    is_favorite: boolean
+
+interface invitedEmails {
+    username: string;
+    email: string;
+    uid: string;
 }
+
+interface updatedAt {
+    date: string;
+    username: string;
+    email: string;
+    uid: string;
+    itemMoved: string
+}
+
+
+interface tasksType {
+    title: string;
+    created_at: number;
+    created_by: string;
+    priority: string;
+    type: string;
+    start_work: string;
+    deadline: string;
+    assigned_to: string; //uid basis
+}
+
+interface boardsType {
+    title: string;
+    titleColor: string; //hex
+    created_at: number;
+    board_uid: string;
+    created_by: string;
+    tasks: tasksType[]
+}
+
+interface MessageType {
+
+    userEmail: any;
+    userid: any;
+    id: number; //timestamp
+    content: string
+
+}
+
+interface dataType {
+    description: string;
+    id: number;
+    created_at: number;
+    name: string;
+    created_by: string;
+    deadline: number;
+    is_shared: any;
+    invited_emails: null | invitedEmails[];
+    updated_at: null | updatedAt[];
+    is_favorite: boolean;
+    boards: boardsType[]
+    chatArr: MessageType[]
+}
+
+interface accountType {
+    userid: string;
+    username: string;
+    password: string;
+    email: string;
+    id: number;
+    fullname: string;
+}
+
+
 
 const Projects = () => {
     const { openNew, setOpenNew }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
-
     const [user] = IsLoggedIn()
     const nav = useNavigate()
     const { sidebarLoc }: any = useStore()
@@ -96,6 +155,7 @@ const Projects = () => {
                 .order('created_at', { ascending: false }); // Sort
 
 
+
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
@@ -109,6 +169,7 @@ const Projects = () => {
         }
     }
 
+  
 
 
     async function setAsFav(idOfProj: number, isFavBool: boolean) {
@@ -132,6 +193,7 @@ const Projects = () => {
             console.log(err)
         }
     }
+ 
 
 
     return (

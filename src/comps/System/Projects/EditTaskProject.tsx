@@ -96,6 +96,8 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
     const [workType, setWorkType] = useState<string>("")
 
     const [isDelete, setIsDelete] = useState<boolean>(false)
+    const {loading, setLoading}:any = useStore()
+
 
     useEffect(() => {
         if (user) {
@@ -196,6 +198,12 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
     }, [defaultData])
 
     async function editTask() {
+        setLoading(true)
+
+        if(loading) {
+            return
+        }
+
         try {
             const { data, error } = await supabase
                 .from('projects')
@@ -204,6 +212,7 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
 
             if (error) {
                 console.error('Error fetching data:', error);
+                setLoading(false)
                 return;
             }
 
@@ -259,16 +268,25 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
 
                     // Update the project in Supabase
                     updateTaskInSupabase(updatedBoards);
+                    setLoading(false)
                 } else {
                     console.log('No matching task found.');
+                    setLoading(false)
                 }
             }
         } catch (err) {
             console.log('Error in fetching task:', err);
+            setLoading(false)
         }
     }
 
     async function deleteTask() {
+        setLoading(true)
+
+        if(loading) {
+            return
+        }
+        
         try {
             const { data, error } = await supabase
                 .from('projects')
@@ -277,6 +295,7 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
 
             if (error) {
                 console.error('Error fetching data:', error);
+                setLoading(false)
                 return;
             }
 
@@ -322,12 +341,15 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
 
                     // Update the project in Supabase
                     updateTaskInSupabase(updatedBoards);
+                    setLoading(false)
                 } else {
                     console.log('No matching task found.');
+                    setLoading(false)
                 }
             }
         } catch (err) {
             console.log('Error in fetching task:', err);
+            setLoading(false)
         }
     }
 
@@ -496,20 +518,29 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
                                             variant={"addBoard"}
                                             onClick={() => { setIsDelete(true) }}
                                         >
-                                            Delete Task</Button>
+                                            Delete Task
+                                        </Button>
 
                                         <div className='w-full h-[50px] flex rounded-lg overflow-hidden border-[#535353] border-[1px] mt-2'>
 
                                             <Button
                                                 variant={"withBorderRight"}
-                                                onClick={handleOutsideClick}
+                                                onClick={() => {!loading && handleOutsideClick()}}
                                             >
                                                 Close</Button>
                                             <Button
                                                 variant={"withCancel"}
-                                                onClick={editTask}
+                                                onClick={() => {!loading && editTask()}}
                                             >
-                                                Edit</Button>
+                                               {
+                                                loading ?
+                                                <div className='w-[20px] h-[20px]'>
+                                                    <Loader />
+                                                </div>
+                                                :
+                                                'Edit'
+                                               }
+                                            </Button>
                                         </div>
                                     </>
                                 ) :
@@ -521,14 +552,22 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
 
                                         <Button
                                             variant={"withBorderRight"}
-                                            onClick={() => { setIsDelete(false) }}
+                                            onClick={() => { !loading && setIsDelete(false) }}
                                         >
                                             Cancel</Button>
                                         <Button
                                             variant={"withCancel"}
                                             onClick={deleteTask}
                                         >
-                                            Delete</Button>
+                                   {
+                                                loading ?
+                                                <div className='w-[20px] h-[20px]'>
+                                                    <Loader />
+                                                </div>
+                                                :
+                                                'Delete'
+                                               }
+                                            </Button>
                                     </div>
                                     }
         

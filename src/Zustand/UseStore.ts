@@ -19,23 +19,23 @@ interface AppState {
     settingsBoard: null | number;
     setSettingsBoard: (params: number) => void;
     inviteToProject: boolean | null;
-    setInviteToProject: (params: boolean) => void;
-
+    setInviteToProject: (params: boolean) => void;      
     openKanbanSettings: boolean | null;
     setOpenKanbanSettings: (params: boolean) => void;
-
     openKanbanChat: boolean | null;
     setOpenKanbanChat: (params: boolean) => void;
-
-
     chatListener: boolean | null;
     setChatListener: (params: boolean) => void;
-
-
-sidebarLoc: string | null;
+    sidebarLoc: string | null;
     setSidebarLoc: (params: string) => void;
+    viewNotifs: boolean | null;
+    setViewNotifs: (params: boolean) => void;
 
+    isSidebarHover: boolean | null;
+    setIsSidebarHover: (params: boolean) => void;
 
+    loading: boolean | null;
+    setLoading: (params: boolean) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -56,23 +56,28 @@ const useStore = create<AppState>((set) => ({
     setSettingsTask: (params: number) => set({ settingsTask: params }),
     settingsBoard: null,
     setSettingsBoard: (params: number) => set({ settingsBoard: params }),
-
     inviteToProject: null,
     setInviteToProject: (params: boolean) => set({ inviteToProject: params }),
-
     openKanbanSettings: null,
     setOpenKanbanSettings: (params: boolean) => set({ openKanbanSettings: params }),
-
     openKanbanChat: null,
     setOpenKanbanChat: (params: boolean) => set({ openKanbanChat: params }),
-
-    
     chatListener: null,
     setChatListener: (params: boolean) => set({ chatListener: params }),
-
     sidebarLoc: "Home",
     setSidebarLoc: (params: string) => set({ sidebarLoc: params }),
 
+
+    viewNotifs: null,
+    setViewNotifs: (params: boolean) => set({ viewNotifs: params }),
+
+    
+    isSidebarHover: null,
+    setIsSidebarHover: (params: boolean) => set({ isSidebarHover: params }),
+
+        
+    loading: null,
+    setLoading: (params: boolean) => set({ loading: params }),
 
 }));
 

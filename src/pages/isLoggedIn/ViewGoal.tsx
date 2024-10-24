@@ -208,6 +208,7 @@ const ViewGoal: React.FC = () => {
             } else {
                 console.log(data)
                 setFetchedData(data)
+
             }
 
         }
@@ -572,6 +573,8 @@ const ViewGoal: React.FC = () => {
     }
 
 
+
+
     async function deleteHabit(idx: number) {
 
         try {
@@ -620,11 +623,10 @@ const ViewGoal: React.FC = () => {
             return null;
         }
     }
+
     async function editDocument() {
-        if (renameGoal === "" || editDate === "" || editDescription === "") return
-
-
-
+        if (renameGoal === "" || editDate === "" || editDescription === "") return;
+        console.log("os edit")
         const selectedDate = new Date(editDate);
         const currentDate = new Date();
 
@@ -633,34 +635,51 @@ const ViewGoal: React.FC = () => {
             return; // Exit the function if the date has passed
         }
 
-
         try {
+            // Check for existing goals with the same title
+            const { data: existingGoals, error: fetchError } = await supabase
+                .from('goals')
+                .select('title')
+                .like('title', `${renameGoal}%`)
+                .neq('created_at', params?.time); // Ensure the current goal is excluded
+
+            if (fetchError) {
+                console.error('Error fetching existing goals:', fetchError.message);
+                return;
+            }
+
+            // Determine the new title with an index if necessary
+            let newTitle = renameGoal;
+            if (existingGoals.length > 0) {
+                const index = existingGoals.length + 1;
+                newTitle = `${renameGoal} (${index})`; // Append the index to the title
+            }
+
             const { data, error } = await supabase
                 .from('goals')
                 .update({
-                    title: renameGoal,
+                    title: newTitle,
                     description: editDescription,
                     deadline: editDate
                 })
                 .eq('userid', params?.uid)
-                .eq('created_at', params?.time)
+                .eq('created_at', params?.time);
 
             if (error) {
-                console.log(error)
+                console.log(error);
             } else {
-                console.log(data)
-                console.log("edited")
-                setRenameGoal("")
-                setEditDesc("")
-                setEditDate("")
-                setIsEdit(null)
+                console.log(data);
+                console.log("Goal successfully edited");
+                setRenameGoal("");
+                setEditDesc("");
+                setEditDate("");
+                setIsEdit(null);
             }
-
-        }
-        catch (err) {
-            console.log(err)
+        } catch (err) {
+            console.log(err);
         }
     }
+
 
     return (
         <div className='w-full h-full'>
@@ -823,15 +842,15 @@ const ViewGoal: React.FC = () => {
                                                 <div className='text-xl font-bold flex items-center gap-2'>
                                                     <GoTasklist />  Tasks
                                                 </div>
-             
-                                                  <input
-                                                                        value={subTaskEdit}
-                                                                        maxLength={50}
-                                                                        onChange={(e) => { setSubTaskEdit(e.target.value) }}
-                                                                        placeholder='Search your task'
-                                                                        className='p-2 rounded-lg bg-[#111111] w-full max-w-[300px] outline-none border-[#535353] border-[1px]'
-                                                                        type="text" />
-                               
+
+                                                <input
+                                                    value={subTaskEdit}
+                                                    maxLength={50}
+                                                    onChange={(e) => { setSubTaskEdit(e.target.value) }}
+                                                    placeholder='Search your task'
+                                                    className='p-2 rounded-lg bg-[#111111] w-full max-w-[300px] outline-none border-[#535353] border-[1px]'
+                                                    type="text" />
+
                                             </div>
 
                                             {

@@ -8,6 +8,8 @@ import { FaLinesLeaning } from "react-icons/fa6";
 import { BsCalendarDate } from "react-icons/bs";
 import { FaSort } from "react-icons/fa6";
 import { motion, AnimatePresence } from 'framer-motion'
+import { FaCheck } from "react-icons/fa";
+
 // DnD
 import {
     DndContext,
@@ -52,7 +54,7 @@ import Chat from '../../comps/System/Projects/Chat';
 interface invitedEmails {
     username: string;
     email: string;
-    uid: string;
+    userid: string;
 }
 
 interface updatedAt {
@@ -109,14 +111,6 @@ interface dataType {
     chatArr: MessageType[]
 }
 
-// interface accountType {
-//     userid: string;
-//     username: string;
-//     password: string;
-//     email: string;
-//     id: number;
-//     fullname: string;
-// }
 
 
 export default function Samp() {
@@ -124,12 +118,13 @@ export default function Samp() {
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [colorVal, setColorVal] = useState<string>("")
     const [user] = IsLoggedIn()
-    const [loading, setLoading] = useState<boolean>(false)
-    const { settingsTask, settingsBoard, }: any = useStore()
+    const { loading, setLoading }: any = useStore()
+    const { settingsTask, settingsBoard, viewNotifs }: any = useStore()
     const { inviteToProject, setInviteToProject }: any = useStore()
     const { openKanbanSettings }: any = useStore()
     const { openKanbanChat }: any = useStore()
     const [searchQuery, setSearchQuery] = useState('');
+
 
     useEffect(() => {
         if (user) {
@@ -145,7 +140,7 @@ export default function Samp() {
                 subscription.unsubscribe();
             };
         }
-    }, [user, openKanbanChat, openKanbanSettings, settingsTask, inviteToProject, loading]);
+    }, [user, openKanbanChat, openKanbanSettings, viewNotifs, settingsBoard, settingsTask, inviteToProject, loading]);
 
 
 
@@ -159,7 +154,6 @@ export default function Samp() {
 
                 break;
             case 'UPDATE':
-                console.log(fetchedData)
                 setFetchedData((prevData) =>
                     prevData
                         ? prevData.map((item) =>
@@ -190,7 +184,6 @@ export default function Samp() {
 
             if (data) {
                 setFetchedData(data);
-                console.log(data)
             }
             if (error) {
                 return console.error('Error fetching data:', error);
@@ -212,7 +205,6 @@ export default function Samp() {
     async function onAddContainer() {
         setLoading(true)
         if (loading) {
-            setLoading(false)
             return
         };
 
@@ -222,7 +214,6 @@ export default function Samp() {
             return
         };
 
-        console.log("sdsd")
         try {
             const id = `container-${uuidv4()}`;
             const newData = {
@@ -467,6 +458,7 @@ export default function Samp() {
     }
 
     const handleDragMove = (event: DragMoveEvent) => {
+
         const { active, over } = event;
 
         if (!active || !over || !fetchedData || !fetchedData[0]?.boards) return;
@@ -651,6 +643,11 @@ export default function Samp() {
 
 
     async function saveChangesToDB(updatedContainers: boardsType[]) {
+        setLoading(true)
+
+        if (loading) {
+            return
+        };
         try {
             const { error } = await supabase
                 .from('projects')
@@ -660,11 +657,14 @@ export default function Samp() {
 
             if (error) {
                 console.log('Error saving updated order:', error);
+                setLoading(false)
             } else {
                 console.log('Updated order saved successfully!');
+                setLoading(false)
             }
         } catch (err) {
             console.log('Error during update:', err);
+            setLoading(false)
         }
     }
 
@@ -710,25 +710,25 @@ export default function Samp() {
     useEffect(() => {
         if (!fetchedData) return;
 
-        const filtered = fetchedData.map(project => ({
+        const filtered = fetchedData?.map(project => ({
             ...project,
-            boards: project.boards
-                .filter(board =>
-                    board.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    board.tasks.some(task =>
-                        task.title.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
+            boards: project.boards?.filter(board =>
+                board?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                board?.tasks.some(task =>
+                    task.title.toLowerCase().includes(searchQuery.toLowerCase())
                 )
+            )
                 .map(board => ({
                     ...board,
-                    tasks: board.tasks.filter(task =>
-                        task.title.toLowerCase().includes(searchQuery.toLowerCase())
+                    tasks: board?.tasks?.filter(task =>
+                        task?.title?.toLowerCase().includes(searchQuery.toLowerCase())
                     )
                 }))
         }));
 
         setFilteredData(filtered);
     }, [fetchedData, searchQuery]);
+
 
 
 
@@ -859,6 +859,7 @@ export default function Samp() {
                                 <h1 className="text-white text-xl font-bold">Add task</h1>
                                 <p className='text-sm text-[#888]'>Add your task inside your board.</p>
                             </div>
+
                             <Input
                                 type="text"
                                 placeholder="Task Title"
@@ -967,16 +968,34 @@ export default function Samp() {
                 }
 
 
-                <div className="p-3 h-[60px] mt-[35px] border-b-[#535353] border-b-[1px] md:mt-0  flex items-center justify-between gap-y-2">
-                    <div className='w-full max-w-[150px] mr-2  overflow-hidden'>
-                        <input
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder='⌕ Search (e.g tasks, boards)'
-                            className='text-sm flex gap-2 w-full items-center placeholder:text-[#888] border-[#535353] border-[1px] p-[8.5px] outline-none text-[#888] rounded-md bg-[#111111]'
-                            type="text" />
-                    </div>
+                <div className="p-3 h-[60px] mt-[35px] overflow-auto border-b-[#535353] border-b-[1px] md:mt-0  flex items-center justify-between gap-y-2">
+                    <div className='flex gap-2 items-center'>
+                        {
+                            loading ?
+                            <div className='flex gap-2 items-center text-[10px] border-[#535353] border-[1px] h-full p-2 rounded-md'>
+                                    <div className='w-[20px] h-[20px] text-[#888]'>
+                                        <Loader />
+                                    </div>
+                                </div>
+                                :
+                                <div className='flex gap-2 items-center text-[10px]  border-[#535353] border-[1px] h-full p-[13px] rounded-md'>
+                                    <div className='text-[#888] flex items-center'>
+                                        <FaCheck />
+                                    </div>
+                                </div>
+                        }
+                        <div className='w-full max-w-[250px] mr-2  overflow-hidden r'>
+                            <input
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder='⌕ Search (e.g tasks, boards)'
+                                className=' flex gap-2 w-full items-center placeholder:text-[#888] text-md border-[#535353] border-[1px] p-[7px] outline-none text-[#888] rounded-md bg-[#111111]'
+                                type="text" />
 
+                        </div>
+
+
+                    </div>
                     <div className='flex gap-3 items-center '>
                         <Button
                             variant={"addBoard"}
@@ -998,208 +1017,211 @@ export default function Samp() {
 
 
                 {
-                    user?.uid && fetchedData != null &&
-                        (fetchedData != null && fetchedData[0]?.created_by === user?.uid) ||
-                        fetchedData != null && fetchedData[0]?.is_shared === "public" ||
-                        ((fetchedData != null && fetchedData[0]?.is_shared === "shareable") &&
-                            (fetchedData != null && fetchedData[0]?.invited_emails?.find((itm) => itm?.email === user?.email)))
-                        && fetchedData[0]?.boards?.length > 0
-                        ?
-                        (
-                            <>
-                                {
-                                    fetchedData &&
-                                    <div className=' p-2 flex justify-center md:justify-between items-center md:items-start gap-2 flex-col md:flex-row'>
-                                        <div className='px-3 border-[#535353] border-[1px] py-2 flex flex-col items-start bg-[#191919] rounded-lg w-full max-w-[550px]'>
-                                            <div>
-                                                <h1 className="text-white text-lg font-bold">
-                                                    {
-                                                        fetchedData != null && (fetchedData[0]?.name.length >= 30 ?
-                                                            fetchedData[0]?.name.slice(0, 30) + "..."
-                                                            : fetchedData != null && fetchedData[0]?.name)
-                                                    }
-                                                </h1>
-                                                <div className='text-sm text-[#888] w-full max-w-[800px] break-all'>
-                                                    {fetchedData != null && fetchedData[0]?.description}
-                                                </div>
-                                            </div>
+                    user?.uid && fetchedData !== null
+                        ? (
+                            // Check if the user has access to the project
+                            (fetchedData[0]?.created_by === user?.uid ||
+                                fetchedData[0]?.is_shared === "public" ||
+                                (fetchedData[0]?.is_shared === "shareable" &&
+                                    fetchedData[0]?.invited_emails?.some((itm) => itm?.email === user?.email)))
+                                ? (
+                                    // Check if there are boards
+                                    fetchedData[0]?.boards?.length > 0
+                                        ? (
+                                            <>
+                                                {
 
-                                            <div className='text-sm mb-2 flex gap-[1px] items-center text-green-500 mt-2'>
-                                                {fetchedData[0]?.deadline && checkDeadlineMet(fetchedData[0]?.deadline)}
-                                            </div>
+                                                    fetchedData &&
+                                                    <div className=' p-2 flex justify-center md:justify-between items-center md:items-start gap-2 flex-col md:flex-row'>
+                                                        <div className='px-3 border-[#535353] border-[1px] py-2 flex flex-col items-start bg-[#191919] rounded-lg w-full max-w-[550px]'>
+                                                            <div>
+                                                                <h1 className="text-white text-lg font-bold">
+                                                                    {
+                                                                        fetchedData != null && (fetchedData[0]?.name.length >= 30 ?
+                                                                            fetchedData[0]?.name.slice(0, 30) + "..."
+                                                                            : fetchedData != null && fetchedData[0]?.name)
+                                                                    }
+                                                                </h1>
+                                                                <div className='text-sm text-[#888] w-full max-w-[800px] break-all'>
+                                                                    {fetchedData != null && fetchedData[0]?.description}
+                                                                </div>
+                                                            </div>
 
-                                            {
-                                                fetchedData[0]?.boards?.length > 0 && fetchedData[0]?.boards != null &&
+                                                            <div className='text-sm mb-2 flex gap-[1px] items-center text-green-500 mt-2'>
+                                                                {fetchedData[0]?.deadline && checkDeadlineMet(fetchedData[0]?.deadline)}
+                                                            </div>
 
-                                                <Visualizer boardsOBJ={fetchedData[0]?.boards} />
+                                                            {
+                                                                fetchedData[0]?.boards?.length > 0 && fetchedData[0]?.boards != null &&
 
-                                            }
-                                            <div className='text-sm border-[#535353] border-[1px] px-2 py-1 mt-2 rounded-md bg-[#111111]'>
-                                                {fetchedData != null && fetchedData[0]?.is_shared}
-                                            </div>
-                                        </div>
+                                                                <Visualizer boardsOBJ={fetchedData[0]?.boards} />
 
-                                    </div>
-                                }
-                                {
-                                    fetchedData != null && fetchedData[0]?.boards?.length === 0 || fetchedData != null && fetchedData[0]?.boards === null &&
-                                    <div className='p-2 text-[#888] text-sm'>create your first board!</div>
-                                }
-                                <div className='mt-5'>
-                                    <div className="grid p-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-                                        <DndContext
-                                            sensors={sensors}
-                                            collisionDetection={closestCorners}
-                                            onDragStart={handleDragStart}
-                                            onDragMove={handleDragMove}
-                                            onDragEnd={handleDragEnd}>
+                                                            }
+                                                            <div className='text-sm border-[#535353] border-[1px] px-2 py-1 mt-2 rounded-md bg-[#111111]'>
+                                                                {fetchedData != null && fetchedData[0]?.is_shared}
+                                                            </div>
+                                                        </div>
 
-                                            <SortableContext items={filteredData && filteredData[0]?.boards != null ? filteredData[0].boards.map((board: boardsType) => board.board_uid) : []}>
-                                                <AnimatePresence>
-                                                    {
-                                                        filteredData && filteredData[0]?.boards.length === 0 && searchQuery &&
-                                                        <div className='text-sm text-[#888]'>No result</div>
-                                                    }
-                                                    {user && filteredData && filteredData[0].boards && filteredData[0].boards.map((board: boardsType) => (
-                                                        <motion.div
-                                                            key={board.board_uid}
-                                                            layout 
-                                                            initial={{ opacity: 0, y: 10 }} 
-                                                            animate={{ opacity: 1, y: 0 }} // Animate to visible position
-                                                            exit={{ opacity: 0, y: 10 }} // Animate out to hidden position
-                                                            transition={{ duration: 0.3, ease: 'easeInOut' }} // Adjust duration and easing
-                                                        >
+                                                    </div>
+                                                }
 
-                                                            <Container
-                                                                id={board.board_uid}
-                                                                title={board.title}
-                                                                titleColor={board?.titleColor}
-                                                                key={board.board_uid}
-                                                                itemLength={Array.isArray(board.tasks) ? board.tasks.length : 0} // Safely access length
-                                                                onAddItem={() => {
-                                                                    setShowAddItemModal(true);
-                                                                    setCurrentContainerId(board.board_uid);
-                                                                }}>
+                                                <div className='mt-5'>
+                                                    <div className="grid p-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+                                                        <DndContext
+                                                            sensors={sensors}
+                                                            collisionDetection={closestCorners}
+                                                            onDragStart={handleDragStart}
+                                                            onDragMove={handleDragMove}
+                                                            onDragEnd={handleDragEnd}>
 
-                                                                <div
-                                                                    className='p-2 flex flex-col gap-2'>
-                                                                    {Array.isArray(board.tasks) && board.tasks.length > 0 ? (
-                                                                        board.tasks.map((task: tasksType, idx: number) => {
-                                                                            const deadline = findTaskDetails(`task-${task?.created_at}`, "deadline");
-                                                                            const type = findTaskDetails(`task-${task?.created_at}`, "type");
-                                                                            if (!user) return
-                                                                            return (
+                                                            <SortableContext items={filteredData && filteredData[0]?.boards != null ? filteredData[0].boards.map((board: boardsType) => board.board_uid) : []}>
+                                                                <AnimatePresence>
+                                                                    {
+                                                                        filteredData && filteredData[0]?.boards?.length === 0 && searchQuery &&
+                                                                        <div className='text-sm text-[#888]'>No result</div>
+                                                                    }
+                                                                    {user && filteredData && filteredData[0].boards && filteredData[0].boards.map((board: boardsType) => (
+                                                                        <motion.div
+                                                                            key={board.board_uid}
+                                                                            layout
+                                                                            initial={{ opacity: 0, y: 10 }}
+                                                                            animate={{ opacity: 1, y: 0 }} // Animate to visible position
+                                                                            exit={{ opacity: 0, y: 10 }} // Animate out to hidden position
+                                                                            transition={{ duration: 0.3, ease: 'easeInOut' }} // Adjust duration and easing
+                                                                        >
+
+                                                                            <Container
+                                                                                id={board.board_uid}
+                                                                                title={board.title}
+                                                                                titleColor={board?.titleColor}
+                                                                                key={board.board_uid}
+                                                                                itemLength={Array.isArray(board.tasks) ? board.tasks.length : 0} // Safely access length
+                                                                                onAddItem={() => {
+                                                                                    setShowAddItemModal(true);
+                                                                                    setCurrentContainerId(board.board_uid);
+                                                                                }}>
+
                                                                                 <div
-                                                                                    className='px-2'
+                                                                                    className='p-2 flex flex-col gap-2'>
+                                                                                    {Array.isArray(board.tasks) && board.tasks.length > 0 ? (
+                                                                                        board.tasks.map((task: tasksType, idx: number) => {
+                                                                                            const deadline = findTaskDetails(`task-${task?.created_at}`, "deadline");
+                                                                                            const type = findTaskDetails(`task-${task?.created_at}`, "type");
+                                                                                            if (!user) return
+                                                                                            return (
+                                                                                                <div
+                                                                                                    className='px-2'
 
-                                                                                >
+                                                                                                >
+                                                                                                    <Items
+                                                                                                        title={task?.title}
+                                                                                                        id={`task-${task?.created_at}`}
+                                                                                                        start_work={task?.start_work}
+                                                                                                        deadline={checkDeadlineMetForTask(deadline)}
+                                                                                                        assigned_to={task?.assigned_to}
+                                                                                                        type={type}
+                                                                                                        priority={task?.priority}
+                                                                                                        key={idx}
+                                                                                                        isAssigned={
+                                                                                                            task.assigned_to === "Everyone" ? true : (task?.assigned_to === user?.email)
+                                                                                                        }
+                                                                                                    />
+                                                                                                </div>
+                                                                                            );
+                                                                                        })
+                                                                                    ) : (
+                                                                                        <p className='px-2 text-sm text-[#888]'>No tasks available</p>
+                                                                                    )}
+
+                                                                                </div>
+
+                                                                            </Container>
+                                                                        </motion.div>
+
+                                                                    ))}
+                                                                </AnimatePresence>
+                                                            </SortableContext>
+
+
+                                                            <DragOverlay adjustScale={false}>
+                                                                {/* Drag Overlay For item Item */}
+                                                                {activeId && activeId.toString().includes('task') && (
+                                                                    <Items
+                                                                        start_work={findItemTask(activeId.toString())}
+                                                                        deadline={findItemTask(activeId.toString())}
+                                                                        assigned_to={findTaskAssignee((activeId.toString()))}
+                                                                        type={findTaskDetails((activeId.toString()), ("type"))}
+                                                                        priority={""}
+                                                                        id={activeId}
+                                                                        isAssigned={true}
+                                                                        title={findItemTitle(activeId.toString())} />
+                                                                )}
+                                                                {/* Drag Overlay For Container */}
+                                                                {activeId && activeId.toString().includes('container') && (
+                                                                    <Container
+                                                                        titleColor={findContainerItems(activeId)?.titleColor}
+                                                                        itemLength={findContainerItems(activeId)?.tasks?.length}
+                                                                        id={activeId}
+                                                                        title={findContainerItems(activeId)?.title}>
+                                                                        {
+                                                                            activeId && findContainerItems(activeId)?.tasks?.map((task: tasksType) => (
+                                                                                <div className='px-2'>
                                                                                     <Items
-                                                                                        title={task?.title}
-                                                                                        id={`task-${task?.created_at}`}
                                                                                         start_work={task?.start_work}
-                                                                                        deadline={checkDeadlineMetForTask(deadline)}
+                                                                                        deadline={checkDeadlineMetForTask(findTaskDetails(`task-${task?.created_at}`, "deadline"))}
                                                                                         assigned_to={task?.assigned_to}
-                                                                                        type={type}
+                                                                                        type={task?.type}
                                                                                         priority={task?.priority}
-                                                                                        key={idx}
                                                                                         isAssigned={
                                                                                             task.assigned_to === "Everyone" ? true : (task?.assigned_to === user?.email)
                                                                                         }
+                                                                                        key={task?.created_at}
+                                                                                        title={task?.title}
+                                                                                        id={task?.created_at}
                                                                                     />
                                                                                 </div>
-                                                                            );
-                                                                        })
-                                                                    ) : (
-                                                                        <p className='px-2 text-sm text-[#888]'>No tasks available</p>
-                                                                    )}
-
-                                                                </div>
-
-                                                            </Container>
-                                                        </motion.div>
-
-                                                    ))}
-                                                </AnimatePresence>
-                                            </SortableContext>
-
-
-                                            <DragOverlay adjustScale={false}>
-                                                {/* Drag Overlay For item Item */}
-                                                {activeId && activeId.toString().includes('task') && (
-                                                    <Items
-                                                        start_work={findItemTask(activeId.toString())}
-                                                        deadline={findItemTask(activeId.toString())}
-                                                        assigned_to={findTaskAssignee((activeId.toString()))}
-                                                        type={findTaskDetails((activeId.toString()), ("type"))}
-                                                        priority={""}
-                                                        id={activeId}
-                                                        isAssigned={true}
-                                                        title={findItemTitle(activeId.toString())} />
-                                                )}
-                                                {/* Drag Overlay For Container */}
-                                                {activeId && activeId.toString().includes('container') && (
-                                                    <Container
-                                                        titleColor={findContainerItems(activeId)?.titleColor}
-                                                        itemLength={findContainerItems(activeId)?.tasks?.length}
-                                                        id={activeId}
-                                                        title={findContainerItems(activeId)?.title}>
-                                                        {
-                                                            activeId && findContainerItems(activeId)?.tasks?.map((task: tasksType) => (
-                                                                <div className='px-2'>
-                                                                    <Items
-                                                                        start_work={task?.start_work}
-                                                                        deadline={checkDeadlineMetForTask(findTaskDetails(`task-${task?.created_at}`, "deadline"))}
-                                                                        assigned_to={task?.assigned_to}
-                                                                        type={task?.type}
-                                                                        priority={task?.priority}
-                                                                        isAssigned={
-                                                                            task.assigned_to === "Everyone" ? true : (task?.assigned_to === user?.email)
+                                                                            ))
                                                                         }
-                                                                        key={task?.created_at}
-                                                                        title={task?.title}
-                                                                        id={task?.created_at}
-                                                                    />
-                                                                </div>
-                                                            ))
-                                                        }
 
-                                                    </Container>
-                                                )}
-                                            </DragOverlay>
+                                                                    </Container>
+                                                                )}
+                                                            </DragOverlay>
 
-                                        </DndContext>
+                                                        </DndContext>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            // No boards available
+                                            <div className='text-sm text-[#888] w-full text-left p-2 '>Create your first Kanban board!</div>
+                                        )
+                                ) : (
+                                    // User is not allowed access
+                                    <div className='text-sm text-[#888] w-full text-center p-2'>
+                                        Not Allowed
                                     </div>
-                                </div>
-                            </>
-                        )
-                        :
-                        (
-                            <div className='p-3'>
-                                {
-                                    !filteredData ?
+                                )
+                        ) : (
+                            // Fetched data is not available or still loading
+                            <div className='p-3 overflow-hidden'>
+                                {!fetchedData ? (
+                                    <div className='flex gap-2 items-center h-[92vh] justify-center'>
                                         <div className='w-[20px] h-[20px]'>
                                             <Loader />
                                         </div>
-                                        :
-                                        (<>
-                                            {
-                                                !user ?
-                                                    <div>NO USER</div>
-                                                    :
-                                                    <>
-                                                        {
-                                                            filteredData.length === 0 ?
-                                                                <div>The project may have been deleted or does not exist.</div>
-                                                                :
-                                                                <div>NOT ALLOWED</div>
-                                                        }
-                                                    </>
-                                            }
-                                        </>)
-                                }
+                                        <div className='text-sm text-[#888]'>Fetching your data</div>
+                                    </div>
+                                ) : (
+                                    <div className='text-sm text-[#888] w-full text-center'>
+                                        The project may have been deleted or does not exist.
+                                    </div>
+                                )}
                             </div>
                         )
                 }
+
+
+
             </div>
         </div>
     );

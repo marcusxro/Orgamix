@@ -11,6 +11,8 @@ import IsLoggedIn from '../firebase/IsLoggedIn';
 import gsap from 'gsap'
 import userNoProfile from '../assets/UserNoProfile.jpg'
 import { useNavigate } from 'react-router-dom';
+import { IoIosNotifications } from "react-icons/io";
+import useStore from '../Zustand/UseStore';
 
 
 interface dataType {
@@ -26,79 +28,100 @@ interface paramsType {
     location: string
 }
 
-const Sidebar: React.FC<paramsType> = ({location}) => {
+const Sidebar: React.FC<paramsType> = ({ location }) => {
 
     const [user] = IsLoggedIn()
 
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
+    const { isSidebarHover, setIsSidebarHover }: any = useStore()
+    const { viewNotifs, setViewNotifs }: any = useStore()
 
 
     useEffect(() => {
-       if(user) { getAccounts();}
+        if (user) { getAccounts(); }
     }, [user]);
 
     const midRef = useRef<HTMLDivElement | null>(null)
 
+
     useEffect(() => {
-        const btnSidebar = document.querySelectorAll('.btnSidebar')
 
-        function exapandWidth() {
-            gsap.to(midRef.current, {
-                maxWidth: '200px',
-                duration: 0.3
-            })
+        const btnSidebar = document.querySelectorAll('.btnSidebar');
 
-            for (let i = 0; i < btnSidebar.length; i++) {
-                gsap.to(btnSidebar[i].querySelectorAll('span'), {
-                    display: 'block'
-                })
-                gsap.to(btnSidebar[i].querySelectorAll('span'), {
-                    scale: '1',
-                    transformOrigin: 'left center',
-                    duration: 0.3
-                })
+
+        // Expand the sidebar
+        function expandWidth() {
+            // Expand only if the sidebar is not already expanded
+            if (!isSidebarHover) {
+                gsap.to(midRef.current, {
+                    maxWidth: '200px',
+                    duration: 0.3,
+                    onStart: () => setIsSidebarHover(true), // Set hover state at start
+                    onComplete: () => {
+                        // Use gsap.set to show elements without flickering
+                        btnSidebar.forEach(btn => {
+                            gsap.set(btn.querySelectorAll('span'), { display: 'block' });
+                            gsap.to(btn.querySelectorAll('span'), {
+                                scale: '1',
+                                transformOrigin: 'left center',
+                                duration: 0.2
+                            });
+                        });
+                    }
+                });
             }
         }
 
+        // Collapse the sidebar
         function decWidth() {
-            gsap.to(midRef.current, {
-                maxWidth: '80px',
-                duration: 0.3
-            })
+            // Collapse only if the sidebar is currently expanded
+            if (isSidebarHover) {
+                gsap.to(midRef.current, {
+                    maxWidth: '80px',
+                    duration: 0.3,
+                    onComplete: () => setIsSidebarHover(false) // Set hover state at end
+                });
 
-            for (let i = 0; i < btnSidebar.length; i++) {
-                gsap.to(btnSidebar[i].querySelectorAll('span'), {
-                    display: 'none'
-                })
-                gsap.to(btnSidebar[i].querySelectorAll('span'), {
-                    scale: '0',
-                    transformOrigin: 'left center',
-                    duration: 0.3
-                })
+                btnSidebar.forEach(btn => {
+                    // Delay the display to prevent flicker
+                    gsap.to(btn.querySelectorAll('span'), {
+                        scale: '0',
+                        transformOrigin: 'left center',
+                        duration: 0.3,
+                        onComplete: () => {
+                            gsap.set(btn.querySelectorAll('span'), { display: 'none' }); // Hide after animation
+                        }
+                    });
+                });
             }
         }
 
+        // Add event listeners for hover actions
+        midRef.current?.addEventListener('mouseover', expandWidth);
+        midRef.current?.addEventListener('mouseleave', decWidth);
 
-        midRef.current?.addEventListener("mouseover", exapandWidth)
-        midRef.current?.addEventListener("mouseleave", decWidth)
 
-
+        // Initialize button states (sidebar collapsed)
         for (let i = 0; i < btnSidebar.length; i++) {
             gsap.to(btnSidebar[i].querySelectorAll('span'), {
                 display: 'none',
-            })
+                duration: 0
+            });
             gsap.to(btnSidebar[i].querySelectorAll('span'), {
                 scale: '0',
                 transformOrigin: 'left center',
-                duration: 0,
-            })
+                duration: 0
+            });
         }
 
         return () => {
-            midRef.current?.addEventListener("mouseover", exapandWidth)
-            midRef.current?.addEventListener("mouseleave", decWidth)
-        }
-    }, [])
+            // Cleanup listeners on unmount
+            midRef.current?.removeEventListener('mouseover', expandWidth);
+            midRef.current?.removeEventListener('mouseleave', decWidth);
+        };
+    }, [isSidebarHover]);
+
+
 
     async function getAccounts() {
         try {
@@ -139,9 +162,34 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                 })
             }
         }
-        
+
         exapandWidth()
         nav(params)
+    }
+
+    function viewNotifFunc() {
+        const btnSidebar = document.querySelectorAll('.btnSidebar')
+
+        function exapandWidth() {
+            gsap.to(midRef.current, {
+                maxWidth: '80px',
+                duration: 0.3
+            })
+
+            for (let i = 0; i < btnSidebar.length; i++) {
+                gsap.to(btnSidebar[i].querySelectorAll('span'), {
+                    display: 'none'
+                })
+                gsap.to(btnSidebar[i].querySelectorAll('span'), {
+                    scale: '0',
+                    transformOrigin: 'left center',
+                    duration: 0.3
+                })
+            }
+        }
+
+        exapandWidth()
+        setViewNotifs(true)
     }
 
     return (
@@ -157,18 +205,18 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
 
                 <span className='flex flex-col'>
                     <div className='font-bold text-[15px]'>
-                    {fetchedData && user && (
-                        fetchedData[0]?.username.length >= 15
-                            ? fetchedData[0]?.username.slice(0, 10) + '...'
-                            : fetchedData[0]?.username
-                    )}
+                        {fetchedData && user && (
+                            fetchedData[0]?.username.length >= 15
+                                ? fetchedData[0]?.username.slice(0, 10) + '...'
+                                : fetchedData[0]?.username
+                        )}
                     </div>
                     <div className='text-[#888] text-[10px]'>
-                    {fetchedData && user && (
-                        fetchedData[0]?.email.length >= 15
-                            ? fetchedData[0]?.email.slice(0, 15) + '...'
-                            : fetchedData[0]?.email
-                    )}
+                        {fetchedData && user && (
+                            fetchedData[0]?.email.length >= 15
+                                ? fetchedData[0]?.email.slice(0, 15) + '...'
+                                : fetchedData[0]?.email
+                        )}
                     </div>
                 </span>
             </div>
@@ -180,7 +228,7 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                     <div className='text-2xl'><LuLayoutDashboard /></div><span> Dashboard</span>
                 </div>
                 <div
-                    onClick={() => { navigateToPages("/user/tasks")}}
+                    onClick={() => { navigateToPages("/user/tasks") }}
                     className={`${location === "Tasks" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
                     <div className='text-2xl'>
                         <GoTasklist />
@@ -188,7 +236,7 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                     <span>Tasks</span>
                 </div>
                 <div
-                    onClick={() => { navigateToPages("/user/notes")}}
+                    onClick={() => { navigateToPages("/user/notes") }}
                     className={`${location === "Notes" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>
@@ -197,7 +245,7 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                     <span>Notes</span>
                 </div>
                 <div
-                    onClick={() => { navigateToPages("/user/goals")}}
+                    onClick={() => { navigateToPages("/user/goals") }}
                     className={`${location === "Goals" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>
@@ -225,16 +273,26 @@ const Sidebar: React.FC<paramsType> = ({location}) => {
                 </div>
 
             </div>
+        
             <div className='border-t-[.1px] border-t-[#303030] mt-auto pt-1'>
                 <div
-                    onClick={() => { navigateToPages("/user/tasks") }}
+                    onClick={() => { viewNotifFunc() }}
                     className={`${location === "Settings" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
+                    <div className='text-2xl'>
+                        <IoIosNotifications />
+                    </div>
 
+                    <span>Notification</span>
+                </div>
+                <div
+                    onClick={() => { navigateToPages("/user/tasks") }}
+                    className={`${location === "Settings" && 'bg-[#414141]'}  btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
                     <div className='text-2xl'>
                         <IoSettingsOutline />
                     </div>
                     <span>Settings</span>
                 </div>
+
             </div>
 
         </div>

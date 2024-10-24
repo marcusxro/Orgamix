@@ -15,7 +15,7 @@ const AddProject:React.FC = () => {
     const [deadline, setDeadline] = useState<string>("")
     const [privacySel, setPrivacySel] = useState("public")
     const {openNew, setOpenNew}:any = useStore() 
-    const [loading, setLoading] = useState<boolean>(false)
+    const {loading, setLoading}:any = useStore()
 
     const [user] = IsLoggedIn()
 

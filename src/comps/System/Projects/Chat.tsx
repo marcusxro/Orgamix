@@ -11,7 +11,10 @@ import moment from 'moment';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { CiChat1 } from "react-icons/ci";
+import { FaArrowDown } from "react-icons/fa6";
 import Loader from '../../Loader';
+
+
 interface MessageType {
 
     userEmail: any;
@@ -41,13 +44,16 @@ const Chat = () => {
     const { openKanbanChat, setOpenKanbanChat }: any = useStore()
     const params = useParams()
     const [user] = IsLoggedIn()
-    const [chats, setChats] = useState<chatType | null>(null)
+    const [chats, setChats] = useState<chatType[] | null>(null)
     const [chatArray, setChatArray] = useState<MessageType[] | null>(null)
     const [chatText, setChatText] = useState<string>("")
     const [myAccount, setMyAccount] = useState<accountType | null>(null)
     const [isOpen, setIsOpen] = useState(false);
-    const [loading ,setLoading] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
     const [isFetched, setIsFetched] = useState<boolean>(false)
+    const [isShow, setIsShow] = useState<boolean>(false)
+
+
     const toggleEmojiPicker = () => {
         if (isOpen) {
             setTimeout(() => {
@@ -134,7 +140,9 @@ const Chat = () => {
                 .eq('created_at', params?.time)
                 .single(); // Ensures we get a single result (not an array)
 
-
+            if(data) {
+                console.log(data?.chats)
+            }
             if (!data?.chats) {
                 createSchemaIfChatsNull()
             } else {
@@ -178,7 +186,6 @@ const Chat = () => {
                             chatTitle: 'Your groupchat',
                             isMuted: false,
                             bgColor: "313131",
-                            chatArr: []
                         })
                     })
                     .eq('created_at', params?.time)
@@ -199,7 +206,7 @@ const Chat = () => {
         try {
             const { data, error } = await supabase
                 .from('projects')
-                .select('chatArr')
+                .select('chatarr')
                 .eq('created_at', params?.time)
                 .single();
 
@@ -207,8 +214,9 @@ const Chat = () => {
                 console.log("Error fetching chats:", error);
                 return;
             } else {
-                if (data?.chatArr) {
-                    setChatArray(data.chatArr);
+                if (data?.chatarr) {
+                    console.log(chatArray)
+                    setChatArray(data.chatarr);
                 }
             }
         } catch (err) {
@@ -218,11 +226,16 @@ const Chat = () => {
 
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
-    const scrollToBottom = () => {
+
+    const scrollToBottomSmooth = () => {
         if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            chatContainerRef.current.scrollTo({
+                top: chatContainerRef.current.scrollHeight,
+                behavior: 'smooth'
+            });
         }
     };
+
 
     const isNearBottom = () => {
         if (chatContainerRef.current) {
@@ -231,9 +244,45 @@ const Chat = () => {
         }
         return false;
     };
+
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (chatContainerRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+                const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+
+                console.log(scrollPercentage);
+
+                if (scrollPercentage <= 0.9) {
+                    setIsShow(true)
+                } else {
+                    setIsShow(false)
+                }
+            }
+        };
+
+        const chatContainer = chatContainerRef.current;
+
+        if (chatContainer) {
+            chatContainer.addEventListener('scroll', handleScroll);
+        }
+
+        // Cleanup the event listener on component unmount
+        return () => {
+            if (chatContainer) {
+                chatContainer.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, [isShow]);
+
+
+
+
+
     useEffect(() => {
         if (isNearBottom()) {
-            scrollToBottom();
+            scrollToBottomSmooth();
         }
     }, [chatArray, user]);
 
@@ -249,12 +298,12 @@ const Chat = () => {
             return () => clearTimeout(timer); // Cleanup the timer
         }
     }, [user, openKanbanChat, chats, isFetched]);
-    
-    
+
+
 
     async function sendChat() {
         setLoading(true)
-        if(loading) {
+        if (loading) {
             setLoading(false)
             return
         }
@@ -272,9 +321,9 @@ const Chat = () => {
             // Fetch the chats field for the specific project
             const { data, error } = await supabase
                 .from('projects')
-                .select('chatArr')
+                .select('chatarr')
                 .eq('created_at', params?.time)
-                .single(); 
+                .single();
 
             if (error) {
                 console.log("Error fetching chats:", error);
@@ -282,7 +331,7 @@ const Chat = () => {
                 return;
             }
             if (data && myAccount) {
-
+                
                 const newMessage = {
                     userEmail: myAccount && myAccount?.username, // User's email
                     userid: user?.uid, // User's ID
@@ -291,12 +340,12 @@ const Chat = () => {
                 };
 
                 // Append the new message to the chatArr
-                const updatedChatArr = [...(data.chatArr || []), newMessage];
+                const updatedChatArr = [...(data.chatarr || []), newMessage];
 
                 // Update the chatArr field in the database
                 const { error: updateError } = await supabase
                     .from('projects')
-                    .update({ chatArr: updatedChatArr })
+                    .update({ chatarr: updatedChatArr })
                     .eq('created_at', params?.time)
 
                 if (updateError) {
@@ -305,7 +354,7 @@ const Chat = () => {
                     return
                 } else {
                     isNearBottom()
-                    setChatText(""); 
+                    setChatText("");
                     setLoading(false)
                     return
                 }
@@ -322,7 +371,7 @@ const Chat = () => {
                 .from('accounts')
                 .select('*')
                 .eq('userid', user?.uid)
-                .single(); 
+                .single();
             if (data) {
                 setMyAccount(data)
             }
@@ -389,6 +438,7 @@ const Chat = () => {
     //     }
     // }
 
+
     return (
         <AnimatePresence>
             {
@@ -412,7 +462,7 @@ const Chat = () => {
                                     <CiChat1 />
                                 </div>
                                 <div >
-                                    {chats && chats?.chatTitle}
+                                    {chats != null && chats[0]?.chatTitle as string}
                                 </div>
                             </div>
                             <div className='flex gap-2 items-center'>
@@ -428,6 +478,7 @@ const Chat = () => {
                                 <div
                                     ref={chatContainerRef}
                                     className='h-full max-h-[500px] bg-red overflow-auto '>
+
                                     {
                                         chatArray != null && chatArray.length > 0 ?
                                             <div className='h-full gap-3 flex flex-col'>
@@ -477,6 +528,15 @@ const Chat = () => {
                                                 </div>
                                             </div>
                                     }
+                                    {
+                                        isShow &&
+                                        <div
+                                            style={{ transform: 'translate(-50%, -50%)' }}
+                                            onClick={scrollToBottomSmooth}
+                                            className='h-[50px] absolute bottom-[10%] cursor-pointer hover:bg-[#1111] border-[#535353] text-[#535353] border-[1px] left-[50%] w-[50px] rounded-full flex items-center justify-center p-1 bg-[#222]'>
+                                            <FaArrowDown />
+                                        </div>
+                                    }
                                 </div>
                             </div>
                             <div className='flex gap-2 h-full max-h-[70px] '>
@@ -489,15 +549,15 @@ const Chat = () => {
                                     name="" id="" />
                                 <div className='flex flex-col gap-2'>
                                     <div
-                                        onClick={() => {!loading && sendChat()}}
+                                        onClick={() => { !loading && sendChat() }}
                                         className={`${chatText ? ' bg-[#111]' : ' bg-[#222]'} h-full cursor-pointer p-1 w-[50px] flex items-center justify-center rounded-lg border-[#535353] border-[1px]`}>
                                         {
                                             loading ?
-                                            <div className='w-[20px] h-[20px]'>
-                                                <Loader />
-                                            </div>
-                                            :
-                                                 <IoSend />
+                                                <div className='w-[20px] h-[20px]'>
+                                                    <Loader />
+                                                </div>
+                                                :
+                                                <IoSend />
                                         }
                                     </div>
                                     <div>
@@ -532,9 +592,9 @@ const Chat = () => {
                                                 e.stopPropagation();
                                             }}
                                             initial={{ opacity: 0.5 }}
-                                            animate={{ opacity: .9}}
+                                            animate={{ opacity: .9 }}
                                             exit={{ scale: 0.5, opacity: 0 }}
-                                            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}> 
+                                            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}>
                                             <div className="dark-mode-emoji-picker scale-[0.9]">
                                                 <EmojiPicker onEmojiClick={onEmojiClick} theme={"dark" as Theme} />
                                             </div>

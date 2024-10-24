@@ -92,7 +92,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
         try {
             const { data, error } = await supabase
                 .from('projects')
-                .select('chatArr')
+                .select('chatarr')
                 .eq('created_at', params?.time)
                 .single();
 
@@ -100,8 +100,8 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
                 console.log("Error fetching chats:", error);
                 return;
             } else {
-                if (data?.chatArr) {
-                    setChatArray(data.chatArr);
+                if (data?.chatarr) {
+                    setChatArray(data.chatarr);
                 }
             }
         } catch (err) {
