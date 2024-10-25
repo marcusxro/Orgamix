@@ -28,18 +28,73 @@ interface paramsType {
     location: string
 }
 
+interface NotificationType {
+    id: number;
+    content: string;
+    created_at: any; // Assuming this is a timestamp in milliseconds
+    uid: string;
+    linkofpage: string;
+  }
+  
+
 const Sidebar: React.FC<paramsType> = ({ location }) => {
 
     const [user] = IsLoggedIn()
-
+    const { inviteToProject }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const { isSidebarHover, setIsSidebarHover }: any = useStore()
-    const { viewNotifs, setViewNotifs }: any = useStore()
-
+    const {  setViewNotifs }: any = useStore()
+    const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
     useEffect(() => {
-        if (user) { getAccounts(); }
-    }, [user]);
+        if (user) { 
+            getAccounts(); 
+            getNotifs()
+            const subscription = supabase
+                .channel('public:notification')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'notification' }, (payload) => {
+                    console.log('Realtime event:', payload);
+                    handleRealtimeEvent(payload);
+                })
+                .subscribe();
+            return () => {
+                subscription.unsubscribe();
+            };
+        
+        }
+    }, [user, inviteToProject]);
+
+    
+    const handleRealtimeEvent = (payload: any) => {
+        console.log(payload)
+        switch (payload.eventType) {
+            case 'INSERT':
+                setNotifications((prevData) =>
+                    prevData ? [...prevData, payload.new] : [payload.new]
+                );
+                break;
+            case 'UPDATE':
+                setNotifications((prevData) =>
+                    prevData
+                        ? prevData.map((item) =>
+                            item.id === payload.new.id ? payload.new : item
+                        )
+                        : [payload.new]
+                );
+                break;
+            case 'DELETE':
+                console.log("DELETED")
+                setNotifications((prevData: any) =>
+                    prevData ? prevData.filter((item: NotificationType) => item.id !== payload.old.id) : null
+                );
+                break;
+            default:
+                break;
+        }
+    };
+
+
+
 
     const midRef = useRef<HTMLDivElement | null>(null)
 
@@ -192,6 +247,28 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
         setViewNotifs(true)
     }
 
+
+    async function getNotifs() {
+        try {
+          const { data, error } = await supabase
+            .from('notification')
+            .select('*')
+            .eq('uid', user?.uid)
+            .order('created_at', { ascending: false });
+    
+          if (data) {
+            setNotifications(data); // Set initial notifications
+          }
+    
+          if (error) {
+            console.log(error);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+
     return (
         <div
             ref={midRef}
@@ -278,11 +355,20 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
                 <div
                     onClick={() => { viewNotifFunc() }}
                     className={`${location === "Settings" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
-                    <div className='text-2xl'>
+                    <div className='text-2xl relative'>
                         <IoIosNotifications />
+                       {
+                        notifications.length > 0 &&
+                        <div className='absolute top-[-10px] text-white bg-[#111]  h-[20px] flex items-center p-1 rounded-md text-[12px] left-[65%]'>
+                        {
+                        notifications.length > 999 ? "999+" : notifications.length
+                    }
+                        </div>
+                       }
                     </div>
 
-                    <span>Notification</span>
+                    <span>Notification</span> 
+      
                 </div>
                 <div
                     onClick={() => { navigateToPages("/user/tasks") }}

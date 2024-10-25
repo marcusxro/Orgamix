@@ -9,6 +9,9 @@ import { BsCalendarDate } from "react-icons/bs";
 import { FaSort } from "react-icons/fa6";
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaCheck } from "react-icons/fa";
+import { IoMdAdd } from "react-icons/io";
+import moment from 'moment';
+
 
 // DnD
 import {
@@ -66,6 +69,12 @@ interface updatedAt {
 }
 
 
+interface Subtask {
+    id: number;
+    description: string;
+    completed: boolean;
+}
+
 interface tasksType {
     title: string;
     created_at: number;
@@ -75,6 +84,7 @@ interface tasksType {
     start_work: string;
     deadline: string;
     assigned_to: string; //uid basis
+    subTasks: Subtask[]
 }
 
 interface boardsType {
@@ -124,6 +134,11 @@ export default function Samp() {
     const { openKanbanSettings }: any = useStore()
     const { openKanbanChat }: any = useStore()
     const [searchQuery, setSearchQuery] = useState('');
+
+    const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+    const [newSubtask, setNewSubtask] = useState<string>("");
+    const [isEditing, setIsEditing] = useState<number | null>(null); // Track the ID of the subtask being edited
+    const [editedTask, setEditedTask] = useState<string>("");
 
 
     useEffect(() => {
@@ -272,27 +287,41 @@ export default function Samp() {
     const [workEnd, setWorkEnd] = useState<string>("")
     const [workType, setWorkType] = useState<string>("")
 
-
     async function onAddItem() {
-        setLoading(true)
-
-        if (loading) {
-            setLoading(false)
-            return
-        };
-
-        if (!itemName) {
-            setLoading(false)
-            return
-        };
-        if (!assignee) {
-            setLoading(false)
-            return
-        };
-
+        setLoading(true);
+    
+        if (!itemName || !assignee) {
+            setLoading(false);
+            return;
+        }
+    
         try {
+            // Fetch the existing project to get the boards
+            const { data: projectData, error: fetchError } = await supabase
+                .from("projects")
+                .select("boards")
+                .eq("created_at", params?.time)
+                .single();
+    
+            if (fetchError) {
+                console.log("Error fetching project:", fetchError);
+                setLoading(false);
+                return;
+            }
+    
+            const existingBoards: boardsType[] = projectData?.boards || [];
+    
+            // Flatten all task titles across all boards
+            const allTaskTitles = existingBoards.flatMap(board => board.tasks.map(task => task.title));
+    
+            // Count how many times the itemName appears in all task titles
+            const matchingTasks = allTaskTitles.filter(title => title.startsWith(itemName));
+            const taskIndex = matchingTasks.length > 0 ? `(${matchingTasks.length + 1})` : "";
+    
+            const finalTitle = `${itemName}${taskIndex}`;
+    
             const newTask: tasksType = {
-                title: itemName,
+                title: finalTitle, // Use the title with the new index
                 created_at: Date.now(),
                 created_by: user?.uid || "",
                 priority: priority,
@@ -300,60 +329,49 @@ export default function Samp() {
                 start_work: workStart,
                 deadline: workEnd,
                 assigned_to: assignee === "" ? "Everyone" : assignee,
+                subTasks: subtasks,
             };
-
-            // Fetch the existing project to get the boards
-            const { data: projectData, error: fetchError } = await supabase
-                .from("projects")
-                .select("boards")
-                .eq("created_at", params?.time)
-                .single();
-
-            if (fetchError) {
-                console.log("Error fetching project:", fetchError);
-                setLoading(false)
-                return;
-            }
-
-            const existingBoards: boardsType[] = projectData?.boards || [];
+    
             // Find the specific board to add the task to
             const boardIndex = existingBoards.findIndex(board => board.board_uid === currentContainerId);
             if (boardIndex === -1) {
                 console.log("Board not found!");
-                setLoading(false)
+                setLoading(false);
                 return;
             }
-            // Append the new task to the found board's tasks
+    
+            // Append the new task to the board's tasks
             existingBoards[boardIndex].tasks.push(newTask);
-
-            // Update the boards array in the project
-
+    
+            // Update the project with the modified boards array
             const { error: updateError } = await supabase
                 .from("projects")
                 .update({ boards: existingBoards })
                 .eq("created_at", params?.time);
-
+    
             if (updateError) {
                 console.log("Error updating tasks:", updateError);
-                setLoading(false)
+                setLoading(false);
             } else {
-                setLoading(false)
                 console.log("Task added successfully!");
             }
-
+    
+            setLoading(false);
             setShowAddItemModal(false);
-            setItemName("")
-            setAssigne("Everyone")
-            setWorkType("")
-            setWorkEnd("")
-            setWorkStart("")
-            setPriority("")
-
+            setItemName("");
+            setAssigne("Everyone");
+            setWorkType("");
+            setWorkEnd("");
+            setWorkStart("");
+            setPriority("");
+    
         } catch (err) {
             console.log("Error adding task:", err);
-            setLoading(false)
+            setLoading(false);
         }
     }
+    
+    
 
 
     // Find the value of the items
@@ -418,6 +436,21 @@ export default function Samp() {
 
         // Return an empty string if the task detail is not valid
         return typeof taskDetail === 'string' ? taskDetail : "";
+    };
+
+    const findTaskSubs = (id: string) => {
+        const replacedString: string = id.replace("task-", "");
+        const toInt: number = parseInt(replacedString, 10);
+
+        const foundTask = fetchedData?.[0]?.boards?.flatMap((board) => board.tasks)
+            .find((task) => task.created_at === toInt);
+
+
+
+        const taskDetail = foundTask?.subTasks.length ?? 0; // Ensure this is a string
+
+        // Return an empty string if the task detail is not valid
+        return taskDetail;
     };
 
 
@@ -730,6 +763,46 @@ export default function Samp() {
     }, [fetchedData, searchQuery]);
 
 
+    const addSubtask = () => {
+        if (newSubtask.trim()) {
+            const newTask: Subtask = {
+                id: Date.now(), // Unique ID based on timestamp
+                description: newSubtask,
+                completed: false,
+            };
+            setSubtasks([...subtasks, newTask]);
+            setNewSubtask(""); // Clear input after adding
+        }
+    };
+
+    const deleteSubtask = (id: number) => {
+        const updatedSubtasks = subtasks.filter(subtask => subtask.id !== id);
+        setSubtasks(updatedSubtasks);
+    };
+
+    const toggleCompletion = (id: number) => {
+        const updatedSubtasks = subtasks.map(subtask =>
+            subtask.id === id ? { ...subtask, completed: !subtask.completed } : subtask
+        );
+        setSubtasks(updatedSubtasks);
+    };
+
+
+    const startEditing = (id: number, description: string) => {
+        setIsEditing(id);
+        setEditedTask(description);
+    };
+
+    const saveEditedTask = (id: number) => {
+        if (!editedTask) return
+
+        const updatedSubtasks = subtasks.map(subtask =>
+            subtask.id === id ? { ...subtask, description: editedTask } : subtask
+        );
+        setSubtasks(updatedSubtasks);
+        setIsEditing(null); // Exit editing mode
+        setEditedTask("");
+    };
 
 
     return (
@@ -807,9 +880,9 @@ export default function Samp() {
                         (fetchedData[0]?.is_shared !== "private") ||
                         (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid)) &&
                     <Modal
+                    purpose='modal'
                         showModal={showAddContainerModal}
-                        setShowModal={setShowAddContainerModal}
-                    >
+                        setShowModal={setShowAddContainerModal}>
                         <div className="flex flex-col w-full items-start gap-y-4">
                             <div>
                                 <h1 className="text-xl font-bold">Add Board</h1>
@@ -853,116 +926,199 @@ export default function Samp() {
                         (fetchedData[0]?.is_shared !== "private") ||
                         (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid)) &&
 
-                    <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal}>
-                        <div className="flex flex-col w-full items-start gap-y-4 ">
-                            <div className='mb-2'>
-                                <h1 className="text-white text-xl font-bold">Add task</h1>
-                                <p className='text-sm text-[#888]'>Add your task inside your board.</p>
-                            </div>
+                    <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal} purpose='task'>
+                        <div className="flex flex-col w-full items-start gap-y-4 justify-between h-full overflow-auto">
+                            <div className='flex flex-col w-full items-start gap-y-4 '>
+                                <div className='mb-2'>
+                                    <h1 className="text-white text-xl font-bold">Add task</h1>
+                                    <p className='text-sm text-[#888]'>Add your task inside your board.</p>
+                                </div>
 
-                            <Input
-                                type="text"
-                                placeholder="Task Title"
-                                name="itemname"
-                                colorVal={"#fffff"}
-                                value={itemName}
-                                onChange={(e) => setItemName(e.target.value)}
-                            />
-                            <div className='w-full flex gap-3 items-center'>
-                                {
-                                    fetchedData && fetchedData[0]?.is_shared != "private" && user &&
-                                    <>
-                                        <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><IoIosContact /></span> Assignee</div>
-                                        <select
-                                            value={assignee}
-                                            onChange={(e) => { setAssigne(e.target.value) }}
-                                            className='p-2 w-full outline-none bg-[#111111] border-[#535353] border-[1px] rounded-lg flex items-center justify-center cursor-pointer'>
-                                            <option
-                                                className='text-green-500 hover:text-green-500'
-                                                value="Everyone" >Everyone</option>
-                                            {
-                                                fetchedData && fetchedData[0]?.is_shared != "public" &&
-
+                                <Input
+                                    type="text"
+                                    placeholder="Task Title"
+                                    name="itemname"
+                                    colorVal={"#fffff"}
+                                    value={itemName}
+                                    onChange={(e) => setItemName(e.target.value)}
+                                />
+                                <div className='w-full flex gap-3 items-center'>
+                                    {
+                                        fetchedData && fetchedData[0]?.is_shared != "private" && user &&
+                                        <>
+                                            <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><IoIosContact /></span> Assignee</div>
+                                            <select
+                                                value={assignee}
+                                                onChange={(e) => { setAssigne(e.target.value) }}
+                                                className='p-2 w-full outline-none bg-[#111111] border-[#535353] border-[1px] rounded-lg flex items-center justify-center cursor-pointer'>
                                                 <option
                                                     className='text-green-500 hover:text-green-500'
-                                                    value={user?.email?.toString()}>(me) {user?.email}</option>
-                                            }
+                                                    value="Everyone" >Everyone</option>
+                                                {
+                                                    fetchedData && fetchedData[0]?.is_shared != "public" &&
 
-                                            {
-                                                fetchedData && fetchedData[0]?.is_shared != "public" && fetchedData[0]?.invited_emails?.map((itm, idx: number) => (
                                                     <option
-                                                        key={idx}
-                                                        value={itm?.email}>{itm?.email}</option>
-                                                ))
-                                            }
+                                                        className='text-green-500 hover:text-green-500'
+                                                        value={user?.email?.toString()}>(me) {user?.email}</option>
+                                                }
 
-                                        </select>
-                                    </>
-                                }
+                                                {
+                                                    fetchedData && fetchedData[0]?.is_shared != "public" && fetchedData[0]?.invited_emails?.map((itm, idx: number) => (
+                                                        <option
+                                                            key={idx}
+                                                            value={itm?.email}>{itm?.email}</option>
+                                                    ))
+                                                }
 
-                            </div>
-                            <div className='w-full flex gap-3 items-center'>
-                                <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><FaLinesLeaning /></span>Priority</div>
-                                <select
-                                    value={priority}
-                                    onChange={(e) => { setPriority(e.target.value) }}
-                                    className='p-2 w-full bg-[#111111]  border-[#535353] border-[1px] rounded-lg outline-none flex items-center justify-center cursor-pointer'
-                                    name="" id="">
-                                    <option value="">Choose priority</option>
-                                    <option value="High">High</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Low">Low</option>
-                                </select>
-                            </div>
-                            <div className='w-full flex gap-3 items-center'>
-                                <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><FaLinesLeaning /></span>Type</div>
-                                <select
-                                    value={workType}
-                                    onChange={(e) => { setWorkType(e.target.value) }}
-                                    className='p-2 w-full bg-[#111111]  border-[#535353] border-[1px] rounded-lg outline-none flex items-center justify-center cursor-pointer'
-                                    name="" id="">
-                                    <option value="">Choose type</option>
-                                    <option value="Future Enhancement">Future Enhancement</option>
-                                    <option value="Bug">Bug</option>
-                                    <option value="Research">Research</option>
-                                    <option value="Maintenance">Maintenance</option>
-                                    <option value="Improvement">Improvement</option>
-                                    <option value="Urgent">Urgent</option>
-                                </select>
-                            </div>
-                            <div className='w-full flex gap-3 items-center'>
-                                <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><BsCalendarDate /></span> Work Start Date</div>
-                                <input
-                                    value={workStart}
-                                    onChange={(e) => { setWorkStart(e.target.value) }}
-                                    className='p-2 w-full bg-[#111111] border-[#535353] border-[1px] rounded-lg flex  cursor-pointer'
-                                    type="date" />
-                            </div>
-
-                            <div className='w-full flex gap-3 items-center'>
-                                <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><BsCalendarDate /></span> Due Date</div>
-                                <input
-                                    value={workEnd}
-                                    onChange={(e) => { setWorkEnd(e.target.value) }}
-                                    className='p-2 w-full bg-[#111111] border-[#535353] border-[1px] rounded-lg flex  cursor-pointer'
-                                    type="date" />
-                            </div>
-
-
-                            <div className='w-full flex rounded-lg overflow-hidden border-[#535353] border-[1px] mt-4'>
-                                <Button variant={"withBorderRight"} onClick={() => { setShowAddItemModal(false) }}>Close</Button>
-                                <Button variant={"withCancel"} onClick={() => { !loading && onAddItem() }}>
-                                    {
-                                        loading ?
-                                            <div className='w-[20px] h-[20px]'>
-                                                <Loader />
-                                            </div>
-                                            :
-                                            "Add Item"
+                                            </select>
+                                        </>
                                     }
-                                </Button>
 
+                                </div>
+                                <div className='w-full flex gap-3 items-center'>
+                                    <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><FaLinesLeaning /></span>Priority</div>
+                                    <select
+                                        value={priority}
+                                        onChange={(e) => { setPriority(e.target.value) }}
+                                        className='p-2 w-full bg-[#111111]  border-[#535353] border-[1px] rounded-lg outline-none flex items-center justify-center cursor-pointer'
+                                        name="" id="">
+                                        <option value="">Choose priority</option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                                <div className='w-full flex gap-3 items-center'>
+                                    <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><FaLinesLeaning /></span>Type</div>
+                                    <select
+                                        value={workType}
+                                        onChange={(e) => { setWorkType(e.target.value) }}
+                                        className='p-2 w-full bg-[#111111]  border-[#535353] border-[1px] rounded-lg outline-none flex items-center justify-center cursor-pointer'
+                                        name="" id="">
+                                        <option value="">Choose type</option>
+                                        <option value="Future Enhancement">Future Enhancement</option>
+                                        <option value="Bug">Bug</option>
+                                        <option value="Research">Research</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                        <option value="Improvement">Improvement</option>
+                                        <option value="Urgent">Urgent</option>
+                                    </select>
+                                </div>
+                                <div className='w-full flex gap-3 items-center'>
+                                    <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><BsCalendarDate /></span> Work Start Date</div>
+                                    <input
+                                        value={workStart}
+                                        onChange={(e) => { setWorkStart(e.target.value) }}
+                                        className='p-2 w-full bg-[#111111] border-[#535353] border-[1px] rounded-lg flex  cursor-pointer'
+                                        type="date" />
+                                </div>
+
+                                <div className='w-full flex gap-3 items-center'>
+                                    <div className='flex gap-1 items-center w-full max-w-[150px]'> <span className='text-xl'><BsCalendarDate /></span> Due Date</div>
+                                    <input
+                                        value={workEnd}
+                                        onChange={(e) => { setWorkEnd(e.target.value) }}
+                                        className='p-2 w-full bg-[#111111] border-[#535353] border-[1px] rounded-lg flex  cursor-pointer'
+                                        type="date" />
+                                </div>
+
+                                <div className='flex flex-col gap-2 '>
+                                    <div className='flex flex-col'>
+                                        <div>Subtasks</div>
+                                        <div className='text-sm text-[#888]'>Break down tasks into smaller steps. Track progress by checking off completed items.</div>
+                                    </div>
+
+
+                                    <div className="flex gap-2 mt-2">
+                                        <input
+                                            type="text"
+                                            value={newSubtask}
+                                            onChange={(e) => setNewSubtask(e.target.value)}
+                                            placeholder="Enter subtask"
+                                            className='p-2 w-full bg-[#111111] border-[#535353] border-[1px] rounded-lg flex outline-none '
+
+                                        />
+                                        <button onClick={addSubtask}
+                                            className='p-2 px-4 text-[#888]  gap-2 text-sm items-center hover:bg-[#222] flex bg-[#111111] border-[#535353] border-[1px] rounded-lg   cursor-pointer'>
+                                            <span>Add</span> <IoMdAdd />
+                                        </button>
+                                    </div>
+
+                                    <div className="mt-4 flex flex-col gap-2">
+                                        {subtasks.length > 0 ? (
+                                            subtasks.map((subtask) => (
+                                                <div key={subtask.id} className="flex items-center bg-[#222] rounded-md justify-between py-1">
+                                                    <div className='flex gap-2 p-2 items-center'>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={subtask.completed}
+                                                            onChange={() => toggleCompletion(subtask.id)}
+                                                        />
+                                                        <div className='flex flex-col items-start justify-start'>
+                                                            <div className="flex items-center gap-2">
+                                                                <div>
+                                                                </div>
+                                                                {isEditing === subtask.id ? (
+                                                                    <input
+                                                                        type="text"
+                                                                        value={editedTask}
+                                                                        onChange={(e) => setEditedTask(e.target.value)}
+                                                                        className="border p-1 rounded-md px-2 outline-none"
+                                                                    />
+                                                                ) : (
+                                                                    <span
+                                                                        className={subtask.completed ? 'line-through text-gray-400 cursor-pointer' : 'cursor-pointer'}
+                                                                        onClick={() => startEditing(subtask.id, subtask.description)}
+                                                                    >
+                                                                        {subtask.description}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className='text-sm text-[#888] px-2'>
+                                                                {subtask.id ? moment(subtask.id).format('MM/DD/YY, h:mm A') : 'No Creation date'}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2 m-2">
+                                                        {isEditing === subtask.id ? (
+                                                            <button
+                                                                onClick={() => saveEditedTask(subtask.id)}
+                                                                className="text-green-500 hover:text-green-700"
+                                                            >
+                                                                Save
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => deleteSubtask(subtask.id)}
+                                                                className="text-red-500 hover:text-red-700"
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-sm text-[#888]">No subtasks available</div>
+                                        )}
+                                    </div>
+
+                                </div>
                             </div>
+                        </div>
+                        <div className='w-full h-full max-h-[40px] flex rounded-lg overflow-hidden border-[#535353] border-[1px] mt-4'>
+                            <Button variant={"withBorderRight"} onClick={() => { setShowAddItemModal(false) }}>Close</Button>
+                            <Button variant={"withCancel"} onClick={() => { !loading && onAddItem() }}>
+                                {
+                                    loading ?
+                                        <div className='w-[20px] h-[20px]'>
+                                            <Loader />
+                                        </div>
+                                        :
+                                        "Add Item"
+                                }
+                            </Button>
+
                         </div>
                     </Modal>
                 }
@@ -972,7 +1128,7 @@ export default function Samp() {
                     <div className='flex gap-2 items-center'>
                         {
                             loading ?
-                            <div className='flex gap-2 items-center text-[10px] border-[#535353] border-[1px] h-full p-2 rounded-md'>
+                                <div className='flex gap-2 items-center text-[10px] border-[#535353] border-[1px] h-full p-2 rounded-md'>
                                     <div className='w-[20px] h-[20px] text-[#888]'>
                                         <Loader />
                                     </div>
@@ -1125,6 +1281,7 @@ export default function Samp() {
                                                                                                         isAssigned={
                                                                                                             task.assigned_to === "Everyone" ? true : (task?.assigned_to === user?.email)
                                                                                                         }
+                                                                                                        subTasksLength={task?.subTasks.length}
                                                                                                     />
                                                                                                 </div>
                                                                                             );
@@ -1154,6 +1311,7 @@ export default function Samp() {
                                                                         priority={""}
                                                                         id={activeId}
                                                                         isAssigned={true}
+                                                                        subTasksLength={findTaskSubs((activeId.toString()))}
                                                                         title={findItemTitle(activeId.toString())} />
                                                                 )}
                                                                 {/* Drag Overlay For Container */}
@@ -1178,6 +1336,7 @@ export default function Samp() {
                                                                                         key={task?.created_at}
                                                                                         title={task?.title}
                                                                                         id={task?.created_at}
+                                                                                        subTasksLength={task?.subTasks.length}
                                                                                     />
                                                                                 </div>
                                                                             ))

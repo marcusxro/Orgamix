@@ -13,6 +13,7 @@ interface ModalProps {
     showModal: boolean;
     setShowModal: Dispatch<SetStateAction<boolean>>;
     containerClasses?: string;
+    purpose: string
   }
 
 export default function Modal({
@@ -20,6 +21,7 @@ export default function Modal({
   showModal,
   setShowModal,
   containerClasses,
+  purpose
 }: ModalProps) {
   const desktopModalRef = useRef(null);
 
@@ -45,7 +47,7 @@ export default function Modal({
             <motion.div
               ref={desktopModalRef}
               key="desktop-modal"
-              className="fixed inset-0 z-40 p-3 min-h-screen items-center justify-center flex"
+              className="fixed inset-0 z-[22222222] p-3  items-center justify-center flex"
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -57,7 +59,7 @@ export default function Modal({
             >
               <div
                 className={clsx(
-                  `overflow relative w-full max-w-lg transform rounded-xl text-white border-[#535353] border-[1px] bg-[#313131] p-3 text-left shadow-2xl transition-all`,
+                  `relative w-full max-w-lg transform rounded-xl ${purpose === 'task' && 'h-full max-h-[650px]'} flex flex-col text-white border-[#535353] border-[1px] bg-[#313131] p-3 text-left shadow-2xl transition-all`,
                   containerClasses,
                 )}
               >
@@ -67,7 +69,7 @@ export default function Modal({
           </FocusTrap>
           <motion.div
             key="desktop-backdrop"
-            className="fixed inset-0 z-30  blurred bg-opacity-10 backdrop-blur"
+            className="fixed inset-0 z-[2222222]  blurred bg-opacity-10 backdrop-blur"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

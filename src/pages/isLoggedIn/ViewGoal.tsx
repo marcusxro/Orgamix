@@ -626,35 +626,47 @@ const ViewGoal: React.FC = () => {
 
     async function editDocument() {
         if (renameGoal === "" || editDate === "" || editDescription === "") return;
-        console.log("os edit")
+        console.log("os edit");
         const selectedDate = new Date(editDate);
         const currentDate = new Date();
-
+    
         if (selectedDate < currentDate) {
             alert("The selected date has already passed.");
             return; // Exit the function if the date has passed
         }
-
+    
         try {
-            // Check for existing goals with the same title
+            // Fetch the original goal to check its title
+            const { data: originalGoal, error: fetchOriginalError } = await supabase
+                .from('goals')
+                .select('title')
+                .eq('created_at', params?.time)
+                .single();
+    
+            if (fetchOriginalError) {
+                console.error('Error fetching original goal:', fetchOriginalError.message);
+                return;
+            }
+    
+            // Check for existing goals with the same title (except for the original one)
             const { data: existingGoals, error: fetchError } = await supabase
                 .from('goals')
                 .select('title')
                 .like('title', `${renameGoal}%`)
                 .neq('created_at', params?.time); // Ensure the current goal is excluded
-
+    
             if (fetchError) {
                 console.error('Error fetching existing goals:', fetchError.message);
                 return;
             }
-
+    
             // Determine the new title with an index if necessary
             let newTitle = renameGoal;
-            if (existingGoals.length > 0) {
+            if (existingGoals.length > 0 && originalGoal.title !== renameGoal) {
                 const index = existingGoals.length + 1;
                 newTitle = `${renameGoal} (${index})`; // Append the index to the title
             }
-
+    
             const { data, error } = await supabase
                 .from('goals')
                 .update({
@@ -664,7 +676,7 @@ const ViewGoal: React.FC = () => {
                 })
                 .eq('userid', params?.uid)
                 .eq('created_at', params?.time);
-
+    
             if (error) {
                 console.log(error);
             } else {
@@ -679,6 +691,7 @@ const ViewGoal: React.FC = () => {
             console.log(err);
         }
     }
+    
 
 
     return (

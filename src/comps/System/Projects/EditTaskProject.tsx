@@ -11,7 +11,7 @@ import Input from './Input';
 import { Button } from './Button';
 import Loader from '../../Loader';
 import moment from 'moment'
-
+import { IoMdAdd } from "react-icons/io";
 
 interface invitedEmails {
     username: string;
@@ -28,16 +28,24 @@ interface updatedAt {
 }
 
 
+
+
+interface Subtask {
+    id: number;
+    description: string;
+    completed: boolean;
+}
+
 interface tasksType {
     title: string;
     created_at: number;
     created_by: string;
     priority: string;
     type: string;
-    id: number;
     start_work: string;
     deadline: string;
     assigned_to: string; //uid basis
+    subTasks: Subtask[]
 }
 
 interface boardsType {
@@ -78,7 +86,7 @@ interface isAllowedType {
     isAllowed: boolean
 }
 
-const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
+const EditTaskProject: React.FC<isAllowedType> = ({ isAllowed }) => {
     const { settingsTask, setSettingsTask }: any = useStore();
     const [isExiting, setIsExiting] = useState(false);
     const params = useParams()
@@ -96,7 +104,57 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
     const [workType, setWorkType] = useState<string>("")
 
     const [isDelete, setIsDelete] = useState<boolean>(false)
-    const {loading, setLoading}:any = useStore()
+    const { loading, setLoading }: any = useStore()
+
+
+
+
+    const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+    const [newSubtask, setNewSubtask] = useState<string>("");
+    const [isEditing, setIsEditing] = useState<number | null>(null); // Track the ID of the subtask being edited
+    const [editedTask, setEditedTask] = useState<string>("");
+
+
+    const addSubtask = () => {
+        if (newSubtask.trim()) {
+            const newTask: Subtask = {
+                id: Date.now(), // Unique ID based on timestamp
+                description: newSubtask,
+                completed: false,
+            };
+            setSubtasks([...subtasks, newTask]);
+            setNewSubtask(""); // Clear input after adding
+        }
+    };
+
+    const deleteSubtask = (id: number) => {
+        const updatedSubtasks = subtasks.filter(subtask => subtask.id !== id);
+        setSubtasks(updatedSubtasks);
+    };
+
+    const toggleCompletion = (id: number) => {
+        const updatedSubtasks = subtasks.map(subtask =>
+            subtask.id === id ? { ...subtask, completed: !subtask.completed } : subtask
+        );
+        setSubtasks(updatedSubtasks);
+    };
+
+
+    const startEditing = (id: number, description: string) => {
+        setIsEditing(id);
+        setEditedTask(description);
+    };
+
+    const saveEditedTask = (id: number) => {
+        if (!editedTask) return
+
+        const updatedSubtasks = subtasks.map(subtask =>
+            subtask.id === id ? { ...subtask, description: editedTask } : subtask
+        );
+        setSubtasks(updatedSubtasks);
+        setIsEditing(null); // Exit editing mode
+        setEditedTask("");
+    };
 
 
     useEffect(() => {
@@ -162,6 +220,7 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
             setWorkEnd(fetchedData[0]?.deadline || "")
             setWorkStart(fetchedData[0]?.start_work || "")
             setAssigne(fetchedData[0]?.assigned_to || user?.email || "")
+            setSubtasks(fetchedData[0]?.subTasks)
         }
     }, [fetchedData, user])
 
@@ -198,37 +257,37 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
     }, [defaultData])
 
     async function editTask() {
-        setLoading(true)
-
-        if(loading) {
-            return
+        setLoading(true);
+    
+        if (loading) {
+            return;
         }
-
+    
         try {
             const { data, error } = await supabase
                 .from('projects')
                 .select('*')
                 .eq('created_at', params?.time);
-
+    
             if (error) {
                 console.error('Error fetching data:', error);
-                setLoading(false)
+                setLoading(false);
                 return;
             }
-
+    
             if (data && data.length > 0) {
-                let matchedTask: tasksType | null = null; // Set to null initially
+                let matchedTask: tasksType | null = null;
                 let boardIndex = -1; // Default to -1 for not found
                 let taskIndex = -1; // Default to -1 for not found
-
+    
                 // Iterate through the boards to find the matched task
                 for (let i = 0; i < data[0].boards.length; i++) {
                     const board = data[0].boards[i];
-
+    
                     // Check if this board contains the task we are looking for
                     for (let j = 0; j < board.tasks.length; j++) {
                         const task = board.tasks[j];
-
+    
                         // Assuming `settingsTask` has the format 'task-TIMESTAMP' to match
                         const replaced = settingsTask.replace('task-', "");
                         if (String(task.created_at) === String(replaced)) {
@@ -238,55 +297,80 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
                             break; // Exit the inner loop once found
                         }
                     }
-
+    
                     if (matchedTask) {
                         break; // Exit the outer loop if the task is found
                     }
                 }
-
+    
                 // Proceed only if we found a matched task
                 if (matchedTask && boardIndex !== -1 && taskIndex !== -1) {
+                    // Fetch all task titles to check for duplicates
+                    const allTaskTitles = data[0].boards.flatMap((board: boardsType) => 
+                        board.tasks.map((task: tasksType) => task.title)
+                    );
+    
+                    // Check for duplicates only if it's not the task being edited
+                    const isEditingSameTask = matchedTask.title === itemName;
+                    let finalTitle;
+    
+                    if (isEditingSameTask) {
+                        // If editing the same task, use the original title
+                        finalTitle = itemName; 
+                    } else {
+                        // Otherwise, count how many tasks start with itemName
+                        const filteredTitles = allTaskTitles.filter((title: string) => title !== matchedTask.title);
+                        const matchingTasks = filteredTitles.filter((title: string) => title.startsWith(itemName));
+                        const taskIndexSuffix = matchingTasks.length > 0 ? `(${matchingTasks.length + 1})` : "";
+    
+                        // Create the final title with index
+                        finalTitle = `${itemName}${taskIndexSuffix}`;
+                    }
+    
                     const updatedTaskData: any = {
                         assigned_to: assignee,
                         deadline: workEnd,
                         priority: priority,
                         start_work: workStart,
-                        title: itemName,
+                        title: finalTitle, // Use the title without the new index if it's the same task
                         type: workType,
-                        created_at: matchedTask?.created_at
+                        created_at: matchedTask.created_at,
+                        subTasks: subtasks
                     };
-
+    
                     // Update the task in the local array
                     const updatedBoards = [...data[0].boards];
                     const updatedTasks = [...updatedBoards[boardIndex].tasks];
-
+    
                     // Update the specific task with new data
                     updatedTasks[taskIndex] = { ...matchedTask, ...updatedTaskData };
-
+    
                     // Update the boards with the modified tasks array
                     updatedBoards[boardIndex].tasks = updatedTasks;
-
+    
                     // Update the project in Supabase
-                    updateTaskInSupabase(updatedBoards);
-                    setLoading(false)
+                    await updateTaskInSupabase(updatedBoards);
+                    setLoading(false);
+                    console.log('Task updated successfully!');
                 } else {
                     console.log('No matching task found.');
-                    setLoading(false)
+                    setLoading(false);
                 }
             }
         } catch (err) {
             console.log('Error in fetching task:', err);
-            setLoading(false)
+            setLoading(false);
         }
     }
-
+    
+    
     async function deleteTask() {
         setLoading(true)
 
-        if(loading) {
+        if (loading) {
             return
         }
-        
+
         try {
             const { data, error } = await supabase
                 .from('projects')
@@ -386,7 +470,7 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
                         exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
-                        className='w-[450px] h-full bg-[#313131] z-[5000] rounded-lg p-3 overflow-auto border-[#535353] border-[1px] max-h-[600px] flex flex-col justify-between'
+                        className='w-[450px] h-full bg-[#313131] z-[5000] rounded-lg p-3 overflow-auto border-[#535353] border-[1px] max-h-[700px] flex flex-col justify-between'
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className='overflow-auto  h-full' >
@@ -399,7 +483,7 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
                             <div>
                                 {fetchedData && userData && user?.email && defaultData ?
                                     (fetchedData.length > 0) ? (
-                                        fetchedData.map((task) => (
+                                        fetchedData.map((task: tasksType) => (
                                             <div
                                                 className='flex gap-2 flex-col'
                                                 key={task.created_at}>
@@ -495,6 +579,108 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
                                                             : 'No date'}
                                                     </p>
                                                 </div>
+
+                                                <div className='flex flex-col gap-2  py-3 mb-2 border-t-[#888] border-t-[1px]'>
+                                                        <div className='flex flex-col'>
+                                                            <div>Subtasks</div>
+                                                            <div className='text-sm text-[#888]'>Break down tasks into smaller steps. Track progress by checking off completed items.</div>
+                                                        </div>
+
+                                                        {
+                                                            isAllowed && user &&
+                                                            fetchedData && (fetchedData[0]?.assigned_to === user?.email || "Everyone" || "") &&
+                                                            <div className="flex gap-2 mt-2">
+                                                                <input
+                                                                    type="text"
+                                                                    value={newSubtask}
+                                                                    onChange={(e) => setNewSubtask(e.target.value)}
+                                                                    placeholder="Enter subtask"
+                                                                    className='p-2 w-full bg-[#111111] border-[#535353] border-[1px] rounded-lg flex outline-none '
+
+                                                                />
+                                                                <button onClick={addSubtask}
+                                                                    className='p-2 px-4 text-[#888]  gap-2 text-sm items-center hover:bg-[#222] flex bg-[#111111] border-[#535353] border-[1px] rounded-lg   cursor-pointer'>
+                                                                    <span>Add</span> <IoMdAdd />
+                                                                </button>
+                                                            </div>
+                                                        }
+
+
+                                                        <div className="mt-4 flex flex-col gap-2">
+                                                            {task?.subTasks.length > 0 || subtasks.length > 0 ? (
+                                                                subtasks.map((subtask) => (
+                                                                    <div key={subtask.id} className="flex items-center bg-[#222] rounded-md justify-between py-1">
+                                                                        <div className='flex gap-2 p-2 items-center'>
+                                                                            {
+                                                                                isAllowed &&
+                                                                                fetchedData && (fetchedData[0]?.assigned_to === user?.email || "Everyone" || "") &&
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    checked={subtask.completed}
+                                                                                    onChange={() => toggleCompletion(subtask.id)}
+                                                                                />
+                                                                            }
+
+                                                                            <div className='flex flex-col items-start justify-start'>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <div>
+                                                                                    </div>
+                                                                                    {isEditing === subtask.id ? (
+                                                                                        isAllowed &&
+                                                                                        fetchedData && (fetchedData[0]?.assigned_to === user?.email || "Everyone" || "") &&
+
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={editedTask}
+                                                                                            onChange={(e) => setEditedTask(e.target.value)}
+                                                                                            className="border p-1 rounded-md px-2 outline-none"
+                                                                                        />
+                                                                                    ) : (
+                                                                                        <span
+                                                                                            className={subtask.completed ? 'line-through text-gray-400 cursor-pointer' : 'cursor-pointer'}
+                                                                                            onClick={() => isAllowed &&
+                                                                                                fetchedData && (fetchedData[0]?.assigned_to === user?.email || "Everyone" || "") && startEditing(subtask.id, subtask.description)}
+                                                                                        >
+                                                                                            {subtask.description}
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                                <div className='text-sm text-[#888] px-2'>
+                                                                                    {subtask.id ? moment(subtask.id).format('MM/DD/YY, h:mm A') : 'No Creation date'}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {
+                                                                            isAllowed &&
+                                                                            fetchedData && (fetchedData[0]?.assigned_to === user?.email || "Everyone" || "") &&
+                                                                            <div className="flex gap-2 m-2">
+                                                                                {isEditing === subtask.id ? (
+                                                                                    <button
+                                                                                        onClick={() => saveEditedTask(subtask.id)}
+                                                                                        className="text-green-500 hover:text-green-700"
+                                                                                    >
+                                                                                        Save
+                                                                                    </button>
+                                                                                ) : (
+                                                                                    <button
+                                                                                        onClick={() => deleteSubtask(subtask.id)}
+                                                                                        className="text-red-500 hover:text-red-700"
+                                                                                    >
+                                                                                        Delete
+                                                                                    </button>
+                                                                                )}
+                                                                            </div>
+                                                                        }
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="text-sm text-[#888]">No subtasks available</div>
+                                                            )}
+                                                        </div>
+
+                                                    </div>
+
                                             </div>
                                         ))
                                     ) : (
@@ -509,7 +695,7 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
 
                         {
                             user &&
-                            isAllowed &&
+                                isAllowed &&
                                 fetchedData && (fetchedData[0]?.assigned_to === user?.email || "Everyone" || "") &&
                                 !isDelete ?
                                 (
@@ -525,21 +711,21 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
 
                                             <Button
                                                 variant={"withBorderRight"}
-                                                onClick={() => {!loading && handleOutsideClick()}}
+                                                onClick={() => { !loading && handleOutsideClick() }}
                                             >
                                                 Close</Button>
                                             <Button
                                                 variant={"withCancel"}
-                                                onClick={() => {!loading && editTask()}}
+                                                onClick={() => { !loading && editTask() }}
                                             >
-                                               {
-                                                loading ?
-                                                <div className='w-[20px] h-[20px]'>
-                                                    <Loader />
-                                                </div>
-                                                :
-                                                'Edit'
-                                               }
+                                                {
+                                                    loading ?
+                                                        <div className='w-[20px] h-[20px]'>
+                                                            <Loader />
+                                                        </div>
+                                                        :
+                                                        'Edit'
+                                                }
                                             </Button>
                                         </div>
                                     </>
@@ -550,27 +736,27 @@ const EditTaskProject: React.FC<isAllowedType> = ({isAllowed}) => {
                                         isAllowed &&
                                         <div className='w-full h-[45px] flex rounded-lg overflow-hidden border-[#535353] border-[1px] mt-2'>
 
-                                        <Button
-                                            variant={"withBorderRight"}
-                                            onClick={() => { !loading && setIsDelete(false) }}
-                                        >
-                                            Cancel</Button>
-                                        <Button
-                                            variant={"withCancel"}
-                                            onClick={deleteTask}
-                                        >
-                                   {
-                                                loading ?
-                                                <div className='w-[20px] h-[20px]'>
-                                                    <Loader />
-                                                </div>
-                                                :
-                                                'Delete'
-                                               }
+                                            <Button
+                                                variant={"withBorderRight"}
+                                                onClick={() => { !loading && setIsDelete(false) }}
+                                            >
+                                                Cancel</Button>
+                                            <Button
+                                                variant={"withCancel"}
+                                                onClick={deleteTask}
+                                            >
+                                                {
+                                                    loading ?
+                                                        <div className='w-[20px] h-[20px]'>
+                                                            <Loader />
+                                                        </div>
+                                                        :
+                                                        'Delete'
+                                                }
                                             </Button>
-                                    </div>
+                                        </div>
                                     }
-        
+
 
 
                                 </>)

@@ -10,6 +10,7 @@ import { supabase } from '../../../supabase/supabaseClient';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import { TbSubtask } from "react-icons/tb";
 
 type ItemsType = {
   id: UniqueIdentifier;
@@ -19,7 +20,8 @@ type ItemsType = {
   start_work: string,
   deadline: string | undefined,
   assigned_to: string;
-  isAssigned: boolean
+  isAssigned: boolean;
+  subTasksLength: number;
 };
 
 interface invitedEmails {
@@ -80,7 +82,7 @@ interface accountType {
   fullname: string;
 }
 
-const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to }: ItemsType) => {
+const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to, subTasksLength }: ItemsType) => {
   const {
     attributes,
     listeners,
@@ -171,7 +173,14 @@ const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to 
 
         </div>
 
-        <div className="flex items-center justify-between gap-3 px-2 py-4  w-full">
+        <div className="flex items-start justify-between gap-3 px-2 py-4  w-full">
+         <div className='flex gap-2 items-start flex-col-reverse'>
+      {
+        subTasksLength > 0 &&
+           <div className='flex gap-2 items-center text-[10px] border-[#535353] border-[1px] p-1 rounded-md px-2 bg-[#111]'>
+         <TbSubtask />  {subTasksLength}
+          </div>
+      }
           <div className='flex gap-1 flex-col'>
             <div className='break-all'>{title}</div>
             {
@@ -180,15 +189,16 @@ const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to 
                 <MdDateRange />   {deadline}
               </div>
             }
-          {
-            isDragging ?
-            "Dragging" :
-            <div className='break-all text-sm text-[#888] '>Assigned for: 
-         {" "}   <span className={`${assigned_to === user?.email && 'underline text-green-700'}`}>{assigned_to === user?.email && "(me)"}         {" "}   {assigned_to && assigned_to ? (assigned_to.length > 15 ? assigned_to.slice(0,15) + "..." : assigned_to): "Everyone"}</span> {" "}
-          
-            </div>
-          }
+            {
+              isDragging ?
+                "Dragging" :
+                <div className='break-all text-sm text-[#888] '>Assigned for:
+                  {" "}   <span className={`${assigned_to === user?.email && 'underline text-green-700'}`}>{assigned_to === user?.email && "(me)"}         {" "}   {assigned_to && assigned_to ? (assigned_to.length > 15 ? assigned_to.slice(0, 15) + "..." : assigned_to) : "Everyone"}</span> {" "}
+
+                </div>
+            }
           </div>
+         </div>
           <div className='flex gap-3 '>
             {
 
@@ -206,12 +216,12 @@ const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to 
               </button>
 
             }
-          <button
-            onClick={() => { setSettingsTask(id) }}
-            className="p-2 text-md rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  shadow-lg hover:bg-[#222222]"
-          >
-            <MdMenuOpen />
-          </button>
+            <button
+              onClick={() => { setSettingsTask(id) }}
+              className="p-2 text-md rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  shadow-lg hover:bg-[#222222]"
+            >
+              <MdMenuOpen />
+            </button>
           </div>
         </div>
       </div>

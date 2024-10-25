@@ -270,7 +270,7 @@ const InviteToProjects: React.FC = () => {
                             .from('notification')
                             .insert({
                                 uid: email?.userid,  // Notify this invited user
-                                content: `The project ${prevData && prevData[0]?.name} has been set to private by ${myAccount && myAccount[0]?.username}`,
+                                content: `The project "${prevData && prevData[0]?.name}" has been set to private by ${myAccount && myAccount[0]?.username}`,
                                 created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
                                 linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}`
                             });
