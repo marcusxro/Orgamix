@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../../supabase/supabaseClient'
 import Sidebar from '../../comps/Sidebar'
 import IsLoggedIn from '../../firebase/IsLoggedIn'
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 interface dataType {
     userid: string;
@@ -18,8 +18,7 @@ const System: React.FC = () => {
     const location = useLocation()
     const [user] = IsLoggedIn()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
-
-
+  
     useEffect(() => {
       if(user) {  getAccounts() }
     }, [user, location])
@@ -86,14 +85,13 @@ const System: React.FC = () => {
                         <span className='text-xl'>📅 Events</span>
                         <p className='text-sm text-gray-400 mt-2'>Plan and manage events.</p>
                     </div>
-                </div>
-
+</div>
                 <div className='flex gap-3 h-[50vh] mt-4'>
                     <div className='flex flex-col gap-3 w-full h-[50vh] overflow-auto'>
                         <div>Tasks for today</div>
                         <div className='flex flex-col gap-3'>
 
-                            <div className='bg-[#313131] flex overflow-hidden w-full h-full rounded-lg border-[1px]
+                            <div className='bg-[#616060] flex overflow-hidden w-full h-full rounded-lg border-[1px]
                              border-[#535353] hover:bg-[#535353] cursor-pointer'>
                                 <div className='w-[10px] bg-green-400 h-full p-1'>
                                 </div>

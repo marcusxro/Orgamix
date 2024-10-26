@@ -10,6 +10,7 @@ import noUserProfile from '../../../assets/UserNoProfile.jpg'
 import { supabase } from '../../../supabase/supabaseClient';
 import { useParams } from 'react-router-dom';
 import Loader from '../../Loader';
+import FetchPFP from '../../FetchPFP';
 
 
 interface invitedEmails {
@@ -455,11 +456,9 @@ const InviteToProjects: React.FC = () => {
                                                         }}
                                                         key={idx}
                                                         className='w-full flex items-center gap-3 cursor-pointer p-3 hover:bg-[#111111] rounded-lg'>
-                                                        <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
-                                                            <img
-                                                                className='w-full h-full'
-                                                                src={noUserProfile} alt="" />
-                                                        </div>
+                                                         <div className='w-[35px] h-[35px] rounded-full overflow-hidden flex items-center justify-center border-[#535353] border-[1px] '>
+                                                            <FetchPFP userUid={itm?.userid} />
+                                                            </div>
                                                         <div className='flex flex-col'>
                                                             <div className='font-bold text-sm'>{itm?.email.length >= 40 ? itm?.email.slice(0, 40) + "..." : itm?.email}</div>
                                                             <div className='text-[#888] text-sm'>{itm?.username}</div>
@@ -516,10 +515,8 @@ const InviteToProjects: React.FC = () => {
                                                             onClick={() => { itm?.userid != user?.uid && addToArr(itm); console.log("CLICKED") }}
                                                             key={idx}
                                                             className='w-full flex items-center gap-3 cursor-pointer p-3 hover:bg-[#111111] rounded-lg'>
-                                                            <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
-                                                                <img
-                                                                    className='w-full h-full'
-                                                                    src={noUserProfile} alt="" />
+                                                            <div className='w-[35px] h-[35px] rounded-full overflow-hidden flex items-center justify-center border-[#535353] border-[1px] '>
+                                                            <FetchPFP userUid={itm?.userid} />
                                                             </div>
                                                             <div className='flex flex-col'>
                                                                 <div className={`${itm?.userid === user?.uid && "line-through"} font-bold text-sm`}>{itm?.userid === user?.uid && "(you) "}{itm?.email.length >= 26 ? itm?.email.slice(0, 25) + "..." : itm?.email}</div>

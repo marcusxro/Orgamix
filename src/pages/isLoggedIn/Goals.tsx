@@ -82,9 +82,7 @@ const Goals: React.FC = () => {
 
     const handleRealtimeEvent = (payload: any) => {
         const isCurrentUserProject = payload.new?.created_by === user?.uid || payload.old?.created_by === user?.uid;
-
         if (!isCurrentUserProject) return;
-
         switch (payload.eventType) {
             case 'INSERT':
                 setFetchedData((prevData) =>

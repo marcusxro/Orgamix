@@ -13,6 +13,7 @@ import userNoProfile from '../assets/UserNoProfile.jpg'
 import { useNavigate } from 'react-router-dom';
 import { IoIosNotifications } from "react-icons/io";
 import useStore from '../Zustand/UseStore';
+import FetchPFP from './FetchPFP';
 
 
 interface dataType {
@@ -34,8 +35,10 @@ interface NotificationType {
     created_at: any; // Assuming this is a timestamp in milliseconds
     uid: string;
     linkofpage: string;
-  }
-  
+}
+
+
+
 
 const Sidebar: React.FC<paramsType> = ({ location }) => {
 
@@ -43,12 +46,12 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
     const { inviteToProject }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const { isSidebarHover, setIsSidebarHover }: any = useStore()
-    const {  setViewNotifs }: any = useStore()
+    const { setViewNotifs }: any = useStore()
     const [notifications, setNotifications] = useState<NotificationType[]>([]);
 
     useEffect(() => {
-        if (user) { 
-            getAccounts(); 
+        if (user) {
+            getAccounts();
             getNotifs()
             const subscription = supabase
                 .channel('public:notification')
@@ -60,11 +63,11 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
             return () => {
                 subscription.unsubscribe();
             };
-        
+
         }
     }, [user, inviteToProject]);
 
-    
+
     const handleRealtimeEvent = (payload: any) => {
         console.log(payload)
         switch (payload.eventType) {
@@ -250,23 +253,26 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
 
     async function getNotifs() {
         try {
-          const { data, error } = await supabase
-            .from('notification')
-            .select('*')
-            .eq('uid', user?.uid)
-            .order('created_at', { ascending: false });
-    
-          if (data) {
-            setNotifications(data); // Set initial notifications
-          }
-    
-          if (error) {
-            console.log(error);
-          }
+            const { data, error } = await supabase
+                .from('notification')
+                .select('*')
+                .eq('uid', user?.uid)
+                .order('created_at', { ascending: false });
+
+            if (data) {
+                setNotifications(data); // Set initial notifications
+            }
+
+            if (error) {
+                console.log(error);
+            }
         } catch (err) {
-          console.log(err);
+            console.log(err);
         }
-      }
+    }
+
+
+    
 
 
     return (
@@ -276,8 +282,9 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
 
             <div className='mb-1 px-5 pt-2 items-center justify-start  flex btnSidebar gap-3'>
 
-                <div className='w-[25px] h-[25px] overflow-hidden rounded-full bg-red-700'>
-                    <img src={userNoProfile} className='w-full h-full object-cover' alt="" />
+
+                <div className='w-[25px] h-[25px] overflow-hidden rounded-full flex items-center justify-center'>
+                    <FetchPFP userUid={user?.uid} />
                 </div>
 
                 <span className='flex flex-col'>
@@ -340,7 +347,7 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
                     <span>Projects</span>
                 </div>
                 <div
-                    onClick={() => { navigateToPages("/user/tasks") }}
+                    onClick={() => { navigateToPages("/user/calendar") }}
                     className={`${location === "Events" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>
@@ -350,25 +357,25 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
                 </div>
 
             </div>
-        
+
             <div className='border-t-[.1px] border-t-[#303030] mt-auto pt-1'>
                 <div
                     onClick={() => { viewNotifFunc() }}
                     className={`${location === "Settings" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
                     <div className='text-2xl relative'>
                         <IoIosNotifications />
-                       {
-                        notifications.length > 0 &&
-                        <div className='absolute top-[-10px] text-white bg-[#111]  h-[20px] flex items-center p-1 rounded-md text-[12px] left-[65%]'>
                         {
-                        notifications.length > 999 ? "999+" : notifications.length
-                    }
-                        </div>
-                       }
+                            notifications.length > 0 &&
+                            <div className='absolute top-[-10px] text-white bg-[#111]  h-[20px] flex items-center p-1 rounded-md text-[12px] left-[65%]'>
+                                {
+                                    notifications.length > 999 ? "999+" : notifications.length
+                                }
+                            </div>
+                        }
                     </div>
 
-                    <span>Notification</span> 
-      
+                    <span>Notification</span>
+
                 </div>
                 <div
                     onClick={() => { navigateToPages("/user/tasks") }}

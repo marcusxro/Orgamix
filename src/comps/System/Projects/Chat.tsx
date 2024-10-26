@@ -140,7 +140,7 @@ const Chat = () => {
                 .eq('created_at', params?.time)
                 .single(); // Ensures we get a single result (not an array)
 
-            if(data) {
+            if (data) {
                 console.log(data?.chats)
             }
             if (!data?.chats) {
@@ -331,7 +331,7 @@ const Chat = () => {
                 return;
             }
             if (data && myAccount) {
-                
+
                 const newMessage = {
                     userEmail: myAccount && myAccount?.username, // User's email
                     userid: user?.uid, // User's ID
@@ -480,10 +480,11 @@ const Chat = () => {
                                     className='h-full max-h-[500px] bg-red overflow-auto '>
 
                                     {
-                                        chatArray != null && chatArray.length > 0 ?
+                                        chatArray && chatArray != null && chatArray.length > 0 ?
                                             <div className='h-full gap-3 flex flex-col'>
                                                 {
                                                     chatArray.map((itm: MessageType, idx: number) => (
+                                                        itm.content != null &&
                                                         <motion.div
                                                             key={idx}
                                                             initial={{ scale: 0.8, opacity: 0 }}  // Initial scale and opacity

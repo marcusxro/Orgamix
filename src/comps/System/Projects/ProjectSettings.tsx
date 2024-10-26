@@ -215,54 +215,83 @@ const ProjectSettings = () => {
         }
     }
 
-    async function editPorject() {
-        setLoading(true)
-
-        if(!fetchedData) {
-            return setLoading(false)
+    async function editProject() {
+        setLoading(true);
+    
+        if (!fetchedData) {
+            setLoading(false);
+            return;
         }
-
-        if(loading) {
-            return setLoading(false)
+    
+        if (loading) {
+            setLoading(false);
+            return;
         }
-        // if(isEq != 'delete/' + fetchedData[0]?.name) {
-        //     console.log("haha");
-        //     setLoading(false)
-        //    return 
-        // }
-
-        if(!projectDesc || !projectTitle) {
+    
+        if (!projectDesc || !projectTitle) {
             console.log("haha");
-             setLoading(false)
-            return 
+            setLoading(false);
+            return;
         }
-
-
+    
         try {
+            let finalTitle = projectTitle;
+    
+            // Check if the title is changing
+            if (projectTitle !== fetchedData[0]?.name) {
+                // Check if any project has a similar name
+                const { data: existingProjects, error: fetchError } = await supabase
+                    .from('projects')
+                    .select('name')
+                    .like('name', `${projectTitle}%`);
+    
+                if (fetchError) {
+                    console.error('Error fetching data:', fetchError);
+                    setLoading(false);
+                    return;
+                }
+    
+                // Find the highest index if there are similar names
+                if (existingProjects.length > 0) {
+                    const namePattern = new RegExp(`^${projectTitle} \\((\\d+)\\)$`);
+                    let maxIndex = 1;
+    
+                    existingProjects.forEach(project => {
+                        const match = project.name.match(namePattern);
+                        if (match) {
+                            maxIndex = Math.max(maxIndex, parseInt(match[1], 10) + 1);
+                        } else if (project.name === projectTitle) {
+                            maxIndex = 2;
+                        }
+                    });
+    
+                    finalTitle = `${projectTitle} (${maxIndex})`;
+                }
+            }
+    
+            // Update the project
             const { error } = await supabase
                 .from('projects')
                 .update({
-                    name: projectTitle,
+                    name: finalTitle,
                     description: projectDesc,
                     deadline: projectDeadline
                 })
-                .eq('created_at', params?.time)
-
+                .eq('created_at', params?.time);
+    
             if (error) {
-                setLoading(false)
-                return console.error('Error fetching data:', error);
+                console.error('Error updating data:', error);
             } else {
-                console.log("dne")
-                setLoading(false)
-                setIsEdit(false)
+                console.log("Project updated successfully");
+                setIsEdit(false);
             }
-        }
-        catch (err) {
-            setLoading(false)
-            console.log(err)
+        } catch (err) {
+            console.error("Unexpected error:", err);
+        } finally {
+            setLoading(false);
         }
     }
-
+    
 
     const nav = useNavigate()
 
@@ -353,7 +382,7 @@ const ProjectSettings = () => {
                                                                     Cancel
                                                                 </div>
                                                                 <div 
-                                                                onClick={editPorject}
+                                                                onClick={editProject}
                                                                 className={`${isEdit && "text-green-500 flex items-center"} hover:bg-[#1111] bg-[#222] border-[#535353] border-[1px]  p-2  rounded-lg cursor-pointer`}>
                                                                     {
                                                                         loading ? 

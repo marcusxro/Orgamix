@@ -255,7 +255,7 @@ const Projects = () => {
                                                     exit={{ opacity: 0, y: 10 }}
                                                     transition={{ duration: 0.3 }}
                                                     onClick={() => { nav(`/user/projects/view/${itm?.created_by}/${itm?.created_at}`); }}
-                                                    className='hover:bg-[#111111] cursor-pointer p-2 border-[#535353] border-[1px] rounded-lg w-full max-w-[300px] h-full max-h-[300px]'>
+                                                    className='hover:bg-[#111111] bg-[#313131] cursor-pointer p-2 border-[#535353] border-[1px] rounded-lg w-full max-w-[300px] h-full max-h-[300px]'>
                                                     <div className='h-full max-h-[180px] w-full rounded-md overflow-hidden '>
                                                         <img src={imageBg} className='w-full h-full object-cover' alt="" />
                                                     </div>

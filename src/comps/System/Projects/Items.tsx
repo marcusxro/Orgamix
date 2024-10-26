@@ -177,9 +177,9 @@ const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to,
          <div className='flex gap-2 items-start flex-col-reverse'>
       {
         subTasksLength > 0 &&
-           <div className='flex gap-2 items-center text-[10px] border-[#535353] border-[1px] p-1 rounded-md px-2 bg-[#111]'>
-         <TbSubtask />  {subTasksLength}
-          </div>
+        <div className='flex gap-2 items-center text-[10px] border-[#535353] border-[1px] p-1 rounded-md px-2 bg-[#111]'>
+        <TbSubtask />  {subTasksLength}
+         </div>
       }
           <div className='flex gap-1 flex-col'>
             <div className='break-all'>{title}</div>

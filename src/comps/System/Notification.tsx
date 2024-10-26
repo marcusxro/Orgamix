@@ -211,7 +211,7 @@ const Notification: React.FC = () => {
                       key={`${itm.id}-${index}`} // Using both id and index for uniqueness
                     >
                       <div
-                        className='p-3 rounded-lg flex justify-between items-start w-full'>
+                        className='p-3 rounded-lg flex justify-between gap-2 items-start w-full'>
                         <span className='w-full max-w-[300px]'>{itm.content}</span>
                         <span className="text-gray-400 text-sm whitespace-nowrap">
                           {itm.created_at ? moment(itm.created_at).format('h:mm A') : 'No Creation date'}

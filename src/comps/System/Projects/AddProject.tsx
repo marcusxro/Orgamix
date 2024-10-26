@@ -20,39 +20,73 @@ const AddProject:React.FC = () => {
     const [user] = IsLoggedIn()
 
     async function createProject() {
-        setLoading(true)
-        if(loading) {
-            setLoading(false)
-            return
+        setLoading(true);
+        if (loading) {
+            setLoading(false);
+            return;
         }
-        if(!nameVal || !description || !category) {
-            setLoading(false)
-            return
+        if (!nameVal || !description || !category) {
+            setLoading(false);
+            return;
         }
+    
         try {
-            const { error } = await supabase.from('projects')
-                .insert({
-                    description: description,
-                    created_at: Date.now(),
-                    name: nameVal,
-                    deadline: deadline,
-                    is_shared: privacySel,
-                    created_by: user?.uid
+            // Check if a project with a similar name exists
+            const { data: existingProjects, error: fetchError } = await supabase
+                .from('projects')
+                .select('name')
+                .eq('created_by', user?.uid)
+                .like('name', `${nameVal}%`)
+       
+    
+            if (fetchError) {
+                console.error('Error fetching data:', fetchError);
+                setLoading(false);
+                return;
+            }
+    
+            // If there are similar project names, find the highest index and increment it
+            let finalName = nameVal;
+            if (existingProjects.length > 0) {
+                const namePattern = new RegExp(`^${nameVal} \\((\\d+)\\)$`);
+                let maxIndex = 1;
+    
+                existingProjects.forEach(project => {
+                    const match = project.name.match(namePattern);
+                    if (match) {
+                        maxIndex = Math.max(maxIndex, parseInt(match[1], 10) + 1);
+                    } else if (project.name === nameVal) {
+                        maxIndex = 2;
+                    }
                 });
-
+    
+                finalName = `${nameVal} (${maxIndex})`;
+            }
+    
+            // Insert the new project with the determined name
+            const { error } = await supabase.from('projects').insert({
+                name: finalName,
+                description: description,
+                created_at: Date.now(),
+                deadline: deadline,
+                is_shared: privacySel,
+                created_by: user?.uid,
+                category: category
+            });
+    
             if (error) {
                 console.error('Error inserting data:', error);
-                setLoading(false)
             } else {
-                setLoading(false)
-                setOpenNew(!openNew)
-                console.log("Project created")
+                console.log("Project created");
+                setOpenNew(!openNew);
             }
         } catch (err) {
-            console.log(err);
-            setLoading(false)
+            console.error('Unexpected error:', err);
+        } finally {
+            setLoading(false);
         }
     }
+    
 
     return (
         <div

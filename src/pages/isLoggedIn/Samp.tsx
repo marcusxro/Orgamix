@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { CiShare2 } from "react-icons/ci";
 import { MdOutlineViewKanban } from "react-icons/md";
 import { IoIosContact } from "react-icons/io";
@@ -68,7 +68,6 @@ interface updatedAt {
     itemMoved: string
 }
 
-
 interface Subtask {
     id: number;
     description: string;
@@ -97,12 +96,19 @@ interface boardsType {
 }
 
 interface MessageType {
-
     userEmail: any;
     userid: any;
     id: number; //timestamp
     content: string
+}
 
+interface accountType {
+    userid: string; //
+    username: string; //
+    password: string; //
+    email: string;
+    id: number;
+    is_ban: boolean;
 }
 
 
@@ -118,7 +124,8 @@ interface dataType {
     updated_at: null | updatedAt[];
     is_favorite: boolean;
     boards: boardsType[]
-    chatArr: MessageType[]
+    chatArr: MessageType[];
+    currently_here: accountType[]
 }
 
 
@@ -134,7 +141,6 @@ export default function Samp() {
     const { openKanbanSettings }: any = useStore()
     const { openKanbanChat }: any = useStore()
     const [searchQuery, setSearchQuery] = useState('');
-
     const [subtasks, setSubtasks] = useState<Subtask[]>([]);
     const [newSubtask, setNewSubtask] = useState<string>("");
     const [isEditing, setIsEditing] = useState<number | null>(null); // Track the ID of the subtask being edited
@@ -144,6 +150,7 @@ export default function Samp() {
     useEffect(() => {
         if (user) {
             getProjects();
+            getAccounts()
             const subscription = supabase
                 .channel('public:projects')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, (payload) => {
@@ -208,6 +215,26 @@ export default function Samp() {
             console.log(err)
         }
     }
+
+    async function getAccounts() {
+        try {
+            const { data, error } = await supabase
+                .from('accounts')
+                .select('*')
+                .eq('userid', user?.uid)
+
+            if (data) {
+                console.log(data)
+            }
+            if (error) {
+                return console.error('Error fetching data:', error);
+            }
+
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
 
     const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
     const [currentContainerId, setCurrentContainerId] = useState<UniqueIdentifier>();
@@ -289,12 +316,12 @@ export default function Samp() {
 
     async function onAddItem() {
         setLoading(true);
-    
+
         if (!itemName || !assignee) {
             setLoading(false);
             return;
         }
-    
+
         try {
             // Fetch the existing project to get the boards
             const { data: projectData, error: fetchError } = await supabase
@@ -302,24 +329,24 @@ export default function Samp() {
                 .select("boards")
                 .eq("created_at", params?.time)
                 .single();
-    
+
             if (fetchError) {
                 console.log("Error fetching project:", fetchError);
                 setLoading(false);
                 return;
             }
-    
+
             const existingBoards: boardsType[] = projectData?.boards || [];
-    
+
             // Flatten all task titles across all boards
             const allTaskTitles = existingBoards.flatMap(board => board.tasks.map(task => task.title));
-    
+
             // Count how many times the itemName appears in all task titles
             const matchingTasks = allTaskTitles.filter(title => title.startsWith(itemName));
             const taskIndex = matchingTasks.length > 0 ? `(${matchingTasks.length + 1})` : "";
-    
+
             const finalTitle = `${itemName}${taskIndex}`;
-    
+
             const newTask: tasksType = {
                 title: finalTitle, // Use the title with the new index
                 created_at: Date.now(),
@@ -331,7 +358,7 @@ export default function Samp() {
                 assigned_to: assignee === "" ? "Everyone" : assignee,
                 subTasks: subtasks,
             };
-    
+
             // Find the specific board to add the task to
             const boardIndex = existingBoards.findIndex(board => board.board_uid === currentContainerId);
             if (boardIndex === -1) {
@@ -339,23 +366,23 @@ export default function Samp() {
                 setLoading(false);
                 return;
             }
-    
+
             // Append the new task to the board's tasks
             existingBoards[boardIndex].tasks.push(newTask);
-    
+
             // Update the project with the modified boards array
             const { error: updateError } = await supabase
                 .from("projects")
                 .update({ boards: existingBoards })
                 .eq("created_at", params?.time);
-    
+
             if (updateError) {
                 console.log("Error updating tasks:", updateError);
                 setLoading(false);
             } else {
                 console.log("Task added successfully!");
             }
-    
+
             setLoading(false);
             setShowAddItemModal(false);
             setItemName("");
@@ -364,14 +391,14 @@ export default function Samp() {
             setWorkEnd("");
             setWorkStart("");
             setPriority("");
-    
+
         } catch (err) {
             console.log("Error adding task:", err);
             setLoading(false);
         }
     }
-    
-    
+
+
 
 
     // Find the value of the items
@@ -672,9 +699,6 @@ export default function Samp() {
     }
 
 
-
-
-
     async function saveChangesToDB(updatedContainers: boardsType[]) {
         setLoading(true)
 
@@ -804,7 +828,8 @@ export default function Samp() {
         setEditedTask("");
     };
 
-
+  
+    
     return (
         <div className=' flex flex-col h-[100dvh] overflow-hidden md:flex-row'>
 
@@ -870,8 +895,6 @@ export default function Samp() {
 
             <div className="h-[30px] w-full max-w-[100%] md:sticky md:top-0 md:h-screen md:max-w-[200px]">
                 <KanBanSidebar location='kanban' />
-
-
             </div>
 
             <div className=' w-full h-[100dvh] overflow-auto'>
@@ -880,7 +903,7 @@ export default function Samp() {
                         (fetchedData[0]?.is_shared !== "private") ||
                         (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid)) &&
                     <Modal
-                    purpose='modal'
+                        purpose='modal'
                         showModal={showAddContainerModal}
                         setShowModal={setShowAddContainerModal}>
                         <div className="flex flex-col w-full items-start gap-y-4">
@@ -1220,6 +1243,7 @@ export default function Samp() {
 
                                                     </div>
                                                 }
+         
 
                                                 <div className='mt-5'>
                                                     <div className="grid p-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
