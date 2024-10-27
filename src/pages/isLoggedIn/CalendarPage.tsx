@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '../../comps/Sidebar';
 import IsLoggedIn from '../../firebase/IsLoggedIn';
 import { supabase } from '../../supabase/supabaseClient';
-import { format, addDays, startOfWeek } from 'date-fns';
+import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import moment from 'moment';
 import { MdOutlineClass } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import { motion } from 'framer-motion'
+
+
 const CalendarPage: React.FC = () => {
     const [user] = IsLoggedIn();
     const [events, setEvents] = useState<any>([]);
@@ -132,7 +134,12 @@ const CalendarPage: React.FC = () => {
             const day = addDays(currentWeekStart, i);
             const dailyEvents = events.filter((event: any) =>
                 format(event.start, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
-            );
+            );   
+            const today = new Date();
+             const isToday = isSameDay(day, today);
+
+            const dayLabel = isToday ? `${format(day, 'EEEE, MMMM do')} (today)` : format(day, 'EEEE, MMMM do');
+
 
             if (dailyEvents.length > 0) {
                 hasEvents = true; // Set flag to true if any events exist
@@ -147,7 +154,7 @@ const CalendarPage: React.FC = () => {
                         variants={itemAnimation}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <span className="font-bold text-lg mb-3">{format(day, 'EEEE, MMMM do')}</span>
+                        <span className="font-bold text-lg mb-3">{dayLabel} </span>
                         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2'>
                             {dailyEvents.map((event: any, index: number) => (
                                 <motion.div
@@ -160,7 +167,7 @@ const CalendarPage: React.FC = () => {
                                     variants={itemAnimation}
                                     transition={{ duration: 0.3, ease: 'easeInOut' }}
                                 >
-                                    <div className='font-bold mb-2'>{event.title}</div>
+                                    <div className='font-bold mb-2 text-white'>{event.title}</div>
                                     <div className='text-[#888] text-sm flex items-center gap-1'>
                                         <MdOutlineClass /> {event?.type}
                                     </div>
@@ -185,7 +192,7 @@ const CalendarPage: React.FC = () => {
                         variants={itemAnimation}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <span className="font-bold text-lg mb-3">{format(day, 'EEEE, MMMM do')}</span>
+                    <span className="font-bold text-lg mb-3">{dayLabel} </span>
                         <div className='my-1 text-gray-500'>No Events</div>
                     </motion.div>
                 );

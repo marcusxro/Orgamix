@@ -39,7 +39,7 @@ interface accountType {
     fullname: string;
 }
 
-const Chat = () => {
+const Chat:React.FC = () => {
     const [isExiting, setIsExiting] = useState(false);
     const { openKanbanChat, setOpenKanbanChat }: any = useStore()
     const params = useParams()

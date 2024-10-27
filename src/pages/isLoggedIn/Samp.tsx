@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { CiShare2 } from "react-icons/ci";
 import { MdOutlineViewKanban } from "react-icons/md";
 import { IoIosContact } from "react-icons/io";
 import { FaLinesLeaning } from "react-icons/fa6";
 import { BsCalendarDate } from "react-icons/bs";
-import { FaSort } from "react-icons/fa6";
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaCheck } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import moment from 'moment';
-
+import { MdDateRange } from "react-icons/md";
 
 // DnD
 import {
@@ -43,7 +42,6 @@ import { Button } from '../../comps/System/Projects/Button';
 import KanBanSidebar from '../../comps/System/Projects/KanBanSidebar';
 import { supabase } from '../../supabase/supabaseClient';
 import IsLoggedIn from '../../firebase/IsLoggedIn';
-import { MdDateRange } from "react-icons/md";
 import Visualizer from '../../comps/System/Projects/Visualizer';
 import useStore from '../../Zustand/UseStore';
 import EditTaskProject from '../../comps/System/Projects/EditTaskProject';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../comps/Sidebar';
-import { CiCirclePlus } from "react-icons/ci";
+import { IoMdAdd } from "react-icons/io";
 import AddNote from '../../comps/System/AddNote';
 import IsLoggedIn from '../../firebase/IsLoggedIn';
 import { supabase } from '../../supabase/supabaseClient';
@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import useStore from '../../Zustand/UseStore';
 import Loader from '../../comps/Loader';
 import { motion, AnimatePresence } from 'framer-motion'
+import { GoSortAsc } from "react-icons/go";
+
 
 interface fetchedDataType {
     id: number;
@@ -24,11 +26,22 @@ interface fetchedDataType {
 const Notes = () => {
     const [user] = IsLoggedIn()
     const [fetchedData, setFetchedData] = useState<fetchedDataType[] | null>(null)
+    const [filteredData, setFilteredData] = useState<fetchedDataType[] | null | undefined>(null)
     const [showAdd, setShowAdd] = useState<boolean>(true)
     const [mobileShow, setMobileShow] = useState<boolean>(false)
     const { editTask } = useStore()
     const [action, setAction] = useState<number | null>(null)
+    const [searchVal, setSearchVal] = useState<string>("")
 
+    useEffect(() => {
+        const filteredArray = fetchedData?.filter((itm: fetchedDataType) => {
+            return itm?.title.toLowerCase().includes(searchVal.toLowerCase())
+        })
+        console.log(filteredArray)
+
+        setFilteredData(filteredArray)
+
+    }, [searchVal])
 
     useEffect(() => {
         if (user) {
@@ -53,7 +66,7 @@ const Notes = () => {
 
         if (!isCurrentUserProject) return;
 
-        
+
         switch (payload.eventType) {
             case 'INSERT':
                 setFetchedData((prevData) =>
@@ -89,6 +102,7 @@ const Notes = () => {
                 console.error(error)
             } else {
                 setFetchedData(data)
+                setFilteredData(data)
             }
         }
         catch (err) {
@@ -141,16 +155,35 @@ const Notes = () => {
                     </div>
 
 
-                    <div className='w-full flex gap-3 flex-col  h-[90dvh] mt-5 mb-5'>
-                        <div
-                            onClick={() => { setShowAdd(prevs => !prevs); setMobileShow(prevs => !prevs) }}
-                            className='w-full max-w-[150px] h-full max-h-[150px] p-9
-                    flex items-center justify-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg text-3xl hover:bg-[#535353]'>
-                            <CiCirclePlus />
+                    <div className='w-full flex gap-3 flex-col items-start h-[90dvh] mt-5 mb-5'>
+                        <div className='flex gap-2 justify-between w-full'>
+                            <div className='flex gap-2 justify-between items-center w-full max-w-[300px]'>
+                                <div
+                                    onClick={() => { setShowAdd(prevs => !prevs); setMobileShow(prevs => !prevs) }}
+                                    className='w-auto p-3
+                            flex items-center justify-center bg-[#111] border-[#535353] border-[1px] cursor-pointer rounded-lg  hover:bg-[#222]'>
+                                    <IoMdAdd />
+                                </div>
+                                <input
+                                    value={searchVal}
+                                    onChange={(e) => { setSearchVal(e.target.value) }}
+                                    placeholder='Search notes'
+                                    className='w-full h-full rounded-lg bg-[#111] border-[#535353] border-[1px] outline-none px-3'
+                                    type="text" />
+                            </div>
+                            <div
+                                className='flex items-center justify-center text-xl rounded-lg bg-[#111] border-[#535353] border-[1px] outline-none px-3 hover:bg-[#222]'>
+                                <GoSortAsc />
+                            </div>
                         </div>
-                        <div className='flex gap-3 flex-wrap'>
+
+                        <div className='flex gap-3 flex-wrap w-full'>
                             {
-                                fetchedData === null ?
+                                filteredData?.length === 0 && searchVal != "" &&
+                                <div className='text-sm text-[#888]'>No result</div>
+                            }
+                            {
+                                filteredData === null ?
                                     <div className='w-[20px] h-[20px]'>
                                         <Loader />
                                     </div>
@@ -158,19 +191,19 @@ const Notes = () => {
 
                                     <AnimatePresence>
                                         {
-                                            fetchedData && fetchedData?.map((itm: fetchedDataType, idx: number) => (
+                                            filteredData && filteredData?.map((itm: fetchedDataType, idx: number) => (
                                                 <motion.div
-                                                layout
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: 10 }}
-                                                transition={{ duration: 0.3 }}
+                                                    layout
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: 10 }}
+                                                    transition={{ duration: 0.3 }}
                                                     onClick={() => {
                                                         nav(`/user/notes/${itm?.userid}/${itm?.createdat}`)
                                                     }}
                                                     key={idx}
-                                                    className='w-full max-w-[150px] h-full max-h-[150px] overflow-auto
-                                    flex items-start justify-start flex-col bg-[#313131] p-3 border-[#535353] border-[1px] cursor-pointer rounded-lg text-3xl hover:bg-[#222222] '>
+                                                    className='w-full max-w-[200px] h-full max-h-[200px] overflow-auto
+                                                    flex items-start justify-start flex-col bg-[#313131] p-3 border-[#535353] border-[1px] cursor-pointer rounded-lg text-3xl hover:bg-[#222222] '>
                                                     <div className='font-bold text-sm'>
                                                         {itm?.title}
                                                     </div>
@@ -182,31 +215,38 @@ const Notes = () => {
                                                                 : 'No Deadline'}
                                                         </span>
                                                     </div>
-                                                    <div className='text-sm text-[#888] flex items-center gap-1'>
-                                                        <BiCategory />
+                                                    {
+                                                        itm?.category &&
+                                                        <div className='text-sm text-[#888] flex items-center gap-1'>
+                                                            <BiCategory />
 
-                                                        <span className='text-[10px]'>
-                                                            {itm?.category}
-                                                        </span>
-                                                    </div>
+                                                            <span className='text-[10px]'>
+                                                                {itm?.category}
+                                                            </span>
 
-                                                    <div className='mt-auto w-full border-[#535353] border-[1px]  rounded-lg overflow-hidden flex'>
-                                                        {
-                                                            itm?.id === action ?
-                                                                <>
+                                                        </div>
+                                                    }
+
+
+                                                    <div className='mt-auto w-full   rounded-lg overflow-hidden flex'>
+                                                        <div className='w-full mt-2 border-[#535353] border-[1px] rounded-lg overflow-hidden flex'>
+                                                            {
+                                                                itm?.id === action ?
+                                                                    <>
+                                                                        <div
+                                                                            onClick={(e) => { e.stopPropagation(); deleteTask(itm?.id) }}
+                                                                            className='text-sm bg-[#111111] border-r-[#535353] border-r-[1px]  hover:bg-[#292929] text-red-500 w-full  p-1 text-center'>Delete</div>
+
+                                                                        <div
+                                                                            onClick={(e) => { e.stopPropagation(); setAction(null) }}
+                                                                            className='text-sm bg-[#111111] text-green-500 w-full  p-1 text-center hover:bg-[#292929] hover:border-[#111111] '>Cancel</div>
+                                                                    </>
+                                                                    :
                                                                     <div
-                                                                        onClick={(e) => { e.stopPropagation(); deleteTask(itm?.id) }}
-                                                                        className='text-sm bg-[#111111] border-r-[#535353] border-r-[1px]  hover:bg-[#292929] text-red-500 w-full  p-1 text-center'>Delete</div>
-
-                                                                    <div
-                                                                        onClick={(e) => { e.stopPropagation(); setAction(null) }}
-                                                                        className='text-sm bg-[#111111] text-green-500 w-full  p-1 text-center hover:bg-[#292929] hover:border-[#111111] '>Cancel</div>
-                                                                </>
-                                                                :
-                                                                <div
-                                                                    onClick={(e) => { e.stopPropagation(); setAction(itm?.id) }}
-                                                                    className='text-sm bg-[#111111] text-green-500 w-full  p-1 text-center hover:bg-[#292929]'>Actions</div>
-                                                        }
+                                                                        onClick={(e) => { e.stopPropagation(); setAction(itm?.id) }}
+                                                                        className='text-sm bg-[#111111] text-green-500 w-full  p-1 text-center hover:bg-[#292929]'>Delete</div>
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </motion.div>
                                             ))
@@ -227,11 +267,9 @@ const Notes = () => {
 
                 {
                     mobileShow &&
-                    <div
-                        onClick={() => { setMobileShow(prevs => !prevs) }}
-                        className='ml-auto positioners w-full h-full flex justify-end lg:hidden z-30'>
-                        <AddNote purpose={'modal'} closeMobile={closeMobile} />
-                    </div>
+
+                    <AddNote purpose={'modal'} closeMobile={closeMobile} />
+
                 }
 
             </div>

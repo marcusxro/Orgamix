@@ -14,6 +14,7 @@ import ViewTask from '../../comps/System/ViewTask'
 import TaskSorter from '../../comps/System/TaskSorter'
 import Loader from '../../comps/Loader'
 import { motion, AnimatePresence } from 'framer-motion'
+import useStore from '../../Zustand/UseStore'
 
 
 interface taskDataType {
@@ -26,7 +27,7 @@ interface taskDataType {
     userid: string;
     repeat: string
     createdAt: string;
-    link: string;
+    link: string[];
     category: string;
 }
 
@@ -35,33 +36,59 @@ interface taskDataType {
 const Tasks: React.FC = () => {
     const [user] = IsLoggedIn()
     const { showNotif, setShowNotif } = useStoreBoolean()
-
-
     const [taskData, setTasksData] = useState<taskDataType[] | null>(null)
     const [taskDataCompleted, setTasksDataCompleted] = useState<taskDataType[] | null>(null)
-
     const [tabItem, setTabination] = useState<string>("Pending")
     const [actions, setActions] = useState<number | null>(null)
-    const [edit, setedit] = useState<taskDataType | null>(null)
     const [isNotifying, setIsNotifying] = useState(false);
     const [isComplete, setIsComplete] = useState<string | number | null>(null)
     const [sortVal, setSortVal] = useState<string | null>(null);
+    const [sortMethodLoaded, setSortMethodLoaded] = useState<boolean>(false);
+    const { isSort, setSort }: any = useStore();
+    const sortMethod = localStorage.getItem('sortMethod');
+    const { viewEditTask, setViewEditTask } = useStore();
+    const [searchVal, setSearchVal] = useState<string>("")
+    const [filteredObj, setFilteredObj] = useState<taskDataType[] | null | undefined>(null)
 
+    const [filteredComp, setFilteredComp] = useState<taskDataType[] | null | undefined>(null)
 
-    const [isSort, setSort] = useState<boolean>(false)
+    useEffect(() => {
+        console.log(sortMethod)
+
+        if (user && sortMethod && !sortMethodLoaded) {
+            setSortVal(sortMethod);
+            setSortMethodLoaded(true); // Mark that the sort method has been loaded
+            console.log("Sort method loaded on initial render:", sortMethod);
+        }
+    }, [user, sortMethod, sortMethodLoaded]);
 
 
     useEffect(() => {
-        const sortMethod = localStorage.getItem('sortMethod')
+        if (searchVal != '') {
+            const filteredData: taskDataType[] | undefined = filteredObj?.filter((itm) => {
+                return itm?.title.toLowerCase().includes(searchVal.toLowerCase())
+            })
 
-        if (sortMethod) {
-            getUserTask()
+            setFilteredObj(filteredData)
 
-            setSortVal(sortMethod)
+            const filteredDataCompleted: taskDataType[] | undefined = taskDataCompleted?.filter((itm) => {
+                return itm?.title.toLowerCase().includes(searchVal.toLowerCase())
+            })
+
+            setFilteredComp(filteredDataCompleted)
+
+        } else {
+            setFilteredObj(taskData)
+            setFilteredComp(taskDataCompleted)
         }
-    }, [isSort, localStorage])
+    }, [searchVal])
 
-
+    useEffect(() => {
+        if (sortVal) {
+            getUserTask(); // Fetch sorted tasks
+            getUserTaskCompleted();
+        }
+    }, [sortVal]);
 
     const notif = (message: string) => {
         if (!isNotifying) {
@@ -86,22 +113,24 @@ const Tasks: React.FC = () => {
 
     useEffect(() => {
         if (user) {
-            getUserTask()
-            getUserTaskCompleted()
+            getUserTask();
+            getUserTaskCompleted();
+
             const subscription = supabase
                 .channel('public:tasks')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload) => {
                     console.log('Realtime event:', payload);
                     handleRealtimeEvent(payload);
-                    getUserTask()
-                    getUserTaskCompleted()
+                    getUserTask();
+                    getUserTaskCompleted();
                 })
-                .subscribe()
+                .subscribe();
+
             return () => {
                 subscription.unsubscribe();
             };
         }
-    }, [user, edit, isSort])
+    }, [user, sortVal, isSort]); // Update on `sortVal` change as well
 
 
     const handleRealtimeEvent = (payload: any) => {
@@ -109,7 +138,7 @@ const Tasks: React.FC = () => {
 
         if (!isCurrentUserProject) return;
 
-        
+
         switch (payload.eventType) {
             case 'INSERT':
                 setTasksData((prevData) =>
@@ -190,38 +219,35 @@ const Tasks: React.FC = () => {
 
     async function getUserTask() {
         try {
-            if (!user || !user.uid) {
+            if (!user) {
                 console.error('User is not defined or uid is missing');
                 return;
             }
 
-
-            const columnName = returnSortTitle()
-
+            const columnName = returnSortTitle();
             const { data, error } = await supabase
                 .from('tasks')
                 .select('*')
                 .eq('userid', user?.uid)
                 .eq('isdone', false)
-                .order(columnName, { ascending: true }) // Sort by creation date in ascending order
-
+                .order(columnName || "createdAt", { ascending: true });
 
             if (data) {
-                const isRev = sortVal === 'Creation Date' ? data.reverse() : data
-                setTasksData(isRev)
+                const sortedData = sortVal === 'Creation Date' ? data.reverse() : data;
+                setTasksData(sortedData);
+                setFilteredObj(sortedData)
             } else {
-                console.log(error)
+                console.log("Error:", error);
             }
-        }
-        catch (err) {
-            console.log(err)
+        } catch (err) {
+            console.error("Error fetching tasks:", err);
         }
     }
 
 
     async function getUserTaskCompleted() {
         try {
-            if (!user || !user.uid) {
+            if (!user) {
                 console.error('User is not defined or uid is missing');
                 return;
             }
@@ -234,12 +260,13 @@ const Tasks: React.FC = () => {
                 .select('*')
                 .eq('userid', user?.uid)
                 .eq('isdone', true)
-                .order(columnName, { ascending: true }) // Sort by creation date in ascending order
+                .order(columnName || "createdAt", { ascending: true });
 
 
             if (data) {
                 const isRev = sortVal === 'Creation Date' ? data.reverse() : data
                 setTasksDataCompleted(isRev)
+                setFilteredComp(isRev)
             } else {
                 console.log(error)
             }
@@ -271,13 +298,16 @@ const Tasks: React.FC = () => {
 
     async function taskCompleted(idx: number) {
         try {
+
+
             const { error } = await supabase
                 .from('tasks')
                 .update({
                     isdone: true
                 })
                 .eq('id', idx)
-                .eq('userid', user?.uid);
+                .eq('userid', user?.uid)
+                .order('createdAt', { ascending: true })
             if (error) {
                 errorNotif('Error encountered!')
             } else {
@@ -297,7 +327,9 @@ const Tasks: React.FC = () => {
                     isdone: false
                 })
                 .eq('id', idx)
-                .eq('userid', user?.uid);
+                .eq('userid', user?.uid)
+                .order('createdAt', { ascending: true })
+
             if (error) {
                 errorNotif('Error encountered!')
             } else {
@@ -309,12 +341,14 @@ const Tasks: React.FC = () => {
         }
     }
 
+    const { isShowAdd, setIsShowAdd }: any = useStore();
+    const { viewTask, setViewTask } = useStore();
 
-    const [isShowAdd, setIsShowAdd] = useState<Boolean>(false)
-    const [viewTask, setViewTask] = useState<taskDataType | null>(null)
+    console.log(viewEditTask)
 
-
-
+    useEffect(() => {
+        console.log(viewTask)
+    }, [viewTask])
 
     return (
         <div className='w-full h-full relative'>
@@ -322,40 +356,25 @@ const Tasks: React.FC = () => {
             <ToastContainer />
             {
                 isSort &&
-                <div
-                    onClick={() => { setSort(false) }}
-                    className='positioners w-full h-full flex items-center justify-center p-3'>
-
-                    <TaskSorter closer={setSort} />
-
-                </div>
+                <TaskSorter closer={setSort} />
             }
             {
                 viewTask != null &&
-                <div
-                    onClick={() => { setViewTask(null) }}
-                    className='positioners w-full h-full flex items-center justify-center p-3'>
-
-                    <ViewTask objPass={viewTask} closer={setViewTask} />
-
-                </div>
+                <ViewTask objPass={viewTask} />
             }
 
             {
                 isShowAdd &&
-                <div
-                    onClick={() => { setIsShowAdd(false) }}
-                    className='positioners w-full h-full flex items-center justify-end'>
-                    <AddNewTask purpose='Modal' closer={setIsShowAdd} />
-                </div>
+
+                <AddNewTask purpose='Modal' closer={setIsShowAdd} />
+
             }
+
             {
-                edit != null && user &&
-                <div
-                    onClick={() => { setedit(null) }}
-                    className='positioners w-full h-full flex items-center justify-center p-3'>
-                    <EditTask objPass={edit} closer={setedit} />
-                </div>
+                viewEditTask != null && user &&
+
+                <EditTask objPass={viewEditTask} />
+
             }
             <div className='ml-[86px] p-3 flex gap-3 h-[100dvh] mr-[0px] lg:mr-[370px] '>
                 <div className='flex flex-col gap-3 items-start w-full'>
@@ -370,56 +389,86 @@ const Tasks: React.FC = () => {
                         </div>
                         <div
                             onClick={() => { setIsShowAdd(true) }}
-                            className='p-2 block lg:hidden bg-[#111111] border-[#535353] border-[1px] rounded-lg cursor-pointer text-2xl hover:bg-[#535353]'>
+                            className='p-2 block lg:hidden bg-[#111111] border-[#535353] border-[1px] rounded-lg cursor-pointer text-2xl hover:bg-[#222]'>
                             <IoMdAdd />
                         </div>
                     </div>
-                    <div className='flex gap-3 justify-between items-center w-full'>
 
-                        <div className='flex my-3 border-[#535353] border-[1px] w-auto items-start overflow-hidden  rounded-l-lg  rounded-r-lg'>
+                    <div className='flex gap-3 justify-between items-center w-full'>
+                        <div className='flex  border-[#535353] border-[1px] w-auto items-start overflow-hidden  rounded-l-lg  rounded-r-lg'>
                             <div
                                 onClick={() => { setTabination("Pending") }}
-                                className={`${tabItem === 'Pending' && 'text-green-500'} px-4 py-2 bg-[#111111] rounded-l-lg cursor-pointer `}> Pending</div>
+                                className={`${tabItem === 'Pending' && 'text-green-500'} px-4 py-2 hover:bg-[#222] bg-[#111111] rounded-l-lg cursor-pointer `}> Pending</div>
                             <div className='w-[1px] bg-[#535353]'>
 
                             </div>
                             <div
                                 onClick={() => { setTabination("Completed") }}
-                                className={`${tabItem === 'Completed' && 'text-green-500'} px-4 py-2 bg-[#111111]  rounded-r-lg cursor-pointer`}> Completed</div>
+                                className={`${tabItem === 'Completed' && 'text-green-500'} px-4 py-2 bg-[#111111] hover:bg-[#222]  rounded-r-lg cursor-pointer`}> Completed</div>
                         </div>
 
-                        <div
-                            onClick={() => { setSort(true) }}
-                            className='p-2  bg-[#111111] border-[#535353] border-[1px] rounded-lg cursor-pointer text-2xl hover:bg-[#535353]'>
-                            <GoSortAsc />
+                        <div className='flex lg:flex-row-reverse gap-4 items-end lg:items-center flex-col'>
+                            <div
+                                onClick={() => { setSort(true) }}
+                                className='p-2  bg-[#111111] border-[#535353] border-[1px] rounded-lg cursor-pointer text-2xl hover:bg-[#222]'>
+                                <GoSortAsc />
+                            </div>
+                            <input
+                                value={searchVal}
+                                onChange={(e) => { setSearchVal(e.target.value) }}
+                                className='p-[8px] hidden lg:block bg-[#111111] px-3 outline-none border-[#535353] border-[1px] rounded-lg  '
+                                placeholder='Search Tasks'
+                                type="text" name="" id="" />
                         </div>
                     </div>
+                    <input
+                        value={searchVal}
+                        onChange={(e) => { setSearchVal(e.target.value) }}
+                        className='p-[8px] block w-full max-w-[250px] lg:hidden bg-[#111111] px-3 outline-none border-[#535353] border-[1px] rounded-lg  '
+                        placeholder='Search Tasks'
+                        type="text" name="" id="" />
+
                     <div className='mt-4 grid gap-3 grid-cols-1 w-full xs:hidden sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 pb-[10px]'>
+                        {
+                            tabItem === 'Pending' && filteredObj && filteredObj.length === 0 &&
+                            <div className='text-sm text-[#888]'>No result</div>
+                        }
+
+                        {
+                            tabItem !== 'Pending' && filteredComp && filteredComp.length === 0 &&
+                            <div className='text-sm text-[#888]'>No result</div>
+                        }
                         {
                             taskData === null ?
                                 <div className='w-[20px] h-[20px]'>
                                     <Loader />
                                 </div>
+
                                 :
                                 tabItem === 'Pending' ?
                                     <>
-                                        {
-                                            taskData && taskData.length > 0 ? (
-                                                taskData.map((itm: taskDataType, idx: number) => (
-                                                    <AnimatePresence>
+                                        <AnimatePresence>
+                                            {
+
+                                                filteredObj && filteredObj.length > 0 && filteredObj && (
+                                                    filteredObj.map((itm: taskDataType, idx: number) => (
+
                                                         <motion.div
                                                             layout
-
                                                             initial={{ opacity: 0, y: 10 }}
                                                             animate={{ opacity: 1, y: 0 }}
                                                             exit={{ opacity: 0, y: 10 }}
                                                             transition={{ duration: 0.3 }}
-                                                            className='bg-[#313131] hover:bg-[#222222]  overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
+                                                            className='bg-[#313131] hover:bg-[#222]  overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
                                                             key={idx}>
-                                                            <div className='font-bold'>
+                                                            <div className='font-bold break-all'>
                                                                 {itm?.title}
                                                             </div>
-                                                            <p className='text-[#888] break-all'>{itm?.description != '' ? itm?.description : 'No Description'}</p>
+                                                            <p className='text-[#888] break-all text-sm'>{itm?.description != '' ? itm?.description : 'No Description'}</p>
+
+                                                            {itm?.repeat != '' &&
+                                                                <p className='text-[#888] break-all text-sm'>{itm?.repeat != '' && itm?.repeat}</p>
+                                                            }
 
                                                             <div className='mt-auto pt-2 flex gap-4 text-[10px] md:text-sm'>
                                                                 {
@@ -458,26 +507,26 @@ const Tasks: React.FC = () => {
                                                                     actions === itm?.id ?
                                                                         <>
                                                                             <div
-                                                                                onClick={() => { deleteTask(itm?.id) }}
-                                                                                className='bg-[#111111] px-3 p-1 text-red-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Delete</div>
+                                                                                onClick={() => { deleteTask(itm?.id); }}
+                                                                                className='bg-[#111111] px-3 p-1 text-red-500  hover:bg-[#222] border-r-[1px] border-[#535353] text-center w-full'>Delete</div>
                                                                             <div
-                                                                                onClick={() => { setedit(itm) }}
+                                                                                onClick={() => { setViewEditTask(itm) }}
                                                                                 className='bg-[#111111] px-3 p-1 text-blue-500 
-                                                                        hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Edit</div>
+                                                                        hover:bg-[#2222] border-r-[1px] border-[#535353] text-center w-full'>Edit</div>
 
                                                                             <div
                                                                                 onClick={() => { setActions(null) }}
-                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Cancel</div>
+                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#222]'>Cancel</div>
                                                                         </>
                                                                         :
                                                                         <>
                                                                             <div
                                                                                 onClick={() => { setViewTask(itm) }}
-                                                                                className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
+                                                                                className='bg-[#111111] px-3 p-1  hover:bg-[#222] border-r-[1px] border-[#535353] text-center w-full'>View</div>
 
                                                                             <div
                                                                                 onClick={() => { setActions(itm?.id) }}
-                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Actions</div>
+                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#222]'>Actions</div>
                                                                         </>
                                                                 }
                                                             </div>
@@ -488,11 +537,11 @@ const Tasks: React.FC = () => {
                                                                         <>
                                                                             <div
                                                                                 onClick={() => { taskCompleted(itm?.id) }}
-                                                                                className='bg-[#111111] px-3 p-1 text-green-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Complete</div>
+                                                                                className='bg-[#111111] px-3 p-1 text-green-500  hover:bg-[#222] border-r-[1px] border-[#535353] text-center w-full'>Complete</div>
                                                                             <div
                                                                                 onClick={() => { setIsComplete(null) }}
                                                                                 className='bg-[#111111] px-3 p-1 text-red-500 
-                                                                        hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Cancel</div>
+                                                                        hover:bg-[#222] border-r-[1px] border-[#535353] text-center w-full'>Cancel</div>
 
                                                                         </>
                                                                         :
@@ -500,27 +549,26 @@ const Tasks: React.FC = () => {
                                                                             onClick={() => {
                                                                                 setIsComplete(itm?.id)
                                                                             }}
-                                                                            className=' bg-[#111111]  p-1 rounded-lg text-center text-green-500 w-full'>
+                                                                            className=' bg-[#111111] hover:bg-[#222] p-1 rounded-lg text-center text-green-500 w-full'>
                                                                             Complete
                                                                         </div>
                                                                 }
                                                             </div>
                                                         </motion.div>
-                                                    </AnimatePresence>
-                                                ))
-                                            ) : (
-                                                <div>No tasks available</div>
-                                            )
-                                        }
+
+                                                    ))
+                                                )
+                                            }
+                                        </AnimatePresence>
                                     </>
                                     :
                                     <>
+                                                  <AnimatePresence>
                                         {
-                                            taskDataCompleted && taskDataCompleted.length > 0 ? (
-                                                taskDataCompleted.map((itm: taskDataType, idx: number) => (
-                                                    <AnimatePresence>
+                                            filteredComp && filteredComp.length > 0 && filteredComp && (
+                                                filteredComp.map((itm: taskDataType, idx: number) => (
                                                         <motion.div
-                                                            layout  
+                                                            layout
                                                             initial={{ opacity: 0, y: 10 }}
                                                             animate={{ opacity: 1, y: 0 }}
                                                             exit={{ opacity: 0, y: 10 }}
@@ -568,25 +616,25 @@ const Tasks: React.FC = () => {
                                                                         <>
                                                                             <div
                                                                                 onClick={() => { deleteTask(itm?.id) }}
-                                                                                className='bg-[#111111] px-3 p-1 text-red-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Delete</div>
+                                                                                className='bg-[#111111] px-3 p-1 text-red-500  hover:bg-[#222] border-r-[1px] border-[#535353] text-center w-full'>Delete</div>
                                                                             <div
-                                                                                onClick={() => { setedit(itm) }}
+                                                                                onClick={() => { setViewEditTask(itm) }}
                                                                                 className='bg-[#111111] px-3 p-1 text-blue-500 
-                                                                        hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Edit</div>
+                                                                        hover:bg-[#222] border-r-[1px] border-[#535353] text-center w-full'>Edit</div>
 
                                                                             <div
                                                                                 onClick={() => { setActions(null) }}
-                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Cancel</div>
+                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#222]'>Cancel</div>
                                                                         </>
                                                                         :
                                                                         <>
                                                                             <div
                                                                                 onClick={() => { setViewTask(itm) }}
-                                                                                className='bg-[#111111] px-3 p-1  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>View</div>
+                                                                                className='bg-[#111111] px-3 p-1  hover:bg-[#222] border-r-[1px] border-[#535353] text-center w-full'>View</div>
 
                                                                             <div
                                                                                 onClick={() => { setActions(itm?.id) }}
-                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#535353]'>Actions</div>
+                                                                                className='bg-[#111111] px-3 p-1 w-full text-center hover:bg-[#222]'>Actions</div>
                                                                         </>
                                                                 }
                                                             </div>
@@ -597,11 +645,11 @@ const Tasks: React.FC = () => {
                                                                         <>
                                                                             <div
                                                                                 onClick={() => { taskPending(itm?.id) }}
-                                                                                className='bg-[#111111] px-3 p-1 text-green-500  hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Complete</div>
+                                                                                className='bg-[#111111] px-3 p-1 text-green-500  hover:bg-[#222] border-r-[1px] border-[#535353] text-center w-full'>Complete</div>
                                                                             <div
                                                                                 onClick={() => { setIsComplete(null) }}
                                                                                 className='bg-[#111111] px-3 p-1 text-red-500 
-                                                                        hover:bg-[#535353] border-r-[1px] border-[#535353] text-center w-full'>Cancel</div>
+                                                                        hover:bg-[#222] border-r-[1px] border-[#535353] text-center w-full'>Cancel</div>
 
                                                                         </>
                                                                         :
@@ -615,12 +663,11 @@ const Tasks: React.FC = () => {
                                                                 }
                                                             </div>
                                                         </motion.div>
-                                                    </AnimatePresence>
+                                           
                                                 ))
-                                            ) : (
-                                                <div>No tasks available</div>
                                             )
                                         }
+                                                 </AnimatePresence>
                                     </>
 
 

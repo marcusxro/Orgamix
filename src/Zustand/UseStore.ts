@@ -1,5 +1,19 @@
 import { create } from 'zustand';
 
+interface taskDataType {
+    title: string;
+    deadline: string;
+    description: string;
+    id: number;
+    isdone: boolean;
+    priority: string;
+    userid: string;
+    repeat: string
+    createdAt: string;
+    link: string[];
+    category: string;
+}
+
 interface AppState {
     showNotif: boolean | null;
     setShowNotif: (params: boolean) => void;
@@ -30,12 +44,27 @@ interface AppState {
     setSidebarLoc: (params: string) => void;
     viewNotifs: boolean | null;
     setViewNotifs: (params: boolean) => void;
-
     isSidebarHover: boolean | null;
     setIsSidebarHover: (params: boolean) => void;
-
     loading: boolean | null;
     setLoading: (params: boolean) => void;
+    
+    viewEditTask: taskDataType | null;
+    setViewEditTask: (params: taskDataType | null) => void;
+
+
+    viewTask: taskDataType | null;
+    setViewTask: (task: taskDataType | null) => void;
+
+
+    isSort: boolean | null;
+    setSort: (params: boolean) => void;
+
+
+    
+
+    isShowAdd: boolean | null;
+    setIsShowAdd: (params: boolean) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -66,18 +95,25 @@ const useStore = create<AppState>((set) => ({
     setChatListener: (params: boolean) => set({ chatListener: params }),
     sidebarLoc: "Home",
     setSidebarLoc: (params: string) => set({ sidebarLoc: params }),
-
-
     viewNotifs: null,
     setViewNotifs: (params: boolean) => set({ viewNotifs: params }),
-
-    
     isSidebarHover: null,
     setIsSidebarHover: (params: boolean) => set({ isSidebarHover: params }),
 
-        
     loading: null,
     setLoading: (params: boolean) => set({ loading: params }),
+
+    viewEditTask: null,
+    setViewEditTask: (taskData) => set({ viewEditTask: taskData }),
+            
+    viewTask: null,
+    setViewTask: (task) => set({ viewTask: task }),
+
+    isSort: null,
+    setSort: (params: boolean) => set({ isSort: params }),
+
+    isShowAdd: false,
+    setIsShowAdd: (params: boolean) => set({ isShowAdd: params }),
 
 }));
 

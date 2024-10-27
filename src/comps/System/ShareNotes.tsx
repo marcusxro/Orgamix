@@ -5,7 +5,9 @@ import IsLoggedIn from '../../firebase/IsLoggedIn';
 import NoUserPfp from '../../assets/UserNoProfile.jpg'
 import { useParams } from 'react-router-dom';
 import Loader from '../Loader';
-
+import { motion, AnimatePresence } from 'framer-motion';
+import { Tooltip as ReactTooltip } from 'react-tooltip'
+import FetchPFP from '../FetchPFP';
 
 interface accountType {
     userid: string;
@@ -16,6 +18,15 @@ interface accountType {
     fullname: string;
 }
 
+
+interface fetchedDataType {
+    id: number;
+    title: string;
+    notes: string;
+    category: string;
+    userid: string;
+    createdat: string
+}
 
 interface closerType {
     closer: React.Dispatch<React.SetStateAction<boolean>>
@@ -29,10 +40,9 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
     const [selectionVal, setSelectionVal] = useState<string>("")
 
     const [fetchedData, setFetchedData] = useState<accountType[] | null>(null);
-
-
-
-
+    const [fetchedNote, setFetchedNote] = useState<fetchedDataType[] | null>(null);
+    const [isExiting, setIsExiting] = useState(false);
+    const [isCoppied, setIsCoppied]= useState(false);
 
     const [emailAdded, setEmailAdded] = useState<accountType[] | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
@@ -67,10 +77,13 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
 
 
     useEffect(() => {
-        if (params) {
-            console.log(params)
+        if (params && user) {
+
+            getNotes()
+
+
         }
-    }, [params])
+    }, [params, user])
 
     useEffect(() => {
         if (email && user) {
@@ -97,12 +110,38 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
         }
     }
 
-    useEffect(() => {
-        console.log(emailAdded)
-    }, [emailAdded])
+
+    async function getNotes() {
+
+        try {
+            const { data, error } = await supabase
+                .from('notes')
+                .select('*')
+                .eq('userid', params?.uid)
+                .eq('createdat', params?.time);
+
+            if (error) {
+                console.error('Error fetching data:', error);
+            } else {
+
+                setFetchedNote(data)
+                setSelectionVal(data[0]?.share || "")
+                setEmailAdded(data[0]?.sharedEmails || [])
+            }
+        } catch (err) {
+            console.log('Error:', err);
+        }
+    }
 
     const [isExpand, setIsExpand] = useState<boolean>(false)
 
+    const handleOutsideClick = () => {
+        setIsExiting(true);
+        setTimeout(() => {
+            closer(false);
+            setIsExiting(false);
+        }, 300);
+    };
 
     async function saveEditAccess() {
         setLoading(true)
@@ -117,25 +156,12 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
         }
 
         try {
-            console.log(selectionVal);
-
-            let sharedEmails: string[] = [];
-
-            if (selectionVal === "Specific") {
-                if (emailAdded && emailAdded.length > 0) {
-                    sharedEmails = emailAdded.map((itm) => itm.email);
-                } else {
-                    console.warn("No emails added for sharing.");
-                }
-            } else if (selectionVal === "Only me" || selectionVal === "Everyone") {
-                sharedEmails = []; // Empty array for "Only me" and "Everyone"
-            }
 
             const { error } = await supabase
                 .from('notes')
                 .update({
                     share: selectionVal,
-                    sharedEmails: sharedEmails
+                    sharedEmails: emailAdded
                 })
                 .eq('userid', params?.uid)
                 .eq('createdat', params?.time);
@@ -146,6 +172,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
             } else {
                 console.log("EDITED!");
                 setLoading(false);
+                handleOutsideClick()
             }
         } catch (err) {
             console.error(err);
@@ -153,154 +180,196 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
         }
     }
 
+
     const currentLink = window.location.href; // Get the current URL
-
     const handleCopyLink = () => {
-        navigator.clipboard.writeText(currentLink)
-            .then(() => {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(currentLink)
+                .then(() => {
+                    console.log("Link copied to clipboard!");
+                    setIsCoppied(true);
+                })
+                .catch(err => {
+                    console.error("Failed to copy link: ", err);
+                    setIsCoppied(false);
+                });
+        } else {
+            // Fallback for older browsers
+            const textArea = document.createElement("textarea");
+            textArea.value = currentLink;
+            textArea.style.position = "fixed"; // Prevent scrolling to bottom
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand("copy");
                 console.log("Link copied to clipboard!");
-                // Optionally, show a success message to the user
-            })
-            .catch(err => {
-                console.error("Failed to copy link: ", err);
-            });
+                setIsCoppied(true);
+            } catch (err) {
+                console.error("Fallback copy failed: ", err);
+                setIsCoppied(false);
+            }
+            document.body.removeChild(textArea);
+        }
     };
-
-
     
+
+
     return (
-        <div
-            onClick={(e) => { e.stopPropagation() }}
-            className='w-full max-w-[550px] bg-[#313131]  z-[5000] relative
-            rounded-lg p-3 h-full max-h-[600px] border-[#535353] border-[1px] flex flex-col gap-3 overflow-auto'
-        >
-            <div className='h-full flex flex-col'>
-                <div className='mb-3'>
-                    <div className='text-xl font-bold'>
-                        Share note
-                    </div>
-                    <p className='text-sm text-[#888]'>
-                        Collaborate effortlessly by sharing your notes with others. Choose specific users or share with everyone to enhance teamwork and productivity!
-                    </p>
-                </div>
-                <div className='w-full flex gap-3 flex-col mt-2 h-full'>
-
-                    {
-                        selectionVal === "Specific" &&
-                        <input
-                            value={email}
-                            onChange={(e) => { setEmail(e.target.value) }}
-                            type="text"
-                            placeholder='Add people by email'
-                            className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
-                        />
-                    }
-                    {
-                        selectionVal === "Specific" && email != "" && fetchedData && fetchedData.length != 0 &&
-                        <div className='w-full h-full min-h-[auto] max-h-[80px] bg-[#535353] p-2 rounded-lg overflow-auto'>
-                            {
-                                fetchedData && fetchedData?.map((itm: accountType, idx: number) => (
-                                    <div
-                                        onClick={() => { addToArr(itm) }}
-                                        key={idx}
-                                        className='w-full flex items-center gap-3 cursor-pointer p-3 hover:bg-[#111111] rounded-lg'>
-                                        <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
-                                            <img
-                                                className='w-full h-full'
-                                                src={NoUserPfp} alt="" />
-                                        </div>
-                                        <div className='flex flex-col'>
-                                            <div className='font-bold text-sm'>{itm?.email}</div>
-                                            <div className='text-[#888] text-sm'>{itm?.username}</div>
-                                        </div>
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    }
-                    <select
-                        value={selectionVal}
-                        onChange={(e) => { setSelectionVal(e.target.value) }}
-                        className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
-                    >
-                        <option value="">Choose access</option>
-                        <option value="Only Me">Only me</option>
-                        <option value="Everyone">Everyone with the link</option>
-                        <option value="Specific">Add specific access by email</option>
-
-                    </select>
-                    {
-                        selectionVal === "Specific" && emailAdded != null &&
-                        <div
-                            onClick={() => { setIsExpand(prevs => !prevs) }}
-                            className='flex gap-1 items-center p-3  bg-[#111111] outline-none border-[#535353] border-[1px] w-auto rounded-lg'>
-                            <div className='w-[20px] h-[20px] rounded-full overflow-hidden mr-2'>
-                                <img
-                                    className='w-full h-full'
-                                    src={NoUserPfp} alt="" />
-                            </div>
-                            <span> {emailAdded != null && emailAdded.length}</span>
-                            <span>people added</span>
-                        </div>
-                    }
-
-                    {
-                        selectionVal === "Specific" && emailAdded != null && isExpand &&
-                        <div className='bg-[#535353]  w-full max-h-[200px] h-full rounded-lg overflow-auto p-2'>
-                            {
-                                emailAdded && emailAdded?.map((itm: accountType, idx: number) => (
-                                    <div
-                                        onClick={() => {
-                                            removeFromArr(itm?.email)
-                                        }}
-                                        key={idx}
-                                        className='w-full flex items-center gap-3 cursor-pointer p-3 hover:bg-[#111111] rounded-lg'>
-                                        <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
-                                            <img
-                                                className='w-full h-full'
-                                                src={NoUserPfp} alt="" />
-                                        </div>
-                                        <div className='flex flex-col'>
-                                            <div className='font-bold text-sm'>{itm?.email.length >= 26 ? itm?.email.slice(0, 25) + "..." : itm?.email}</div>
-                                            <div className='text-[#888] text-sm'>{itm?.username}</div>
-                                        </div>
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-
-
-            <div className='flex mt-auto items-center w-full gap-3'>
-                <div
-                onClick={() => {handleCopyLink()}} 
-                className='flex items-center bg-blue-500 rounded-lg justify-center border-[#535353] border-[1px]  p-3 cursor-pointer'>
-                    <FaLinkSlash />
-                </div>
-                <div className='flex w-full   border-[#535353] border-[1px]  rounded-lg overflow-hidden'>
-                    <div
-                        onClick={() => { closer(false) }}
-                        className='w-full p-2 hover:bg-[#535353] bg-[#111111] border-r-[#535353] border-r-[1px]  text-center cursor-pointer'>
-                        Cancel
-                    </div>
-                    <div
-                        onClick={() => { saveEditAccess() }}
-                        className={`${loading && 'bg-[#535353]'} w-full p-2 hover:bg-[#535353] flex items-center justify-center  bg-[#111111] text-center cursor-pointer`}>
-                        {
-                            loading ?
-                                <div className='w-[20px] h-[20px]'>
-                                    <Loader />
+        <AnimatePresence>
+            {
+                !isExiting &&
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: { duration: 0.2 } }}
+                    exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                    className='ml-auto positioners flex items-center p-3 justify-center relative w-full h-full'
+                    onClick={handleOutsideClick}>
+                    <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
+                        exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
+                        onClick={(e) => { e.stopPropagation() }}
+                        className={`w-full max-w-[550px] bg-[#313131]  z-[5000] relative
+                           rounded-lg p-3 h-full ${selectionVal != 'Specific' ? 'max-h-[250px]' : "max-h-[600px]"} border-[#535353] border-[1px] flex flex-col gap-3 overflow-auto`}>
+                        <div className='h-full flex flex-col overflow-auto'>
+                            <div className='mb-3'>
+                                <div className='text-xl font-bold'>
+                                    Share note
                                 </div>
-                                :
-                                "Save"
-                        }
-                    </div>
-                </div>
-            </div>
+                                <p className='text-sm text-[#888]'>
+                                    Collaborate effortlessly by sharing your notes with others. Choose specific users or share with everyone to enhance teamwork and productivity!
+                                </p>
+                            </div>
+                            <div className='w-full flex gap-3 flex-col mt-2 h-full'>
 
-        </div>
+                                {
+                                    selectionVal === "Specific" &&
+                                    <input
+                                        value={email}
+                                        onChange={(e) => { setEmail(e.target.value) }}
+                                        type="text"
+                                        placeholder='Add people by email'
+                                        className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                                    />
+                                }
+                                {
+                                    selectionVal === "Specific" && email != "" && fetchedData && fetchedData.length != 0 &&
+                                    <div className='w-full h-full min-h-[auto] max-h-[80px] bg-[#535353] p-2 rounded-lg overflow-auto'>
+                                        {
+                                            fetchedData && fetchedData?.map((itm: accountType, idx: number) => (
+                                                <div
+                                                    onClick={() => { itm?.email !== user?.email && addToArr(itm) }}
+                                                    key={idx}
+                                                    className='w-full flex items-center gap-3 cursor-pointer p-3 hover:bg-[#111111] rounded-lg'>
+                                                    <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
+                                                        <FetchPFP userUid={itm?.userid} />
+                                                    </div>
+                                                    <div className='flex flex-col'>
+                                                        <div className={`${itm?.email === user?.email && 'line-through'} font-bold text-sm`}>
+
+                                                            {itm?.email === user?.email && '(you)'}    {itm?.email}</div>
+                                                        <div className='text-[#888] text-sm'>{itm?.username}</div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                }
+                                <select
+                                    value={selectionVal}
+                                    onChange={(e) => { setSelectionVal(e.target.value) }}
+                                    className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                                >
+                                    <option value="">Choose access</option>
+                                    <option value="Only Me">Only me</option>
+                                    <option value="Everyone">Everyone with the link</option>
+                                    <option value="Specific">Add specific access by email</option>
+
+                                </select>
+                                {
+                                    selectionVal === "Specific" && emailAdded != null &&
+                                    <div
+                                        onClick={() => { setIsExpand(prevs => !prevs) }}
+                                        className='flex gap-1 items-center p-3  bg-[#111111] outline-none border-[#535353] border-[1px] w-auto rounded-lg'>
+                                        <div className='w-[20px] h-[20px] rounded-full overflow-hidden mr-2'>
+                                            <img
+                                                className='w-full h-full'
+                                                src={NoUserPfp} alt="" />
+                                        </div>
+                                        <span> {emailAdded != null && emailAdded.length}</span>
+                                        <span>people added</span>
+                                    </div>
+                                }
+
+                                {
+                                    selectionVal === "Specific" && emailAdded != null && isExpand && fetchedNote &&
+                                    <div className='bg-[#535353]  w-full max-h-[200px] h-full rounded-lg overflow-auto p-2'>
+                                        {
+                                            emailAdded && emailAdded?.map((itm: accountType, idx: number) => (
+                                                <div
+                                                    onClick={() => {
+                                                        removeFromArr(itm?.email)
+                                                    }}
+                                                    key={idx}
+                                                    className='w-full flex items-center gap-3 cursor-pointer p-3 hover:bg-[#111111] rounded-lg'>
+                                                    <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
+                                                        <FetchPFP userUid={itm?.userid} />
+                                                    </div>
+                                                    <div className='flex flex-col'>
+                                                        <div className='font-bold text-sm'>{itm?.email?.length >= 26 ? itm?.email.slice(0, 25) + "..." : itm?.email}</div>
+                                                        <div className='text-[#888] text-sm'>{itm?.username}</div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+
+                        <div className='flex mt-auto items-center w-full gap-3'>
+                            <div
+                                onClick={() => { handleCopyLink() }}
+                                data-tooltip-id={`fetch`}
+                                className={`${isCoppied && "bg-green-500"} flex items-center bg-blue-500 rounded-lg justify-center border-[#535353] border-[1px]  p-3 cursor-pointer`}>
+                                <FaLinkSlash />
+                            </div>
+
+                            <ReactTooltip
+                                id={`fetch`}
+                                place="bottom"
+                                variant="dark"
+                                className='rounded-lg border-[#535353] bg-red-600 border-[1px]'
+                                content={`${isCoppied ? "Link Copied" : "Copy Llnk"}`}
+                            />
+
+                            <div className='flex w-full   border-[#535353] border-[1px]  rounded-lg overflow-hidden'>
+                                <div
+                                    onClick={() => { handleOutsideClick() }}
+                                    className='w-full p-2 hover:bg-[#535353] selectionNone bg-[#111111] border-r-[#535353] border-r-[1px]  text-center cursor-pointer'>
+                                    Cancel
+                                </div>
+                                <div
+                                    onClick={() => { saveEditAccess() }}
+                                    className={`${loading && 'bg-[#535353]'} selectionNone w-full p-2 hover:bg-[#535353] flex items-center justify-center  bg-[#111111] text-center cursor-pointer`}>
+                                    {
+                                        loading ?
+                                            <div className='w-[20px] h-[20px]'>
+                                                <Loader />
+                                            </div>
+                                            :
+                                            "Save"
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </motion.div>
+                </motion.div>
+            }
+        </AnimatePresence>
     )
 }
 
