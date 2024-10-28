@@ -5,7 +5,7 @@ import { supabase } from '../../supabase/supabaseClient';
 import { BiCategory } from "react-icons/bi";
 import { MdOutlineQueryStats } from "react-icons/md";
 import { MdDateRange } from "react-icons/md";
-
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface subtaskType {
     is_done: boolean;
@@ -202,97 +202,133 @@ const ImportGoals: React.FC = () => {
 
     }
 
+    const [isExiting, setIsExiting] = useState(false);
 
+    const handleOutsideClick = () => {
+        setIsExiting(true);
+        setTimeout(() => {
+            setShowCreate("");
+            setIsExiting(false);
+        }, 300);
+    };
 
     return (
-        <div
-            onClick={(e) => { e.stopPropagation() }}
-            className='w-full max-w-[740px] bg-[#313131]  z-[5000] relative
-            rounded-lg p-3 h-full max-h-[800px] border-[#535353] border-[1px] 
-            justify-between flex flex-col '>
+        <AnimatePresence>
+            {
+                !isExiting &&
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: { duration: 0.2 } }}
+                    exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                    className='ml-auto positioners flex items-center p-3 justify-center relative w-full h-full'
+                    onClick={handleOutsideClick}>
+                    <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
+                        exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
+                        onClick={(e) => { e.stopPropagation() }}
+                        className='w-full max-w-[740px] bg-[#313131]  z-[5000] relative
+                        rounded-lg p-3 h-full max-h-[800px] border-[#535353] border-[1px] 
+                        justify-between flex flex-col '>
 
-            <div className='h-full flex flex-col justify-between gap-3'>
-            <div>
-                        <div className='font-bold text-xl'>
-                            Share Your Goals
-                        </div>
-                        <p className='text-sm text-[#888]'>
-                            Publicly share your goals to inspire others and stay accountable!
-                        </p>
-                        <div className='flex items-start mt-3 justify-start'>
-                            <input
-                                value={searchVal}
-                                onChange={(e) => { handleInput(e.target.value) }}
-                                className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
-                                placeholder='Search your goal title'
-                                type="text"
-                            />
-                        </div>
-                    </div>
-
-                <div className='h-full overflow-auto'>
-
-                    <div
-                        className='w-full h-full  mt-5 grid grid-cols-1
-                    sm:grid-cols-2 lg:grid-cols-3 gap-3 overflow-auto'>
-                        {
-                            fetchedData != null && fetchedData.map((itm: dataType, idx) => (
-                                <div
-                                    onClick={() => { handleToggle(itm?.created_at, isEq === itm?.created_at ? true : false) }}
-                                    key={idx}
-                                    className={`${isEq && isEq === itm?.created_at ? 'bg-[#111010]' : 'bg-[#313131]'}  h-[200px] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222] `}>
-                                    {!fetchedData && "No result"}
-                                    
-                                    <div className='flex h-[135px] items-start justify-start border-b-[#535353] border-b-[1px]'>
-                                        <div
-                                            style={{ backgroundColor: determineDate(itm?.deadline) }}
-                                            className={`w-[2px] h-full`}>
-                                        </div>
-
-                                        <div className='flex flex-col p-3'>
-                                            <div className='font-bold mb-1'>
-                                                {itm?.title}
-                                            </div>
-                                            <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                <BiCategory />{itm?.category}
-                                            </div>
-                                            <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                <MdOutlineQueryStats />
-                                                {isFailed(itm?.deadline, itm?.is_done)}
-                                            </div>
-
-                                            {checkDeadlineMet(itm?.deadline)}
-                                        </div>
-                                    </div>
-                                    <div className='p-3'>
-                                        <div>
-                                            {itm?.sub_tasks.length > 1 ? "Tasks" : "Task"}: {itm?.sub_tasks.length}
-                                        </div>
-                                        <div>
-                                            {itm?.habits.length > 1 ? "Habits" : "Habit"}: {itm?.habits.length}
-                                        </div>
-                                    </div>
+                        <div className='h-full flex flex-col justify-between gap-3'>
+                            <div>
+                                <div className='font-bold text-xl'>
+                                    Share Your Goals
                                 </div>
-                            ))
-                        }
-                    </div>
-                </div>
-                <div className='w-full max-h-[40px] h-full rounded-lg border-[#535353] border-[1px] flex overflow-hidden'>
+                                <p className='text-sm text-[#888]'>
+                                    Publicly share your goals to inspire others and stay accountable!
+                                </p>
+                                <div className='flex items-start mt-3 justify-start'>
+                                    <input
+                                        value={searchVal}
+                                        onChange={(e) => { handleInput(e.target.value) }}
+                                        className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                                        placeholder='Search your goal title'
+                                        type="text"
+                                    />
+                                </div>
+                            </div>
 
-                    <div
-                        onClick={() => { setShowCreate("") }}
-                        className='p-2 bg-[#111111] border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222] '>
-                        Close</div>
-                    <div
-                        onClick={() => { handleGoEdit() }}
-                        className={`${!isEq && 'bg-[#535353]'} p-2 bg-[#111111] text-center w-full cursor-pointer hover:bg-[#222222] `}>
-                        Continue
-                    </div>
-                </div>
-            </div>
+                            <div className='h-full overflow-auto'>
 
 
-        </div>
+                                <div
+                                    className='w-full h-full  mt-5 grid grid-cols-1
+                                     sm:grid-cols-2 lg:grid-cols-3 gap-3 overflow-auto'>
+                                        {
+                                            fetchedData?.length === 0 &&
+                                            <div className='text-sm text-[#888]'>No result</div>
+                                        }
+                                    <AnimatePresence>
+                                        {
+                                            fetchedData != null && fetchedData.map((itm: dataType, idx) => (
+                                                <motion.div
+                                                    layout
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: 10 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    onClick={() => { handleToggle(itm?.created_at, isEq === itm?.created_at ? true : false) }}
+                                                    key={idx}
+                                                    className={`${isEq && isEq === itm?.created_at ? 'bg-[#111010]' : 'bg-[#313131]'}  h-[200px] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222] `}>
+                                                    {!fetchedData && "No result"}
+
+                                                    <div className='flex h-[135px] items-start justify-start border-b-[#535353] border-b-[1px]'>
+                                                        <div
+                                                            style={{ backgroundColor: determineDate(itm?.deadline) }}
+                                                            className={`w-[2px] h-full`}>
+                                                        </div>
+
+                                                        <div className='flex flex-col p-3'>
+                                                            <div className='font-bold mb-1'>
+                                                                {itm?.title}
+                                                            </div>
+                                                            <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                                <BiCategory />{itm?.category}
+                                                            </div>
+                                                            <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                                <MdOutlineQueryStats />
+                                                                {isFailed(itm?.deadline, itm?.is_done)}
+                                                            </div>
+
+                                                            {checkDeadlineMet(itm?.deadline)}
+                                                        </div>
+                                                    </div>
+                                                    <div className='p-3'>
+                                                        <div>
+                                                            {itm?.sub_tasks.length > 1 ? "Tasks" : "Task"}: {itm?.sub_tasks.length}
+                                                        </div>
+                                                        <div>
+                                                            {itm?.habits.length > 1 ? "Habits" : "Habit"}: {itm?.habits.length}
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))
+                                        }
+                                    </AnimatePresence>
+                                </div>
+
+                            </div>
+                            <div className='w-full max-h-[40px] h-full rounded-lg border-[#535353] border-[1px] flex overflow-hidden'>
+
+                                <div
+                                    onClick={() => { handleOutsideClick() }}
+                                    className='p-2 bg-[#111111] border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222] '>
+                                    Close</div>
+                                <div
+                                    onClick={() => { handleGoEdit() }}
+                                    className={`${!isEq && 'bg-[#535353]'} p-2 bg-[#111111] text-center w-full cursor-pointer hover:bg-[#222222] `}>
+                                    Continue
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </motion.div>
+                </motion.div>
+            }
+        </AnimatePresence >
     )
 }
 

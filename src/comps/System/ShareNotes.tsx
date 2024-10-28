@@ -31,19 +31,29 @@ interface fetchedDataType {
 interface closerType {
     closer: React.Dispatch<React.SetStateAction<boolean>>
 }
+interface fetchedDataTypes {
+    id: number;
+    title: string;
+    notes: string;
+    category: string;
+    userid: string;
+    createdat: string
+    sharedEmails: accountType[]
+}
+
 
 const ShareNotes: React.FC<closerType> = ({ closer }) => {
     const [user] = IsLoggedIn()
     const params = useParams()
-
+    const [prevData, setPrevData] = useState<fetchedDataTypes[] | null>(null)
     const [email, setEmail] = useState<string>("")
     const [selectionVal, setSelectionVal] = useState<string>("")
 
     const [fetchedData, setFetchedData] = useState<accountType[] | null>(null);
     const [fetchedNote, setFetchedNote] = useState<fetchedDataType[] | null>(null);
     const [isExiting, setIsExiting] = useState(false);
-    const [isCoppied, setIsCoppied]= useState(false);
-
+    const [isCoppied, setIsCoppied] = useState(false);
+    const [myAccount, setMyAccount] = useState<accountType[] | null>(null);
     const [emailAdded, setEmailAdded] = useState<accountType[] | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
 
@@ -86,10 +96,36 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
     }, [params, user])
 
     useEffect(() => {
-        if (email && user) {
+        if (user) {
             getAccounts();
+            getMyAccount()
+        }
+        if (user) {
+            getProjectByID()
         }
     }, [email, user]);
+
+
+
+    async function getProjectByID() {
+
+        try {
+            const { data, error } = await supabase
+                .from('notes')
+                .select('*')
+                .eq('createdat', params?.time)
+                .eq('userid', params?.uid);
+
+            if (error) {
+                console.error('Error fetching data:', error);
+            } else {
+                setPrevData(data)
+                console.log(data)
+            }
+        } catch (err) {
+            console.log('Error:', err);
+        }
+    }
 
     async function getAccounts() {
 
@@ -103,12 +139,32 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
+                console.log(data)
                 setFetchedData(data);
             }
         } catch (err) {
             console.log('Error:', err);
         }
     }
+
+    async function getMyAccount() {
+        try {
+            const { data, error } = await supabase
+                .from('accounts')
+                .select('*')
+                .eq('userid', user?.uid);
+
+            if (error) {
+                console.error('Error fetching data:', error);
+            } else {
+                console.log(data)
+                setMyAccount(data);
+            }
+        } catch (err) {
+            console.log('Error:', err);
+        }
+    }
+
 
 
     async function getNotes() {
@@ -156,7 +212,6 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
         }
 
         try {
-
             const { error } = await supabase
                 .from('notes')
                 .update({
@@ -170,6 +225,106 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
                 console.error(error);
                 setLoading(false);
             } else {
+
+                if (selectionVal === "Only Me" && emailAdded && emailAdded.length > 0) {
+                    // Loop through the invited email list and notify them
+                    for (const email of emailAdded) {
+                        const { error: notificationError } = await supabase
+                            .from('notification')
+                            .insert({
+                                uid: email?.userid,  // Notify this invited user
+                                content: `The note "${prevData && prevData[0]?.title}" has been set to private by ${myAccount && myAccount[0]?.username}`,
+                                created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
+                                linkofpage: `user/notes/${prevData && prevData[0]?.userid}/${prevData && prevData[0]?.createdat}`
+                            });
+
+                        if (notificationError) {
+                            console.error(`Error notifying ${email}:`, notificationError);
+                        } else {
+                            console.log(`Notification sent to ${email}`);
+                        }
+                    }
+                }
+
+                if (selectionVal === "Specific" && emailAdded && emailAdded.length > 0) {
+                    const previousInvitedEmails = prevData && prevData[0]?.sharedEmails || [];
+
+                    // Find the newly added emails
+                    const newlyAddedEmails = emailAdded.filter(email => !previousInvitedEmails.includes(email));
+
+                    const removedEmails = previousInvitedEmails.filter((email: any) => !emailAdded.includes(email));
+
+                    console.log(previousInvitedEmails)
+                    console.log(removedEmails)
+                    console.log(emailAdded)
+
+                    for (const email of newlyAddedEmails) {
+                        // Fetch the user account using the email to get the `userid`, if not already in `emailAdded`
+                        const { data: userAccount, error: userError } = await supabase
+                            .from('accounts')  // Assuming you have an accounts table
+                            .select('userid')
+                            .eq('userid', email?.userid); // Replace with the actual field for email if necessary
+
+                        if (userError || !userAccount || userAccount.length === 0) {
+                            console.error(`Error fetching user account for ${email}:`, userError);
+                            continue;
+                        }
+
+                        const invitedUserId = userAccount[0]?.userid;
+
+                        // Insert notification for each newly invited user
+                        const { error: notificationError } = await supabase
+                            .from('notification')
+                            .insert({
+                                uid: invitedUserId,  // Notify this invited user by their `userid`
+                                content: `You have been invited to the note "${prevData && prevData[0]?.title}" by ${myAccount && myAccount[0]?.username}`,
+                                created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
+                                linkofpage: `user/notes/${prevData && prevData[0]?.userid}/${prevData && prevData[0]?.createdat}`
+                            });
+
+                        if (notificationError) {
+                            console.error(`Error notifying ${email}:`, notificationError);
+                        } else {
+                            console.log(`Notification sent to ${email?.username}`);
+                        }
+                    }
+
+                    if (removedEmails.length > 0) {
+                        for (const email of removedEmails) {
+                            // Fetch the user account using the email to get the `userid`
+                            const { data: userAccount, error: userError } = await supabase
+                                .from('accounts')  // Assuming you have an accounts table
+                                .select('userid')
+                                .eq('userid', email?.userid); // Replace with the actual field for email if necessary
+
+                            if (userError || !userAccount || userAccount.length === 0) {
+                                console.error(`Error fetching user account for ${email}:`, userError);
+                                continue;
+                            }
+
+                            const removedUserId = userAccount[0]?.userid;
+
+                            // Insert notification for each removed user
+                            const { error: notificationError } = await supabase
+                                .from('notification')
+                                .insert({
+                                    uid: removedUserId,  // Notify this removed user by their `userid`
+                                    content: `You have been removed from the note "${prevData && prevData[0]?.title}" by ${myAccount && myAccount[0]?.username}}`,
+                                    created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
+                                    linkofpage: `user/notes/${prevData && prevData[0]?.userid}/${prevData && prevData[0]?.createdat}`
+                                });
+
+                            if (notificationError) {
+                                console.error(`Error notifying ${email}:`, notificationError);
+                            } else {
+                                console.log(`Notification sent to ${email?.email}`);
+                            }
+                        }
+                    }
+
+
+                }
+
                 console.log("EDITED!");
                 setLoading(false);
                 handleOutsideClick()
@@ -182,6 +337,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
 
 
     const currentLink = window.location.href; // Get the current URL
+
     const handleCopyLink = () => {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(currentLink)
@@ -212,7 +368,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
             document.body.removeChild(textArea);
         }
     };
-    
+
 
 
     return (

@@ -12,6 +12,7 @@ import useStore from '../../Zustand/UseStore';
 import Loader from '../../comps/Loader';
 import { motion, AnimatePresence } from 'framer-motion'
 import { GoSortAsc } from "react-icons/go";
+import NoteSorter from '../../comps/NoteSorter';
 
 
 interface fetchedDataType {
@@ -32,6 +33,24 @@ const Notes = () => {
     const { editTask } = useStore()
     const [action, setAction] = useState<number | null>(null)
     const [searchVal, setSearchVal] = useState<string>("")
+    const [isSort, setSort] = useState(false)
+    const [sortVal, setSortVal] = useState<string | null>(null);
+
+
+    const [sortMethodLoaded, setSortMethodLoaded] = useState<boolean>(false);
+    const sortMethod = localStorage.getItem('sortMethodNotes');
+
+
+    useEffect(() => {
+        console.log(sortMethod)
+
+        if (user && sortMethod && !sortMethodLoaded) {
+            setSortVal(sortMethod);
+            setSortMethodLoaded(true); // Mark that the sort method has been loaded
+            console.log("Sort method loaded on initial render:", sortMethod);
+        }
+    }, [user, sortMethod, sortMethodLoaded, sortVal]);
+
 
     useEffect(() => {
         const filteredArray = fetchedData?.filter((itm: fetchedDataType) => {
@@ -58,7 +77,7 @@ const Notes = () => {
                 subscription.unsubscribe();
             };
         }
-    }, [user, editTask])
+    }, [user, editTask, sortVal, localStorage, location])
 
 
     const handleRealtimeEvent = (payload: any) => {
@@ -93,16 +112,34 @@ const Notes = () => {
         }
     };
 
+    function returnSortTitle() {
+        switch (sortVal) {
+            case "Alphabetically":
+                return "title"
+            case "Creation Date":
+                return "createdat"
+            default:
+                return "createdat"
+
+        }
+    }
+
+
     async function getNotes() {
         try {
+            const columnName = returnSortTitle();
             const { data, error } = await supabase.from("notes")
                 .select("*")
                 .eq('userid', user?.uid)
+                .order(columnName === null? "createdat" : columnName, { ascending: true });
+
             if (error) {
                 console.error(error)
             } else {
-                setFetchedData(data)
-                setFilteredData(data)
+                const sortedData = sortVal === 'Creation Date' ? data.reverse() : data;
+
+                setFetchedData(sortedData)
+                setFilteredData(sortedData)
             }
         }
         catch (err) {
@@ -142,6 +179,12 @@ const Notes = () => {
     return (
         <div className='flex'>
             <Sidebar location='Notes' />
+            {
+                isSort &&
+                <NoteSorter closer={setSort} />
+            }
+
+
             <div className={`ml-[85px] w-full p-3 flex gap-3 mr-[0] ${showAdd && 'lg:mr-[570px]'} `}>
                 <div className='w-full h-full'>
                     <div>
@@ -172,7 +215,8 @@ const Notes = () => {
                                     type="text" />
                             </div>
                             <div
-                                className='flex items-center justify-center text-xl rounded-lg bg-[#111] border-[#535353] border-[1px] outline-none px-3 hover:bg-[#222]'>
+                                onClick={() => { setSort(true) }}
+                                className='flex items-center cursor-pointer justify-center text-xl rounded-lg bg-[#111] border-[#535353] border-[1px] outline-none px-3 hover:bg-[#222]'>
                                 <GoSortAsc />
                             </div>
                         </div>

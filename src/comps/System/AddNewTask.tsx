@@ -113,27 +113,27 @@ const AddNewTask: React.FC<propsPurpose> = ({ purpose }) => {
 
             // Check if any tasks have a similar title and calculate the next index
             let newTitle = title;
-            let index = 1;
-            const similarTitles = existingTasks
-                .map(task => task.title)
-                .filter(existingTitle => existingTitle.startsWith(title));
 
-            // Find the highest existing index for this title
-            similarTitles.forEach(existingTitle => {
-                const match = existingTitle.match(/\((\d+)\)$/); // matches "(number)" at the end
-                if (match) {
-                    const number = parseInt(match[1], 10);
-                    if (!isNaN(number) && number >= index) {
-                        index = number + 1;
-                    }
-                } else if (existingTitle === title) {
-                    index = 2;
+
+            if (existingTasks.length > 0) {
+                const exactMatches = existingTasks.filter(itm =>
+                    itm?.title === title || itm?.title.startsWith(`${title} (`));
+
+                if (exactMatches.length > 0) {
+                    const maxIndex = exactMatches.reduce((acc, itm) => {
+                        const match = itm.title.match(/\((\d+)\)$/); // Check for pattern "renameGoal (index)"
+                        const index = match ? parseInt(match[1], 10) : 0;
+                        return Math.max(acc, index);
+                    }, 0);
+
+                    newTitle = `${title} (${maxIndex + 1})`;
                 }
-            });
 
-            if (index > 1) {
-                newTitle = `${title} (${index})`;
+
             }
+
+            
+
 
             // Insert the new task with the modified title
             const { error } = await supabase.from('tasks').insert({

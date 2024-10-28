@@ -6,7 +6,6 @@ import { supabase } from '../../supabase/supabaseClient'
 import { CiCalendarDate } from "react-icons/ci";
 import { GoSortAsc } from "react-icons/go";
 import EditTask from '../../comps/System/EditTask'
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import useStoreBoolean from '../../Zustand/UseStore'
 import { IoMdAdd } from "react-icons/io";
@@ -90,25 +89,6 @@ const Tasks: React.FC = () => {
         }
     }, [sortVal]);
 
-    const notif = (message: string) => {
-        if (!isNotifying) {
-            setIsNotifying(true);
-            toast.success(message, {
-                position: "top-left",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "dark",
-            });
-
-            // Reset notifying state after a timeout (3 seconds to match autoClose)
-            setTimeout(() => {
-                setIsNotifying(false);
-            }, 3000);
-        }
-    };
 
 
     useEffect(() => {
@@ -170,30 +150,9 @@ const Tasks: React.FC = () => {
 
 
 
-    const errorNotif = (message: string) => {
-        if (!isNotifying) {
-            setIsNotifying(true);
-            toast.error(message, {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "dark",
-            });
-
-            // Reset notifying state after a timeout (5 seconds to match autoClose)
-            setTimeout(() => {
-                setIsNotifying(false);
-            }, 5000);
-        }
-    };
-
     useEffect(() => {
         if (showNotif && !isNotifying) {
             setIsNotifying(true);
-            notif('Task edited!'); // Display notification
             console.log("Task edited!");
             setShowNotif(false);
 
@@ -286,12 +245,12 @@ const Tasks: React.FC = () => {
                 })
 
             if (error) {
-                errorNotif('Error encountered!')
+                console.log('Error encountered!')
             }
         }
         catch (err) {
             console.log(err)
-            errorNotif('Error encountered!')
+            console.log('Error encountered!')
         }
     }
 
@@ -309,7 +268,7 @@ const Tasks: React.FC = () => {
                 .eq('userid', user?.uid)
                 .order('createdAt', { ascending: true })
             if (error) {
-                errorNotif('Error encountered!')
+                console.log('Error encountered!')
             } else {
                 console.log("completed")
             }
@@ -331,7 +290,7 @@ const Tasks: React.FC = () => {
                 .order('createdAt', { ascending: true })
 
             if (error) {
-                errorNotif('Error encountered!')
+                console.log('Error encountered!')
             } else {
                 console.log("completed")
             }
@@ -343,17 +302,10 @@ const Tasks: React.FC = () => {
 
     const { isShowAdd, setIsShowAdd }: any = useStore();
     const { viewTask, setViewTask } = useStore();
-
-    console.log(viewEditTask)
-
-    useEffect(() => {
-        console.log(viewTask)
-    }, [viewTask])
-
+    
     return (
         <div className='w-full h-full relative'>
             <Sidebar location='Tasks' />
-            <ToastContainer />
             {
                 isSort &&
                 <TaskSorter closer={setSort} />
@@ -563,10 +515,10 @@ const Tasks: React.FC = () => {
                                     </>
                                     :
                                     <>
-                                                  <AnimatePresence>
-                                        {
-                                            filteredComp && filteredComp.length > 0 && filteredComp && (
-                                                filteredComp.map((itm: taskDataType, idx: number) => (
+                                        <AnimatePresence>
+                                            {
+                                                filteredComp && filteredComp.length > 0 && filteredComp && (
+                                                    filteredComp.map((itm: taskDataType, idx: number) => (
                                                         <motion.div
                                                             layout
                                                             initial={{ opacity: 0, y: 10 }}
@@ -663,11 +615,11 @@ const Tasks: React.FC = () => {
                                                                 }
                                                             </div>
                                                         </motion.div>
-                                           
-                                                ))
-                                            )
-                                        }
-                                                 </AnimatePresence>
+
+                                                    ))
+                                                )
+                                            }
+                                        </AnimatePresence>
                                     </>
 
 

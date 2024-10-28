@@ -58,15 +58,21 @@ const VisitNote = () => {
     const [value, setValue] = useState<string>('');
     const [isEdit, setIsEdit] = useState(false)
     const [isEdited, setIsEdited] = useState<boolean>(false)
-    
+
+
+
+    const [currentText, setCurrentText] = useState<string>('');
+
     useEffect(() => {
         if (user) {
             fetchNoteByIds()
+            
             const subscription = supabase
                 .channel('public:notes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'notes' }, (payload) => {
-                    console.log('Realtime event:', payload);
                     handleRealtimeEvent(payload);
+                    fetchNoteByIds()
+               
                 })
                 .subscribe();
             return () => {
@@ -77,6 +83,18 @@ const VisitNote = () => {
         }
     }, [user, isEdited])
 
+
+    useEffect(() => {
+        if (fetchedData) {
+            setCurrentText(fetchedData[0]?.notes || '');
+        }
+    }, [fetchedData]);
+
+    useEffect(() => {
+        const delay = setTimeout(() => setValue(currentText), 100); // Adjust delay as needed
+        return () => clearTimeout(delay);
+    }, [currentText]);
+
     const handleRealtimeEvent = (payload: any) => {
 
         switch (payload.eventType) {
@@ -86,6 +104,8 @@ const VisitNote = () => {
                 );
                 break;
             case 'UPDATE':
+                console.log(payload)
+                console.log("updated")
                 setFetchedData((prevData) =>
                     prevData
                         ? prevData.map((item) =>
@@ -93,6 +113,7 @@ const VisitNote = () => {
                         )
                         : [payload.new]
                 );
+                console.log(fetchedData)
                 break;
             case 'DELETE':
                 console.log("DELETED")
@@ -118,7 +139,7 @@ const VisitNote = () => {
             } else {
                 setFetchedData(data)
                 setTitle(data[0].title || '');
-                setValue(data[0].notes || '');
+
             }
         }
         catch (err) {
@@ -185,28 +206,30 @@ const VisitNote = () => {
                 return;
             }
 
-            let updatedTitle = title;
+            let newTitle = title;
 
-            // Step 2: Determine if this note is the root note
-            const isRootNote = existingNotes.some(
-                (note: any) => note.title === title && note.createdat === params?.time
-            );
+            if (existingNotes.length > 0) {
+                const exactMatches = existingNotes.filter(itm =>
+                    itm?.title === title || itm?.title.startsWith(`${title} (`));
 
-            if (!isRootNote) {
-                // If not the root note, add an index based on similar notes count
-                const similarNotesCount = existingNotes.filter(note => note.title.startsWith(title)).length;
+                if (exactMatches.length > 0) {
+                    const maxIndex = exactMatches.reduce((acc, itm) => {
+                        const match = itm.title.match(/\((\d+)\)$/); // Check for pattern "renameGoal (index)"
+                        const index = match ? parseInt(match[1], 10) : 0;
+                        return Math.max(acc, index);
+                    }, 0);
 
-                if (!isRootNote && similarNotesCount > 0) {
-                    updatedTitle = `${title} (${similarNotesCount})`;
+                    newTitle = `${title} (${maxIndex + 1})`;
                 }
-        
+
+
             }
 
             // Step 3: Update the note with the updated title
             const { data, error } = await supabase
                 .from("notes")
                 .update({
-                    title: updatedTitle,
+                    title: newTitle,
                 })
                 .eq('userid', params?.uid)
                 .eq('createdat', params?.time);
@@ -273,7 +296,7 @@ const VisitNote = () => {
 
                                                 <div className='flex gap-2'>
                                                     <div
-                                                        onClick={() => { setIsEdit(false) }}
+                                                        onClick={() => {  (false) }}
                                                         className='p-3 rounded-lg bg-[#111111] hover:bg-[#222] outline-none flex items-center justify-center border-[#535353] border-[1px]'>
                                                         <IoMdClose />
                                                     </div>

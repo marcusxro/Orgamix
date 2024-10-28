@@ -12,7 +12,8 @@ import { LuLayoutTemplate } from "react-icons/lu";
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../comps/Loader';
 import { motion, AnimatePresence } from 'framer-motion'
-
+import { GoSortAsc } from "react-icons/go";
+import GoalSorter from '../../comps/System/GoalSorter';
 
 interface subtaskType {
     is_done: boolean;
@@ -46,6 +47,25 @@ const Goals: React.FC = () => {
     const [originalData, setOriginalData] = useState<dataType[] | null>(null); // To store unfiltered data
     const nav = useNavigate()
     const [user] = IsLoggedIn()
+    const [isSort, setSort] = useState(false)
+    const [sortVal, setSortVal] = useState<string | null>(null);
+
+
+    const [sortMethodLoaded, setSortMethodLoaded] = useState<boolean>(false);
+    const sortMethod = localStorage.getItem('sortMethodNotes');
+
+
+    useEffect(() => {
+        console.log(sortMethod)
+
+        if (user && sortMethod && !sortMethodLoaded) {
+            setSortVal(sortMethod);
+            setSortMethodLoaded(true); // Mark that the sort method has been loaded
+            console.log("Sort method loaded on initial render:", sortMethod);
+        }
+    }, [user, sortMethod, sortMethodLoaded, sortVal]);
+
+
 
     useEffect(() => {
         if (user && searchVal && originalData) {
@@ -78,7 +98,7 @@ const Goals: React.FC = () => {
                 subscription.unsubscribe();
             };
         }
-    }, [GoalListener, user])
+    }, [GoalListener, user, sortVal, localStorage, location, isSort])
 
     const handleRealtimeEvent = (payload: any) => {
         const isCurrentUserProject = payload.new?.created_by === user?.uid || payload.old?.created_by === user?.uid;
@@ -110,18 +130,34 @@ const Goals: React.FC = () => {
     };
 
 
+    function returnSortTitle() {
+        switch (sortVal) {
+            case "Alphabetically":
+                return "title"
+            case "Creation Date":
+                return "created_at"
+            default:
+                return "created_at"
+
+        }
+    }
+
+
     async function fetchGoalsByID() {
         try {
+            const columnName = returnSortTitle();
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
-                .eq('userid', user?.uid);
-
+                .eq('userid', user?.uid)
+                .order(columnName === null? "created_at" : columnName, { ascending: true });
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
-                setFetchedData(data);
-                setOriginalData(data)
+                const sortedData = sortVal === 'Creation Date' ? data.reverse() : data;
+
+                setFetchedData(sortedData);
+                setOriginalData(sortedData)
             }
         } catch (err) {
             console.log(err);
@@ -228,47 +264,60 @@ const Goals: React.FC = () => {
         <div>
             <Sidebar location='Goals' />
 
+        {
+            isSort &&
+            <GoalSorter closer={setSort} />
+        }
 
             <div className={`ml-[86px] p-3 flex gap-3 h-[100dvh] mr-[0px] pb-9  ${isOpenSidebar && "lg:mr-[370px]"}`}>
                 <div className='w-full h-full'>
                     <div>
                         <div
                             className='text-2xl font-bold'>
-                            Goals
+                            Goals 
                         </div>
                         <div className='text-sm text-[#888]'>
                             Easily create, edit, and organize your notes in this section for a streamlined experience.
                         </div>
                     </div>
 
-                    <div className='mt-4 flex flex-col md:flex-row items-start gap-2'>
+                    <div className='mt-4 flex flex-col md:flex-row items-start gap-2 mb-5'>
                         <div className='flex gap-2'>
                             <div
                                 onClick={() => {
                                     setIsOpenSidebar(prevClick => !prevClick); setIsOpenModal(prevClick => !prevClick)
                                 }}
-                                className='bg-[#313131] p-3 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
+                                className='bg-[#313131] p-2 hover:bg-[#535353] text-sm border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
                                 Create Goal <span className='text-md'><FaPlus /></span>
                             </div>
                             <div
                                 onClick={() => {
                                     nav('/user/goals/templates')
                                 }}
-                                className='bg-[#313131] p-4 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
+                                className='bg-[#313131] p-3 hover:bg-[#535353] border-[#535353] border-[1px] cursor-pointer rounded-lg flex gap-2 items-center'>
                                 <LuLayoutTemplate />
+                            </div>
+                            <div
+                                onClick={() => { setSort(true); }}
+                                className='flex items-center cursor-pointer justify-center text-xl rounded-lg bg-[#111] border-[#535353] border-[1px] outline-none px-3 hover:bg-[#222]'>
+                                <GoSortAsc />
                             </div>
                         </div>
 
                         <input
                             value={searchVal}
                             onChange={(e) => { setSearchVal(e.target.value) }}
-                            className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                            className='p-2 px-4 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
                             placeholder='Search your goal title'
                             type="text"
                         />
                     </div>
                     <div className='flex flex-wrap gap-3 mt-2 pb-5'>
-                        {fetchedData?.length === 0 && "No result :("}
+                        {fetchedData?.length === 0 && 
+                        <div className='text-sm text-[#888] mt-2'>
+                            No result
+                            </div>
+                        }
                         {
                             fetchedData === null ?
                                 <div className='w-[20px] h-[20px]'>

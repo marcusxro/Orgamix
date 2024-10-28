@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../../supabase/supabaseClient';
 import IsLoggedIn from '../../firebase/IsLoggedIn';
 import Loader from '../Loader';
-
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 
@@ -54,10 +54,19 @@ const ReportGoal: React.FC<propsType> = ({ closer, contentObj }) => {
     const [loading, setLoading] = useState<boolean>(false)
     const [isDoneReport, setIsDoneReport] = useState<boolean>(false)
     const [user] = IsLoggedIn()
+    const [isExiting, setIsExiting] = useState(false);
 
     useEffect(() => {
         console.log(contentObj)
     }, [contentObj])
+
+    const handleOutsideClick = () => {
+        setIsExiting(true);
+        setTimeout(() => {
+            closer(null);
+            setIsExiting(false);
+        }, 300);
+    };
 
     async function reportUser() {
         setLoading(true)
@@ -105,96 +114,113 @@ const ReportGoal: React.FC<propsType> = ({ closer, contentObj }) => {
     }
 
 
+
     return (
-        <div
-            onClick={(e) => { e.stopPropagation() }}
-            className={`w-full max-w-[540px] bg-[#313131]  z-[5000] relative
-        rounded-lg p-3 h-full ${isDoneReport ? 'max-h-[150px]' : 'max-h-[400px]'} border-[#535353] border-[1px] 
-        justify-between flex flex-col`}>
-            <div className='flex  flex-col gap-2'>
-                {
-                    isDoneReport ?
-                        <div>
-                            <div className='text-xl font-bold'>Thank you!</div>
-                            <p className='text-sm text-[#888]'>Your report will be reviewed by our team. Thank you for helping us keep the platform safe!</p>
-                        </div>
-                        :
-                        <>
+        <AnimatePresence>
+            {
+                !isExiting &&
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: { duration: 0.2 } }}
+                    exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                    className='ml-auto positioners flex items-center p-3 justify-center relative w-full h-full'
+                    onClick={handleOutsideClick}>
+                     <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
+                        exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
+                        onClick={(e) => { e.stopPropagation() }}
+                        className={`w-full max-w-[540px] bg-[#313131]  z-[5000] relative
+                        rounded-lg p-3 h-full ${isDoneReport ? 'max-h-[150px]' : 'max-h-[400px]'} border-[#535353] border-[1px] 
+                        justify-between flex flex-col`}>
 
-                            <div className='flex flex-col gap-1 mb-2'>
-                                <div className='text-xl font-bold'>Report</div>
-                                <p className='text-sm text-[#888]'>Please select a reason for reporting this goal and provide any additional information to help us review your report.</p>
-                            </div>
+                        <div className='flex  flex-col gap-2'>
+                            {
+                                isDoneReport ?
+                                    <div>
+                                        <div className='text-xl font-bold'>Thank you!</div>
+                                        <p className='text-sm text-[#888]'>Your report will be reviewed by our team. Thank you for helping us keep the platform safe!</p>
+                                    </div>
+                                    :
+                                    <>
 
-
-
-                            <div className='flex flex-col gap-1'>
-                                <label className='px-1'>Select a reason</label>
-                                <select
-                                    value={selectedReason}
-                                    onChange={(e) => { setSelectedReason(e.target.value) }}
-                                    className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full max-w-[300px]  text-[#888]'
-                                >
-                                    <option value="">Select Reason</option>
-                                    <option value="inappropriate">Inappropriate Content</option>
-                                    <option value="spam">Spam or Misleading Content</option>
-                                    <option value="false_info">False or Misleading Information</option>
-                                    <option value="harassment">Harassment, Bullying, or Abusive Behavior</option>
-                                    <option value="hate_speech">Hate Speech or Offensive Language</option>
-                                    <option value="self_harm">Promotion of Self-harm or Dangerous Activities</option>
-                                    <option value="violence">Violence or Threatening Behavior</option>
-                                    <option value="privacy_violation">Privacy Violation or Personal Information</option>
-                                    <option value="copyright">Copyright or Intellectual Property Violation</option>
-                                    <option value="sexual_content">Sexual Content or Harassment</option>
-                                    <option value="fraud">Fraud or Phishing</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-
-                            <div className='flex flex-col gap-1 w-full'>
-                                <label className='px-1'>Additional Details (Optional)</label>
-                                <textarea
-                                    value={description}
-                                    onChange={(e) => { setDescription(e.target.value) }}
-                                    maxLength={200}
-                                    className='p-3 rounded-lg bg-[#111111] outline-none h-full max-h-[400px] resize-none border-[#535353] border-[1px] w-full'
-                                    placeholder="Describe why you are reporting this goal."
-
-                                ></textarea>
-                            </div>
-                        </>
-                }
-            </div>
-
-            <div className='w-full max-h-[40px] h-full rounded-lg border-[#535353] border-[1px] flex overflow-hidden'>
-                {
-                    isDoneReport ?
-                        <div onClick={() => { !loading && closer(null) }}
-                            className='p-2 bg-[#111111] border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222] '>
-                            Close
-                        </div>
-                        :
-                        <>
-                            <div
-                                onClick={() => { !loading && closer(null) }}
-                                className='p-2 bg-[#111111] border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222] '>Cancel</div>
-                            <div
-                                onClick={() => { reportUser() }}
-                                className={`${selectedReason ? "bg-[#111111]" : " bg-[#535353]"} flex items-center justify-center p-2 border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222]`}>
-                                {
-                                    loading ?
-                                        <div className='w-[20px] h-[20px]'>
-                                            <Loader />
+                                        <div className='flex flex-col gap-1 mb-2'>
+                                            <div className='text-xl font-bold'>Report</div>
+                                            <p className='text-sm text-[#888]'>Please select a reason for reporting this goal and provide any additional information to help us review your report.</p>
                                         </div>
-                                        :
-                                        "Submit"
-                                }
-                            </div>
-                        </>
-                }
-            </div>
 
-        </div>
+
+
+                                        <div className='flex flex-col gap-1'>
+                                            <label className='px-1'>Select a reason</label>
+                                            <select
+                                                value={selectedReason}
+                                                onChange={(e) => { setSelectedReason(e.target.value) }}
+                                                className='p-3 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full max-w-[300px]  text-[#888]'
+                                            >
+                                                <option value="">Select Reason</option>
+                                                <option value="inappropriate">Inappropriate Content</option>
+                                                <option value="spam">Spam or Misleading Content</option>
+                                                <option value="false_info">False or Misleading Information</option>
+                                                <option value="harassment">Harassment, Bullying, or Abusive Behavior</option>
+                                                <option value="hate_speech">Hate Speech or Offensive Language</option>
+                                                <option value="self_harm">Promotion of Self-harm or Dangerous Activities</option>
+                                                <option value="violence">Violence or Threatening Behavior</option>
+                                                <option value="privacy_violation">Privacy Violation or Personal Information</option>
+                                                <option value="copyright">Copyright or Intellectual Property Violation</option>
+                                                <option value="sexual_content">Sexual Content or Harassment</option>
+                                                <option value="fraud">Fraud or Phishing</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+
+                                        <div className='flex flex-col gap-1 w-full'>
+                                            <label className='px-1'>Additional Details (Optional)</label>
+                                            <textarea
+                                                value={description}
+                                                onChange={(e) => { setDescription(e.target.value) }}
+                                                maxLength={200}
+                                                className='p-3 rounded-lg bg-[#111111] outline-none h-full max-h-[400px] resize-none border-[#535353] border-[1px] w-full'
+                                                placeholder="Describe why you are reporting this goal."
+
+                                            ></textarea>
+                                        </div>
+                                    </>
+                            }
+                        </div>
+
+                        <div className='w-full max-h-[40px] h-full rounded-lg border-[#535353] border-[1px] flex overflow-hidden'>
+                            {
+                                isDoneReport ?
+                                    <div onClick={() => { !loading && handleOutsideClick() }}
+                                        className='p-2 bg-[#111111] border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222] '>
+                                        Close
+                                    </div>
+                                    :
+                                    <>
+                                        <div
+                                            onClick={() => { !loading && handleOutsideClick()  }}
+                                            className='p-2 bg-[#111111] border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222] '>Cancel</div>
+                                        <div
+                                            onClick={() => { reportUser() }}
+                                            className={`${selectedReason ? "bg-[#111111]" : " bg-[#535353]"} flex items-center justify-center p-2 border-r-[#535353] text-center border-r-[1px]  w-full cursor-pointer hover:bg-[#222222]`}>
+                                            {
+                                                loading ?
+                                                    <div className='w-[20px] h-[20px]'>
+                                                        <Loader />
+                                                    </div>
+                                                    :
+                                                    "Submit"
+                                            }
+                                        </div>
+                                    </>
+                            }
+                        </div>
+
+                    </motion.div>
+                </motion.div>
+            }
+        </AnimatePresence>
     )
 }
 

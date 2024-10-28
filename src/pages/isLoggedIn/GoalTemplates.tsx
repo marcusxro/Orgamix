@@ -21,7 +21,7 @@ import { MdOutlineFileDownload } from "react-icons/md";
 import GetAuthor from '../../comps/System/GetAuthor';
 import ViewTemplate from '../../comps/System/ViewTemplate';
 import ReportGoal from '../../comps/System/ReportGoal';
-
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 interface subtaskType {
@@ -196,57 +196,32 @@ const GoalTemplates: React.FC = () => {
             className='w-full h-full'>
             {
                 isOpenCreate &&
-                <div
-                    onClick={() => { setIsOpenCreate(prevClick => !prevClick); }}
-                    className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
-                    <ChooseMethod closer={setIsOpenCreate} />
-                </div>
+                <ChooseMethod closer={setIsOpenCreate} />
             }
             {
                 showCreate === "Create" &&
-                <div
-                    onClick={() => { setShowCreate("") }}
-                    className='ml-auto positioners flex items-center justify-end p-3 w-full h-full'>
-                    <CreateGoals listener={setGoalListener} purpose='Modals' closer={setShowCreate} location="template" />
-                </div>
 
+                <CreateGoals listener={setGoalListener} purpose='Modal' closer={setShowCreate} location="template" />
             }
             {
                 templateID != "" &&
-                <div
-                    onClick={() => { setTemplateID("") }}
-                    className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
-                    <ViewTemplate />
-                </div>
-
+                <ViewTemplate />
             }
 
             {
                 showCreate === "Import" &&
-                <div
-                    onClick={() => { setShowCreate("") }}
-                    className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
-                    <ImportGoals />
-                </div>
+                <ImportGoals />
             }
 
 
             {
                 showCreate === "Upload" &&
-                <div
-                    onClick={() => { setShowCreate("") }}
-                    className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
-                    <UploadImport />
-                </div>
+                <UploadImport />
             }
 
             {
                 isReport != null &&
-                <div
-                    onClick={() => { setIsReport(null) }}
-                    className='ml-auto positioners flex items-center justify-center p-3 w-full h-full'>
-                    <ReportGoal closer={setIsReport} contentObj={goalToReport} />
-                </div>
+                <ReportGoal closer={setIsReport} contentObj={goalToReport} />
             }
 
             <header className='p-3 flex items-center h-auto pb-2 justify-between border-b-[#535353] border-b-[1px] overflow-auto'>
@@ -368,20 +343,28 @@ const GoalTemplates: React.FC = () => {
                                         <div>No result :(</div>
                                     </div>
                                 }
-                                {
+                               <AnimatePresence>
+                               {
                                     fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
-                                        <div
+                                        <motion.div
+                                        layout
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                              transition={{ duration: 0.3 }}
                                             onClick={() => {
                                                 setTemplateID(itm?.created_at)
                                             }}
                                             key={idx}
                                             className='w-full  bg-[#313131] border-[#535353] relative border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>
+                                         
                                             <div className='flex h-auto items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
                                                 <div
                                                     className={`w-[2px] h-full`}>
                                                 </div>
 
-                                                <div className='flex flex-col p-3 w-full'>
+                                                <div
+                                                 className='flex flex-col p-3 w-full'>
                                                     {
                                                         viewEllip === idx && isDelete === null &&
                                                         (<div
@@ -479,9 +462,10 @@ const GoalTemplates: React.FC = () => {
                                             </div>
 
 
-                                        </div>
+                                        </motion.div>
                                     ))
                                 }
+                               </AnimatePresence>
                             </>
                     }
                 </div>

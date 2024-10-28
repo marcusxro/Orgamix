@@ -6,6 +6,7 @@ import { FaPlus } from "react-icons/fa6";
 import { GoTasklist } from "react-icons/go";
 import { GiDna2 } from "react-icons/gi";
 import Loader from '../Loader';
+import { motion, AnimatePresence } from 'framer-motion'
 
 
 interface subtaskType {
@@ -38,6 +39,15 @@ const UploadImport = () => {
     const [description, setDesc] = useState<string>('');
     const [category, setCat] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false)
+    const [isExiting, setIsExiting] = useState(false);
+
+    const handleOutsideClick = (params: string) => {
+        setIsExiting(true);
+        setTimeout(() => {
+            setShowCreate(params);
+            setIsExiting(false);
+        }, 100);
+    };
 
     const handleHabitInputChange = (e: any) => {
         setNewHabit(e.target.value);
@@ -382,15 +392,18 @@ const UploadImport = () => {
     async function passToTemplates() {
         setLoading(true)
 
-        if(loading) return
-        if(!fetchedData) return
+        if (loading) return
+        if (!fetchedData) return
 
         try {
 
             if (fetchedData) {
+
+
+
                 const updatedTasks = fetchedData[0]?.sub_tasks.map((goals: subtaskType) => {
-                        return { ...goals, is_done: false}; 
-                
+                    return { ...goals, is_done: false };
+
                 });
 
                 const { error } = await supabase
@@ -416,8 +429,14 @@ const UploadImport = () => {
                 } else {
                     console.log("Data saved")
                     setLoading(false)
-                    setShowCreate("")
-                    setCreatedAt("")
+
+                    setIsExiting(true);
+
+                    setTimeout(() => {
+                        setShowCreate("")
+                        setCreatedAt("")
+                        setIsExiting(false);
+                    }, 100);
                 }
             }
         }
@@ -428,337 +447,355 @@ const UploadImport = () => {
     }
 
 
+
     return (
-        <div
-            onClick={(e) => { e.stopPropagation() }}
-            className='w-full max-w-[550px] bg-[#313131]  z-[5000] relative
-    rounded-lg p-3 h-full max-h-[800px] border-[#535353] border-[1px] justify-between flex flex-col overflow-auto'>
+        <AnimatePresence>
+            {
+                !isExiting &&
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: { duration: 0.2 } }}
+                    exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                    className='ml-auto positioners flex items-center p-3 justify-center relative w-full h-full'
+                    onClick={() => { handleOutsideClick("") }}>
 
-            <div className='overflow-auto h-full flex flex-col justify-start'>
-                <div>
-                    <div className='text-xl font-bold'>Finishing touches</div>
-                    <p className='text-sm text-[#888] mt-1'>Before your upload you goal, make sure that everything is set!</p>
 
-                    <p className='text-sm text-[#888] my-2'>
-                        Please note that once your template is published, all associated subtasks will be marked as "In progress" to ensure users begin with a clean slate.
-                    </p>
+                    <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
+                        exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
+                        onClick={(e) => { e.stopPropagation() }}
+                        className='w-full max-w-[550px] bg-[#313131]  z-[5000] relative
+              rounded-lg p-3 h-full max-h-[800px] border-[#535353] border-[1px] justify-between flex flex-col overflow-auto'>
 
-                </div>
+                        <div className='overflow-auto h-full flex flex-col justify-start'>
+                            <div>
+                                <div className='text-xl font-bold'>Finishing touches</div>
+                                <p className='text-sm text-[#888] mt-1'>Before your upload you goal, make sure that everything is set!</p>
 
-                <div className='mt-3 flex flex-col gap-2 h-auto'>
-                    <input
-                        value={title}
-                        onChange={(e) => { setTitle(e.target.value) }}
-                        placeholder='Title'
-                        className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
-                        type="text" />
+                                <p className='text-sm text-[#888] my-2'>
+                                    Please note that once your template is published, all associated subtasks will be marked as "In progress" to ensure users begin with a clean slate.
+                                </p>
 
-                    <textarea
-                        value={description}
-                        onChange={(e) => { setDesc(e.target.value) }}
-                        className='p-2 rounded-lg resize-none h-full max-h-[300px] bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
-                        placeholder='Description'
-                    ></textarea>
-                    <select
-                        value={category}
-                        onChange={(e) => { setCat(e.target.value) }}
-                        className='p-3 rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  text-[#888]'
-                        name="" id="">
-                        <option value="">Category:</option>
-                        <option value="Work">Work</option>
-                        <option value="Personal">Personal</option>
-                        <option value="Fitness">Fitness</option>
-                        <option value="Education">Education</option>
-                        <option value="Health">Health</option>
-                        <option value="Finance">Finance</option>
-                        <option value="Travel">Travel</option>
-                        <option value="Hobbies">Hobbies</option>
-                        <option value="Relationships">Relationships</option>
-                        <option value="Spiritual">Spiritual</option>
-                        <option value="Career">Career</option>
-                        <option value="Self-Development">Self-Development</option>
-                        <option value="Home">Home</option>
-                        <option value="Community">Community</option>
-                        <option value="Creativity">Creativity</option>
-                        <option value="Environment">Environment</option>
-                        <option value="Volunteering">Volunteering</option>
-                        <option value="Family">Family</option>
-                    </select>
-                </div>
-
-                <div className='mt-4'>
-                    <div className='font-bold px-2 flex items-center gap-1 mb-2'>
-                        <GoTasklist />  Tasks
-                    </div>
-                    <div className='flex flex-col gap-3 '>
-                        {
-                            fetchedData && fetchedData[0]?.sub_tasks.map((itm: subtaskType, idx: number) => (
-                                <div
-                                    key={idx}
-                                    className='overflow-hidden flex flex-col gap-2  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
-                                    <div className='flex flex-col gap-1'>
-                                        {
-                                            subTaskIdx === idx ?
-                                                <input
-                                                    value={subTaskEdit}
-                                                    maxLength={50}
-                                                    onChange={(e) => { setSubTaskEdit(e.target.value) }}
-                                                    placeholder='Rename your task'
-                                                    className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
-                                                    type="text" />
-                                                :
-                                                <div className='font-bold'>
-                                                    {itm?.subGoal}
-                                                </div>
-                                        }
-                                        <p className={`${itm?.is_done && 'line-through'}  text-sm text-[#888]`}>
-                                            {itm?.startedAt}
-                                        </p>
-                                        <p className={`${itm?.is_done ? "text-green-500" : "text-orange-500"} text-sm text-[#888]`}>
-                                            {itm?.is_done ? "Completed" : "In progress"}
-                                        </p>
-                                    </div>
-                                    <div className='flex gap-2'>
-                                        {
-                                            subTaskIdx === idx ?
-                                                (
-                                                    <>
-                                                        <div
-                                                            className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
-                                                            onClick={() => { setSubTaskIdx(null) }}>
-                                                            Cancel
-                                                        </div>
-                                                        <div
-                                                            className='hover:bg-[#535353] flex text-green-500 gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
-                                                            onClick={() => { renameTask(idx) }}>
-                                                            Save
-                                                        </div>
-                                                    </>
-                                                )
-                                                : isDeleteTask === idx ?
-                                                    (
-                                                        <>
-                                                            <div
-                                                                className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
-
-                                                                onClick={() => { setIsDeleteTask(null) }}>
-                                                                Cancel
-                                                            </div>
-                                                            <div
-                                                                className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
-
-                                                                onClick={() => { deleteTask(idx) }}>
-                                                                Delete
-                                                            </div>
-                                                        </>
-                                                    )
-                                                    :
-
-                                                    <>
-                                                        <div
-                                                            className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
-
-                                                            onClick={() => { getValue(itm?.subGoal, idx) }}
-                                                        >Edit</div>
-                                                        <div
-                                                            className='hover:bg-[#535353] text-red-500 flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
-                                                            onClick={() => { setIsDeleteTask(idx) }}>
-                                                            Delete
-                                                        </div>
-                                                    </>
-                                        }
-                                    </div>
-                                </div>
-                            ))
-                        }
-                    </div>
-                    <div className='flex items-start mt-2'>
-                        <input
-                            type='text'
-                            value={newSubTask}
-                            onChange={handleInputChange} // Call the input change handler
-                            maxLength={50}
-                            placeholder='Enter new task...'
-                            className='flex-grow bg-[#313131] border-[#535353] border-[1px] rounded-lg p-2 text-white'
-                        />
-                        <div
-                            onClick={() => { addNewSubTask("task") }} // Call the function to add the new task
-                            className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 px-3 hover:bg-[#222222]  ml-2'>
-                            <FaPlus />
-                        </div>
-                    </div>
-
-                    <div className='font-bold px-2 flex items-center gap-1 mt-5 mb-2'>
-                        <GiDna2 /> Habits
-                    </div>
-                    <div className='flex flex-col gap-3 '>
-                        {
-                            fetchedData && fetchedData[0]?.habits.map((itm: habitsType, idx: number) => (
-                                <div
-                                    key={idx}
-                                    className='overflow-hidden flex flex-col gap-1  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
-                                    <div>
-                                        <div className='font-bold'>
-                                            {
-                                                idx === isOpenEditOfHabit ?
-                                                    <input
-                                                        value={habitEdit}
-                                                        maxLength={50}
-                                                        onChange={(e) => { setHabitEdit(e.target.value) }}
-                                                        placeholder='Rename your task'
-                                                        className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
-                                                        type="text" />
-                                                    :
-                                                    itm?.habit
-                                            }
-                                        </div>
-                                        <p className={`text-sm text-[#888]`}>
-                                            {
-                                                idx === isOpenEditOfHabit
-                                                    ?
-                                                    <select
-                                                        value={repHabitEdit}
-                                                        onChange={(e) => { setHabitDate(e.target.value) }}
-                                                        className='p-3 rounded-lg bg-[#111111] outline-none mt-2 border-[#535353] border-[1px] w-full text-[#888]'
-                                                        name="" id="">
-                                                        <option value="">Repetition</option>
-                                                        <option value="daily">Daily</option>
-                                                        <option value="weekly">Weekly</option>
-                                                        <option value="monthly">Monthly</option>
-                                                        <option value="yearly">Yearly</option>
-                                                        <option value="weekday">Every Weekday (Mon-Fri)</option>
-                                                        <option value="weekend">Every Weekend</option>
-                                                        <option value="bi-weekly">Bi-weekly</option>
-                                                        <option value="quarterly">Quarterly</option>
-                                                        <option value="never">Never</option>
-                                                    </select>
-                                                    :
-                                                    itm?.repeat
-                                            }
-                                        </p>
-                                    </div>
-                                    <div className='flex gap-1 mt-2'>
-                                        {
-                                            idx === isOpenEditOfHabit ?
-                                                (
-                                                    <>
-                                                        <div
-                                                            onClick={() => { setIsOpenHabit(null) }}
-                                                            className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-                                                            Cancel
-                                                        </div>
-                                                        <div
-                                                            onClick={() => { renameHabit(idx) }}
-                                                            className='hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-                                                            Save
-                                                        </div>
-                                                    </>
-                                                )
-                                                :
-                                                idx === isHabitDel ?
-                                                    (
-                                                        <>
-                                                            <div
-                                                                onClick={() => { setIsHabitDel(null) }}
-                                                                className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-                                                                Cancel
-                                                            </div>
-                                                            <div
-                                                                onClick={() => { deleteHabit(idx) }}
-                                                                className='hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-                                                                Delete
-                                                            </div>
-                                                        </>
-                                                    )
-                                                    :
-
-                                                    <>
-                                                        <div
-                                                            onClick={() => { getValueOfHabit(itm?.habit, idx, itm?.repeat) }}
-                                                            className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-                                                            Edit
-                                                        </div>
-                                                        <div
-                                                            onClick={() => { setIsHabitDel(idx) }}
-                                                            className='hover:bg-[#535353] flex gap-1 items-center text-center text-red-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
-                                                            Delete
-                                                        </div>
-                                                    </>
-                                        }
-                                    </div>
-                                </div>
-                            ))
-                        }
-                    </div>
-
-                    <div className='flex items-center mt-2 gap-2'>
-                        <input
-                            type='text'
-                            value={newHabit}
-                            onChange={handleHabitInputChange} // Call the input change handler
-                            maxLength={50}
-                            placeholder='Enter new habit...'
-                            className='flex-grow bg-[#313131] border-[#535353] border-[1px] rounded-lg p-2 text-white'
-                        />
-
-                        <div className='w-full max-w-[200px] items-center flex justify-center'>
-                            <select
-                                value={repHabit}
-                                onChange={(e) => { setRepHabit(e.target.value) }}
-                                className='rounded-lg bg-[#111111] h-full p-2.5 outline-none border-[#535353] border-[1px] w-full text-[#888]'
-                                name="" id="">
-                                <option value="">Repetition</option>
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="yearly">Yearly</option>
-                                <option value="weekday">Every Weekday (Mon-Fri)</option>
-                                <option value="weekend">Every Weekend</option>
-                                <option value="bi-weekly">Bi-weekly</option>
-                                <option value="quarterly">Quarterly</option>
-                                <option value="never">Never</option>
-                            </select>
-                        </div>
-
-                        <div
-                            onClick={() => { addNewSubTask("habit") }} // Call the function to add the new task
-                            className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 px-3 hover:bg-[#222222]  ml-2'>
-                            <FaPlus />
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div className='w-full flex gap-3 mt-2'>
-                <div
-                    onClick={() => { (!loading && setShowCreate("Import"))}}
-                    className='p-3 rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  text-[#888] cursor-pointer hover:bg-[#222222]'>
-                    Back
-                </div>
-
-                <div className='w-full flex border-[#535353] border-[1px] overflow-hidden rounded-lg'>
-                    <div
-                        onClick={() => { (!loading && setShowCreate(""))}}
-                        className='p-3 bg-[#111111] outline-none  text-center border-r-[#535353] border-r-[1px] cursor-pointer text-[#888] w-full hover:bg-[#222222]'>
-                        Cancel
-                    </div>
-                    <div 
-                    onClick={() => {passToTemplates()}}
-                    className={`${loading && 'bg-[#535353] flex items-center justify-center'} p-3 bg-[#111111] outline-none  text-center text-[#888] w-full cursor-pointer hover:bg-[#222222]`}>
-                        {
-                            loading ?
-                            <div className='w-[20px] h-[20px]'>
-                                <Loader />
                             </div>
-                            :
-                            "Save"
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
+
+                            <div className='mt-3 flex flex-col gap-2 h-auto'>
+                                <input
+                                    value={title}
+                                    onChange={(e) => { setTitle(e.target.value) }}
+                                    placeholder='Title'
+                                    className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
+                                    type="text" />
+
+                                <textarea
+                                    value={description}
+                                    onChange={(e) => { setDesc(e.target.value) }}
+                                    className='p-2 rounded-lg resize-none h-full max-h-[300px] bg-[#111111] outline-none border-[#535353] border-[1px] w-full'
+                                    placeholder='Description'
+                                ></textarea>
+                                <select
+                                    value={category}
+                                    onChange={(e) => { setCat(e.target.value) }}
+                                    className='p-3 rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  text-[#888]'
+                                    name="" id="">
+                                    <option value="">Category:</option>
+                                    <option value="Work">Work</option>
+                                    <option value="Personal">Personal</option>
+                                    <option value="Fitness">Fitness</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Health">Health</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Travel">Travel</option>
+                                    <option value="Hobbies">Hobbies</option>
+                                    <option value="Relationships">Relationships</option>
+                                    <option value="Spiritual">Spiritual</option>
+                                    <option value="Career">Career</option>
+                                    <option value="Self-Development">Self-Development</option>
+                                    <option value="Home">Home</option>
+                                    <option value="Community">Community</option>
+                                    <option value="Creativity">Creativity</option>
+                                    <option value="Environment">Environment</option>
+                                    <option value="Volunteering">Volunteering</option>
+                                    <option value="Family">Family</option>
+                                </select>
+                            </div>
+
+                            <div className='mt-4'>
+                                <div className='font-bold px-2 flex items-center gap-1 mb-2'>
+                                    <GoTasklist />  Tasks
+                                </div>
+                                <div className='flex flex-col gap-3 '>
+                                    {
+                                        fetchedData && fetchedData[0]?.sub_tasks.map((itm: subtaskType, idx: number) => (
+                                            <div
+                                                key={idx}
+                                                className='overflow-hidden flex flex-col gap-2  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
+                                                <div className='flex flex-col gap-1'>
+                                                    {
+                                                        subTaskIdx === idx ?
+                                                            <input
+                                                                value={subTaskEdit}
+                                                                maxLength={50}
+                                                                onChange={(e) => { setSubTaskEdit(e.target.value) }}
+                                                                placeholder='Rename your task'
+                                                                className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                                                                type="text" />
+                                                            :
+                                                            <div className='font-bold'>
+                                                                {itm?.subGoal}
+                                                            </div>
+                                                    }
+                                                    <p className={`${itm?.is_done && 'line-through'}  text-sm text-[#888]`}>
+                                                        {itm?.startedAt}
+                                                    </p>
+                                                    <p className={`${itm?.is_done ? "text-green-500" : "text-orange-500"} text-sm text-[#888]`}>
+                                                        {itm?.is_done ? "Completed" : "In progress"}
+                                                    </p>
+                                                </div>
+                                                <div className='flex gap-2'>
+                                                    {
+                                                        subTaskIdx === idx ?
+                                                            (
+                                                                <>
+                                                                    <div
+                                                                        className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
+                                                                        onClick={() => { setSubTaskIdx(null) }}>
+                                                                        Cancel
+                                                                    </div>
+                                                                    <div
+                                                                        className='hover:bg-[#535353] flex text-green-500 gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
+                                                                        onClick={() => { renameTask(idx) }}>
+                                                                        Save
+                                                                    </div>
+                                                                </>
+                                                            )
+                                                            : isDeleteTask === idx ?
+                                                                (
+                                                                    <>
+                                                                        <div
+                                                                            className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
+
+                                                                            onClick={() => { setIsDeleteTask(null) }}>
+                                                                            Cancel
+                                                                        </div>
+                                                                        <div
+                                                                            className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
+
+                                                                            onClick={() => { deleteTask(idx) }}>
+                                                                            Delete
+                                                                        </div>
+                                                                    </>
+                                                                )
+                                                                :
+
+                                                                <>
+                                                                    <div
+                                                                        className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
+
+                                                                        onClick={() => { getValue(itm?.subGoal, idx) }}
+                                                                    >Edit</div>
+                                                                    <div
+                                                                        className='hover:bg-[#535353] text-red-500 flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '
+                                                                        onClick={() => { setIsDeleteTask(idx) }}>
+                                                                        Delete
+                                                                    </div>
+                                                                </>
+                                                    }
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                                <div className='flex items-start mt-2'>
+                                    <input
+                                        type='text'
+                                        value={newSubTask}
+                                        onChange={handleInputChange} // Call the input change handler
+                                        maxLength={50}
+                                        placeholder='Enter new task...'
+                                        className='flex-grow bg-[#313131] border-[#535353] border-[1px] rounded-lg p-2 text-white'
+                                    />
+                                    <div
+                                        onClick={() => { addNewSubTask("task") }} // Call the function to add the new task
+                                        className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 px-3 hover:bg-[#222222]  ml-2'>
+                                        <FaPlus />
+                                    </div>
+                                </div>
+
+                                <div className='font-bold px-2 flex items-center gap-1 mt-5 mb-2'>
+                                    <GiDna2 /> Habits
+                                </div>
+                                <div className='flex flex-col gap-3 '>
+                                    {
+                                        fetchedData && fetchedData[0]?.habits.map((itm: habitsType, idx: number) => (
+                                            <div
+                                                key={idx}
+                                                className='overflow-hidden flex flex-col gap-1  items-start justify-start bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#222222] '>
+                                                <div>
+                                                    <div className='font-bold'>
+                                                        {
+                                                            idx === isOpenEditOfHabit ?
+                                                                <input
+                                                                    value={habitEdit}
+                                                                    maxLength={50}
+                                                                    onChange={(e) => { setHabitEdit(e.target.value) }}
+                                                                    placeholder='Rename your task'
+                                                                    className='p-2 rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'
+                                                                    type="text" />
+                                                                :
+                                                                itm?.habit
+                                                        }
+                                                    </div>
+                                                    <p className={`text-sm text-[#888]`}>
+                                                        {
+                                                            idx === isOpenEditOfHabit
+                                                                ?
+                                                                <select
+                                                                    value={repHabitEdit}
+                                                                    onChange={(e) => { setHabitDate(e.target.value) }}
+                                                                    className='p-3 rounded-lg bg-[#111111] outline-none mt-2 border-[#535353] border-[1px] w-full text-[#888]'
+                                                                    name="" id="">
+                                                                    <option value="">Repetition</option>
+                                                                    <option value="daily">Daily</option>
+                                                                    <option value="weekly">Weekly</option>
+                                                                    <option value="monthly">Monthly</option>
+                                                                    <option value="yearly">Yearly</option>
+                                                                    <option value="weekday">Every Weekday (Mon-Fri)</option>
+                                                                    <option value="weekend">Every Weekend</option>
+                                                                    <option value="bi-weekly">Bi-weekly</option>
+                                                                    <option value="quarterly">Quarterly</option>
+                                                                    <option value="never">Never</option>
+                                                                </select>
+                                                                :
+                                                                itm?.repeat
+                                                        }
+                                                    </p>
+                                                </div>
+                                                <div className='flex gap-1 mt-2'>
+                                                    {
+                                                        idx === isOpenEditOfHabit ?
+                                                            (
+                                                                <>
+                                                                    <div
+                                                                        onClick={() => { setIsOpenHabit(null) }}
+                                                                        className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                        Cancel
+                                                                    </div>
+                                                                    <div
+                                                                        onClick={() => { renameHabit(idx) }}
+                                                                        className='hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                        Save
+                                                                    </div>
+                                                                </>
+                                                            )
+                                                            :
+                                                            idx === isHabitDel ?
+                                                                (
+                                                                    <>
+                                                                        <div
+                                                                            onClick={() => { setIsHabitDel(null) }}
+                                                                            className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                            Cancel
+                                                                        </div>
+                                                                        <div
+                                                                            onClick={() => { deleteHabit(idx) }}
+                                                                            className='hover:bg-[#535353] flex gap-1 items-center text-center text-green-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                            Delete
+                                                                        </div>
+                                                                    </>
+                                                                )
+                                                                :
+
+                                                                <>
+                                                                    <div
+                                                                        onClick={() => { getValueOfHabit(itm?.habit, idx, itm?.repeat) }}
+                                                                        className='hover:bg-[#535353] flex gap-1 items-center  text-center bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                        Edit
+                                                                    </div>
+                                                                    <div
+                                                                        onClick={() => { setIsHabitDel(idx) }}
+                                                                        className='hover:bg-[#535353] flex gap-1 items-center text-center text-red-500 bg-[#111111] border-[#535353] border-[1px] cursor-pointer rounded-lg p-1 px-3 '>
+                                                                        Delete
+                                                                    </div>
+                                                                </>
+                                                    }
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+
+                                <div className='flex items-center mt-2 gap-2'>
+                                    <input
+                                        type='text'
+                                        value={newHabit}
+                                        onChange={handleHabitInputChange} // Call the input change handler
+                                        maxLength={50}
+                                        placeholder='Enter new habit...'
+                                        className='flex-grow bg-[#313131] border-[#535353] border-[1px] rounded-lg p-2 text-white'
+                                    />
+
+                                    <div className='w-full max-w-[200px] items-center flex justify-center'>
+                                        <select
+                                            value={repHabit}
+                                            onChange={(e) => { setRepHabit(e.target.value) }}
+                                            className='rounded-lg bg-[#111111] h-full p-2.5 outline-none border-[#535353] border-[1px] w-full text-[#888]'
+                                            name="" id="">
+                                            <option value="">Repetition</option>
+                                            <option value="daily">Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                            <option value="yearly">Yearly</option>
+                                            <option value="weekday">Every Weekday (Mon-Fri)</option>
+                                            <option value="weekend">Every Weekend</option>
+                                            <option value="bi-weekly">Bi-weekly</option>
+                                            <option value="quarterly">Quarterly</option>
+                                            <option value="never">Never</option>
+                                        </select>
+                                    </div>
+
+                                    <div
+                                        onClick={() => { addNewSubTask("habit") }} // Call the function to add the new task
+                                        className='flex gap-1 items-center justify-between bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 px-3 hover:bg-[#222222]  ml-2'>
+                                        <FaPlus />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div className='w-full flex gap-3 mt-2'>
+                            <div
+                                onClick={() => { (!loading && handleOutsideClick("Import")) }}
+                                className='p-3 rounded-lg bg-[#111111] outline-none  border-[#535353] border-[1px]  text-[#888] cursor-pointer hover:bg-[#222222]'>
+                                Back
+                            </div>
+
+                            <div className='w-full flex border-[#535353] border-[1px] overflow-hidden rounded-lg'>
+                                <div
+                                    onClick={() => { (!loading && handleOutsideClick("")) }}
+                                    className='p-3 bg-[#111111] outline-none  text-center border-r-[#535353] border-r-[1px] cursor-pointer text-[#888] w-full hover:bg-[#222222]'>
+                                    Cancel
+                                </div>
+                                <div
+                                    onClick={() => { passToTemplates() }}
+                                    className={`${loading && 'bg-[#535353] flex items-center justify-center'} p-3 bg-[#111111] outline-none  text-center text-[#888] w-full cursor-pointer hover:bg-[#222222]`}>
+                                    {
+                                        loading ?
+                                            <div className='w-[20px] h-[20px]'>
+                                                <Loader />
+                                            </div>
+                                            :
+                                            "Save"
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            }
+        </AnimatePresence>
     )
 }
 

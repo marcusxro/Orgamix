@@ -1,28 +1,26 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
-import useStore from '../../Zustand/UseStore';
+
 
 interface closerType {
     closer: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const TaskSorter: React.FC<closerType> = ({ closer }) => {
+const NoteSorter: React.FC<closerType> = ({ closer }) => {
     const [isExiting, setIsExiting] = useState(false);
-    const { isSort, setSort }: any = useStore();
-
-    const [selectedSort, setSelectedSort] = useState<string>(localStorage.getItem('sortMethod') || '')
+    const [selectedSort, setSelectedSort] = useState<string>(localStorage.getItem('sortMethodNotes') || '')
 
     const handleOutsideClick = () => {
         setIsExiting(true);
         setTimeout(() => {
-            setSort(null);
+            closer(false);
             setIsExiting(false);
         }, 300);
     };
 
     function saveSortMethod() {
         try {
-            localStorage.setItem('sortMethod', selectedSort);
+            localStorage.setItem('sortMethodNotes', selectedSort);
             closer(false);
             window.location.reload()
         } catch (error) {
@@ -34,7 +32,7 @@ const TaskSorter: React.FC<closerType> = ({ closer }) => {
     return (
         <AnimatePresence>
             {
-                !isExiting && isSort &&
+                !isExiting  &&
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 0.2 } }}
@@ -126,4 +124,4 @@ const TaskSorter: React.FC<closerType> = ({ closer }) => {
     )
 }
 
-export default TaskSorter
+export default NoteSorter

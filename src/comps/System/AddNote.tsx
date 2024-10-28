@@ -60,14 +60,14 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
 
     async function createNote() {
         if (loading) return;
-    
+
         setLoading(true);
-    
+
         if (!value || !title || !category) {
             setLoading(false);
             return;
         }
-    
+
         try {
             // Step 1: Check for existing notes with a similar title
             const { data: existingNotes, error: fetchError } = await supabase
@@ -75,21 +75,35 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
                 .select("title")
                 .eq("userid", user?.uid)
                 .like("title", `${title}%`);
-    
+
             if (fetchError) {
                 console.error(fetchError);
                 setLoading(false);
                 return;
             }
-    
+
             // Step 2: Determine if any existing notes share the title
+            // Determine the new title with an index if necessary
             let newTitle = title;
-            if (existingNotes && existingNotes.length > 0) {
-                // Count the existing notes with the same base title
-                const similarNotesCount = existingNotes.filter(note => note.title.startsWith(title)).length;
-                newTitle = `${title} (${similarNotesCount + 1})`;
+
+            if (existingNotes.length > 0) {
+                const exactMatches = existingNotes.filter(itm =>
+                    itm?.title === title || itm?.title.startsWith(`${title} (`));
+
+                if (exactMatches.length > 0) {
+                    const maxIndex = exactMatches.reduce((acc, itm) => {
+                        const match = itm.title.match(/\((\d+)\)$/); // Check for pattern "renameGoal (index)"
+                        const index = match ? parseInt(match[1], 10) : 0;
+                        return Math.max(acc, index);
+                    }, 0);
+
+                    newTitle = `${title} (${maxIndex + 1})`;
+                }
+
+
             }
-    
+
+
             // Step 3: Insert the new note with the updated title
             const { error: insertError } = await supabase.from("notes").insert({
                 title: newTitle,
@@ -98,19 +112,19 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
                 userid: user?.uid,
                 createdat: Date.now(),
             });
-    
+
             if (insertError) {
                 console.error(insertError);
                 setLoading(false);
                 return;
             }
-    
+
             console.log("Note created!");
             setTitle("");
             setValue("");
             setcategory("");
             setEditTask(!editTask);
-    
+
             if (purpose === "modal") {
                 handleOutsideClick();
             }
@@ -120,23 +134,23 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
             setLoading(false);
         }
     }
-    
+
 
     return (
         <AnimatePresence>
             {
                 !isExiting &&
                 <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { duration: 0.2 } }}
-                exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                className={`${purpose == "modal" && "ml-auto positioners flex items-center p-3 justify-end lg:hidden"} relative w-full h-full`}
-                onClick={handleOutsideClick}>
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: { duration: 0.2 } }}
+                    exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                    className={`${purpose == "modal" && "ml-auto positioners flex items-center p-3 justify-end lg:hidden"} relative w-full h-full`}
+                    onClick={handleOutsideClick}>
 
                     <motion.div
                         initial={{ x: 50, scale: 0.95, opacity: 0 }} // Starts off-screen to the left
                         animate={{ x: 0, scale: 1, opacity: 1, transition: { duration: 0.2 } }} // Moves to default position
-                        exit={{ x: 50, scale: 0.95, opacity: 0, transition: { duration: 0.2 } }} 
+                        exit={{ x: 50, scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
                         onClick={(e) => { e.stopPropagation() }}
                         className='w-full max-w-[550px] bg-[#313131]  z-[5000] relative
                  rounded-lg p-3 h-full border-[#535353] border-[1px] flex flex-col gap-3 overflow-auto'>

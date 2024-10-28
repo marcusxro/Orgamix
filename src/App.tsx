@@ -20,7 +20,6 @@ import { useEffect, useState } from 'react';
 import useNotification from './comps/Notifs';
 import { supabase } from './supabase/supabaseClient';
 import IsLoggedIn from './firebase/IsLoggedIn';
-import Calendar from './pages/isLoggedIn/CalendarPage';
 import CalendarPage from './pages/isLoggedIn/CalendarPage';
 
 function App() {
