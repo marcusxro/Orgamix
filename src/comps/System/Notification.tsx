@@ -19,7 +19,7 @@ interface dataType {
 const Notification: React.FC = () => {
   const { setViewNotifs }: any = useStore();
   const [isExiting, setIsExiting] = useState(false);
-  const [notifications, setNotifications] = useState<dataType[]>([]);
+  const [_, setNotifications] = useState<dataType[]>([]);
   const [groupedData, setGroupedData] = useState<{ [key: string]: dataType[] }>({});
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
@@ -106,7 +106,6 @@ const Notification: React.FC = () => {
   const groupNotifs = (notifications: dataType[]) => {
     const grouped: { [key: string]: dataType[] } = {};
     const today = new Date();
-    setIsLoaded(prevs => !prevs)
 
     notifications.forEach((notif) => {
       const createdAt = new Date(notif.created_at);
@@ -117,9 +116,9 @@ const Notification: React.FC = () => {
       } else if (isYesterday(createdAt, today)) {
         key = 'Yesterday';
       } else if (isLastWeek(createdAt, today)) {
-        key = 'Last Week';
+        key = `Last Week (${moment(createdAt).format('MMMM Do')})`; // Format the date
       } else if (isLastMonth(createdAt, today)) {
-        key = 'Last Month';
+        key = `Last Month (${moment(createdAt).format('MMMM Do')})`; // Format the date
       } else {
         key = 'Earlier';
       }
@@ -129,9 +128,7 @@ const Notification: React.FC = () => {
       }
       grouped[key].push(notif);
     });
-    setIsLoaded(prevs => !prevs)
 
-    console.log('Grouped notifications:', grouped); // Log grouped notifications
     setGroupedData(grouped); // Update the grouped notifications state
   };
 
@@ -219,7 +216,7 @@ const Notification: React.FC = () => {
                       </div>
 
                       {
-                         moment().diff(moment(itm?.created_at), 'seconds') < 5 &&
+                        moment().diff(moment(itm?.created_at), 'seconds') < 5 &&
                         <div className='mx-3 my-2 border-1 border-[#535353] border-[1px] p-1 px-2 text-sm text-green-500 rounded-md'>new</div>
                       }
                     </div>

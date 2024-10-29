@@ -52,7 +52,7 @@ const Goals: React.FC = () => {
 
 
     const [sortMethodLoaded, setSortMethodLoaded] = useState<boolean>(false);
-    const sortMethod = localStorage.getItem('sortMethodNotes');
+    const sortMethod = localStorage.getItem('sortMethodGoals');
 
 
     useEffect(() => {
@@ -85,7 +85,7 @@ const Goals: React.FC = () => {
 
 
     useEffect(() => {
-        if (user) {
+        if (user && sortVal) {
             fetchGoalsByID()
             const subscription = supabase
                 .channel('public:goals')
@@ -133,12 +133,16 @@ const Goals: React.FC = () => {
     function returnSortTitle() {
         switch (sortVal) {
             case "Alphabetically":
-                return "title"
+                return "title";
             case "Creation Date":
-                return "created_at"
+                return "created_at";
+            case "In progress":
+                return "deadline";  // Sort by deadline for active tasks
+            case "Completed":
+            case "Failed":
+                return "is_done";  // Completed/Failed based on is_done and deadline
             default:
-                return "created_at"
-
+                return "created_at";
         }
     }
 
@@ -146,23 +150,56 @@ const Goals: React.FC = () => {
     async function fetchGoalsByID() {
         try {
             const columnName = returnSortTitle();
+    
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
                 .eq('userid', user?.uid)
-                .order(columnName === null? "created_at" : columnName, { ascending: true });
+                .order(columnName || "created_at", {
+                    ascending: sortVal === "Completed" ? false : sortVal === "Failed" ? true : true,
+                });
+    
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
-                const sortedData = sortVal === 'Creation Date' ? data.reverse() : data;
-
-                setFetchedData(sortedData);
-                setOriginalData(sortedData)
+                // Separate goals based on sortVal criteria and then combine
+                let primaryGoals: any = [];
+                let otherGoals:any= [];
+    
+                const now = new Date();
+    
+                data.forEach(goal => {
+                    const deadline = new Date(goal.deadline);
+                    
+                    if (sortVal === "In progress" && deadline > now && !goal.is_done) {
+                        primaryGoals.push(goal);
+                    } else if (sortVal === "Failed" && deadline < now && !goal.is_done) {
+                        primaryGoals.push(goal);
+                    } else if (sortVal === "Completed" && goal.is_done) {
+                        primaryGoals.push(goal);
+                    } else {
+                        // Place any goals that don’t match sortVal criteria here
+                        otherGoals.push(goal);
+                    }
+                });
+    
+                // Combine primary and other goals so primaryGoals are shown first
+                const sortedData = [...primaryGoals, ...otherGoals];
+    
+                // Reverse if sorting by "Creation Date"
+                if (sortVal === 'Creation Date') {
+                    setFetchedData(sortedData.reverse());
+                } else {
+                    setFetchedData(sortedData);
+                }
+                
+                setOriginalData(sortedData);
             }
         } catch (err) {
             console.log(err);
         }
     }
+    
 
     function determineDate(date: string): string {
         const deadline = new Date(date);
@@ -188,7 +225,7 @@ const Goals: React.FC = () => {
     }
 
 
-    function checkDeadlineMet(deadlineString: string): JSX.Element {
+    function checkDeadlineMet(deadlineString: string, isDone: boolean): JSX.Element {
         const deadline = new Date(deadlineString);
         const now = new Date();
         deadline.setHours(0, 0, 0, 0);
@@ -201,7 +238,7 @@ const Goals: React.FC = () => {
         if (daysDiff === 0) {
             // If deadline is today
             return (
-                <div className='text-sm text-[#cc0000] flex gap-1 items-center'>
+                <div className={`${isDone === true && daysDiff > 0 ? "text-green-500" : "text-[#cc0e00]"} flex gap-1 items-center`}>
                     <MdDateRange />
                     Deadline Met
                 </div>
@@ -209,7 +246,7 @@ const Goals: React.FC = () => {
         } else if (daysDiff > 0) {
             // If the deadline is in the future
             return (
-                <div className={`${daysDiff <= 3 && 'text-[#cc0000]'} text-[#888] text-sm flex gap-1 items-center`}>
+                <div className={`${daysDiff <= 3 && !isDone && 'text-[#cc8500]'} ${isDone && 'text-green-500'} text-[#888] text-sm flex gap-1 items-center`}>
                     <MdDateRange />
                     {`${deadlineString} / ${daysDiff} ${daysDiff === 1 ? 'day' : 'days'} left`}
                 </div>
@@ -217,7 +254,7 @@ const Goals: React.FC = () => {
         } else {
             // If the deadline has passed
             return (
-                <div className='text-sm text-[#cc0000] flex gap-1 items-center'>
+                <div className={` ${isDone && daysDiff > 0 ? "text-green-500" : "text-[#cc0e00]"} flex gap-1 items-center text-[#888] `}>
                     <MdDateRange />
                     {`${deadlineString} / ${Math.abs(daysDiff)} ${Math.abs(daysDiff) === 1 ? 'day' : 'days'} ago`}
                 </div>
@@ -226,37 +263,38 @@ const Goals: React.FC = () => {
     }
 
 
-    function isFailed(deadlineString: string, boolVal: boolean) {
-        const deadline = new Date(deadlineString);
-        const now = new Date();
-        deadline.setHours(0, 0, 0, 0);
-        now.setHours(0, 0, 0, 0);
+        function isFailed(deadlineString: string, boolVal: boolean) {
 
-        // Calculate difference in time
-        const timeDiff = deadline.getTime() - now.getTime();
-        const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            const deadline = new Date(deadlineString);
+            const now = new Date();
+            deadline.setHours(0, 0, 0, 0);
+            now.setHours(0, 0, 0, 0);
 
-        if (daysDiff > 0 && !boolVal) {
-            // If the deadline is in the future
-            return (
-                <>In progress</>
-            );
-        } else if (daysDiff > 0 && boolVal) {
-            return (
-                <div className='text-sm text-[#2ecc71] flex gap-1 items-center'>
-                    Completed
-                </div>
-            )
+            // Calculate difference in time
+            const timeDiff = deadline.getTime() - now.getTime();
+            const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+            if (daysDiff > 0 && !boolVal) {
+                // If the deadline is in the future
+                return (
+                    <>                                           <MdOutlineQueryStats />In progress</>
+                );
+            } else if (daysDiff > 0 && boolVal) {
+                return (
+                    <div className='text-sm text-[#2ecc71] flex gap-1 items-center'>
+                        <MdOutlineQueryStats />   Completed
+                    </div>
+                )
+            }
+
+            else {
+                return (
+                    <div className='text-sm text-[#cc0e00] flex gap-1 items-center'>
+                        <MdOutlineQueryStats />     Failed
+                    </div>
+                );
+            }
         }
-
-        else {
-            return (
-                <div className='text-sm text-[#cc0000] flex gap-1 items-center'>
-                    Failed
-                </div>
-            );
-        }
-    }
 
 
 
@@ -264,17 +302,17 @@ const Goals: React.FC = () => {
         <div>
             <Sidebar location='Goals' />
 
-        {
-            isSort &&
-            <GoalSorter closer={setSort} />
-        }
+            {
+                isSort &&
+                <GoalSorter closer={setSort} />
+            }
 
             <div className={`ml-[86px] p-3 flex gap-3 h-[100dvh] mr-[0px] pb-9  ${isOpenSidebar && "lg:mr-[370px]"}`}>
                 <div className='w-full h-full'>
                     <div>
                         <div
                             className='text-2xl font-bold'>
-                            Goals 
+                            Goals
                         </div>
                         <div className='text-sm text-[#888]'>
                             Easily create, edit, and organize your notes in this section for a streamlined experience.
@@ -313,9 +351,9 @@ const Goals: React.FC = () => {
                         />
                     </div>
                     <div className='flex flex-wrap gap-3 mt-2 pb-5'>
-                        {fetchedData?.length === 0 && 
-                        <div className='text-sm text-[#888] mt-2'>
-                            No result
+                        {fetchedData?.length === 0 &&
+                            <div className='text-sm text-[#888] mt-2'>
+                                No result
                             </div>
                         }
                         {
@@ -353,11 +391,11 @@ const Goals: React.FC = () => {
                                                             <BiCategory />{itm?.category}
                                                         </div>
                                                         <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                            <MdOutlineQueryStats />
+
                                                             {isFailed(itm?.deadline, itm?.is_done)}
                                                         </div>
 
-                                                        {checkDeadlineMet(itm?.deadline)}
+                                                        {checkDeadlineMet(itm?.deadline, itm?.is_done)}
                                                     </div>
                                                 </div>
 

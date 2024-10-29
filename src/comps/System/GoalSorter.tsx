@@ -38,7 +38,7 @@ const GoalSorter: React.FC<closerType> = ({ closer }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 0.2 } }}
                     exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                    style={{zIndex: 55555555555555}}
+                    style={{ zIndex: 55555555555555 }}
                     className='ml-auto positioners flex items-center p-3 justify-center relative w-full h-full'
                     onClick={handleOutsideClick}>
 
@@ -73,6 +73,27 @@ const GoalSorter: React.FC<closerType> = ({ closer }) => {
                                 className={`${selectedSort === 'Alphabetically' && 'bg-blue-500'} px-5 py-1 border-[#535353] border-[1px] rounded-lg cursor-pointer`}>
                                 Alphabetically</div>
 
+                            <div
+                                onClick={() => {
+                                    setSelectedSort('In progress')
+                                }}
+                                className={`${selectedSort === 'In progress' && 'bg-blue-500'} px-5 py-1 border-[#535353] border-[1px] rounded-lg cursor-pointer`}>
+                                In progress</div>
+
+                                <div
+                                onClick={() => {
+                                    setSelectedSort('Completed')
+                                }}
+                                className={`${selectedSort === 'Completed' && 'bg-blue-500'} px-5 py-1 border-[#535353] border-[1px] rounded-lg cursor-pointer`}>
+                                Completed</div>
+
+
+                                <div
+                                onClick={() => {
+                                    setSelectedSort('Failed')
+                                }}
+                                className={`${selectedSort === 'Failed' && 'bg-blue-500'} px-5 py-1 border-[#535353] border-[1px] rounded-lg cursor-pointer`}>
+                                Failed</div>
 
                             {/* <div
                     onClick={() => {

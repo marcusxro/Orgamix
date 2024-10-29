@@ -22,6 +22,7 @@ import { supabase } from './supabase/supabaseClient';
 import IsLoggedIn from './firebase/IsLoggedIn';
 import CalendarPage from './pages/isLoggedIn/CalendarPage';
 
+
 function App() {
   return (
     <Router>
@@ -42,7 +43,7 @@ function Main() {
   const location = useLocation();
   const { viewNotifs }: any = useStore();
   const { notifyUser } = useNotification();
-  const [notifications, setNotifications] = useState<dataType[]>([]);
+  const [_, setNotifications] = useState<dataType[]>([]);
   const [user] = IsLoggedIn()
 
   useEffect(() => {
@@ -138,6 +139,7 @@ function Main() {
 
         <Route path='/user/calendar' element={<CalendarPage />} />
         <Route path='/test' element={<TestUpload />} />
+
       </Routes>
 
       {/* Render Notification outside of Routes */}

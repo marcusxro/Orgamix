@@ -154,7 +154,7 @@ const CalendarPage: React.FC = () => {
                         variants={itemAnimation}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                        <span className="font-bold text-lg mb-3">{dayLabel} </span>
+                        <span className={`${isToday ? 'text-green-500' : 'text-white'} font-bold text-lg mb-3`}>{dayLabel} </span>
                         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2'>
                             {dailyEvents.map((event: any, index: number) => (
                                 <motion.div
@@ -186,7 +186,7 @@ const CalendarPage: React.FC = () => {
                 days.push(
                     <motion.div
                         key={i}
-                        className="border-[1px] rounded-lg my-1 bg-[#1f1f1f] border-[#535353] p-4 flex flex-col"
+                        className={`border-[1px] rounded-lg my-1 ${isToday ? 'text-green-500' : 'text-white'} bg-[#1f1f1f] border-[#535353] p-4 flex flex-col`}
                         initial="hidden"
                         animate="visible"
                         variants={itemAnimation}

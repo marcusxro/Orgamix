@@ -30,7 +30,14 @@ const RetryGoal: React.FC<closerType> = ({ closer }) => {
     async function retryGoal() {
         setLoading(true);
         if (loading) return;
-        if (!user || !params) return;
+        if (!user || !params) {
+            setLoading(false)
+            return
+        }
+        if(!openDateVal) {
+            setLoading(false)
+            return
+        }
 
         // Check if the openDateVal is in the past
         const selectedDate = new Date(openDateVal);
