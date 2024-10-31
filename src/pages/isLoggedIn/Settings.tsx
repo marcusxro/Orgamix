@@ -27,6 +27,9 @@ interface dataType {
 
 const Settings: React.FC = () => {
     const [file, setFile] = useState<File | null>(null);
+    const [fileAttachment, setFileAttachment] = useState<File | null>(null);
+
+
     const MAX_FILE_SIZE = 200 * 1024; // 200 KB
     const [imageUrl, setImageUrl] = useState<pubsType | null>(null); // Initialize as null
     const [isAllowed, setIsAllowed] = useState<boolean>(false)
@@ -34,6 +37,7 @@ const Settings: React.FC = () => {
     const [user]: any = IsLoggedIn()
     const [loading, setLoading] = useState<boolean>(false)
     const fileInputRef = useRef<HTMLInputElement>(null); // Add ref for the file input
+    const fileInputRefAttachment = useRef<HTMLInputElement>(null); // Add ref for the file input
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [username, setUsername] = useState<string>("")
     const [isEdit, setIsEdit] = useState<boolean>(true)
@@ -45,12 +49,11 @@ const Settings: React.FC = () => {
     useEffect(() => {
         if (user && fetchedData) {
             setUsername(fetchedData != null && fetchedData[0]?.username || "")
-            console.log(fetchedData != null && fetchedData)
         }
     }, [fetchedData, user])
 
     const [isErrorPfp, setIsErrorPfp] = useState<string | null>(null)
-
+    const [isErrorAttach, setIsErrorAttach] = useState<string | null>(null)
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0] || null;
 
@@ -78,6 +81,32 @@ const Settings: React.FC = () => {
             setChangedImg(URL.createObjectURL(selectedFile)); // Set image preview URL
         }
     };
+
+    const handleFileChangeAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0] || null;
+
+        // Validate file type and size
+        if (selectedFile) {
+            const isImage = selectedFile.type.startsWith('image/');
+            const isUnderLimit = selectedFile.size <= 500 * 1024;
+
+            if (!isImage) {
+                setIsErrorAttach('Please select an image file.');
+                setFileAttachment(null);
+                return;
+            }
+
+            if (!isUnderLimit) {
+                setIsErrorAttach('File size must be less than 500 KB.');
+                setFileAttachment(null);
+                return;
+            }
+            console.log(selectedFile)
+            setIsAllowed(true)
+            setFileAttachment(selectedFile);
+        }
+    };
+
 
     const fetchImage = async () => {
         if (!user) return; // Ensure user is logged in
@@ -109,8 +138,9 @@ const Settings: React.FC = () => {
 
 
 
+
     const uploadImage = async () => {
-        setLoading(true)
+
         if (loading) return
 
         if (!file || !user) {
@@ -158,6 +188,93 @@ const Settings: React.FC = () => {
             setLoading(false)
         }
     };
+    const [loadingFeedBacks, setLoadingFeedBacks] = useState<boolean>(false)
+
+    const uploadImageAttachment = async () => {
+        console.log("proceeding")
+        console.log(fileAttachment)
+
+        if (!fileAttachment || !user) {
+            return false; // Return false if no file or user
+        }
+
+        console.log("proceeding")
+        try {
+            const compressedFile = await imageCompression(fileAttachment, {
+                maxSizeMB: 0.2,
+                useWebWorker: true,
+                maxWidthOrHeight: 500
+            });
+
+            console.log("proceeding")
+            const timestamp = Date.now(); // Get the current timestamp
+            const newFileName = `${timestamp}-${fileAttachment.name}`; // Create a unique file name
+            const filePath = `attachments/${user.uid}/${newFileName}`; // Use the new unique file name
+
+            const { data, error } = await supabase.storage
+                .from('profile')
+                .upload(filePath, compressedFile);
+
+            if (error) {
+                console.error('Error uploading file:', error.message);
+
+                return false; // Return false if upload failed
+            } else {
+                console.log('File uploaded successfully:', data);
+                setFileAttachment(null);
+                setIsErrorAttach(null)
+                setLoadingFeedBacks(true)
+                if (fileInputRefAttachment.current) {
+                    fileInputRefAttachment.current.value = ''; // Clear file input
+                }
+                return newFileName; // Return true if upload succeeded
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            return false; // Return false if an error occurs
+        } finally {
+            setLoading(false);
+        }
+    };
+    const [sentFeedback, setIsSet] = useState<boolean>(false)
+
+    async function sendFeedbacks() {
+        // First, upload the image and check if it was successful
+        setLoadingFeedBacks(false)
+
+        const uploadSuccessful = await uploadImageAttachment();
+
+        if (!feedbackType || !description || !rating) return
+
+        try {
+            const { error } = await supabase
+                .from('feedbacks')
+                .insert({
+                    type: feedbackType,
+                    description: description,
+                    attachment: uploadSuccessful,
+                    rating: rating,
+                    userid: user?.uid,
+                    created_at: Date.now()
+                });
+
+            if (error) {
+                console.error('Error inserting feedback:', error);
+                setLoadingFeedBacks(true)
+            } else {
+                console.log('Feedback submitted successfully.');
+                setFeedbackType("General Feedback")
+                setDescription("")
+                setRating(0)
+                setLoadingFeedBacks(false)
+                setIsSet(true)
+            }
+        } catch (err) {
+            setLoadingFeedBacks(true)
+            console.log('Error in sendFeedbacks():', err);
+        }
+    }
+
 
     useEffect(() => {
         if (user) {
@@ -228,6 +345,14 @@ const Settings: React.FC = () => {
             }, 3000);
         }
     }, [isCompletedPfp])
+
+    useEffect(() => {
+        if (sentFeedback) {
+            setTimeout(() => {
+                setIsSet(false);
+            }, 3000);
+        }
+    }, [sentFeedback])
 
     const [IsError, setError] = useState<string | null>(null)
     const [completed, setCompleted] = useState<boolean>(false)
@@ -304,6 +429,10 @@ const Settings: React.FC = () => {
         visible: { opacity: 1, y: 0 },
         exit: { opacity: 0, y: -20 },
     };
+
+    const [feedbackType, setFeedbackType] = useState('General Feedback');
+    const [description, setDescription] = useState('');
+    const [rating, setRating] = useState<number | any>(3);
 
 
     return (
@@ -493,7 +622,6 @@ const Settings: React.FC = () => {
                 <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
                     <div>
                         <div className='text-xl font-bold'>Password</div>
-                        <p className="text-[#888] text-sm">Manage your account preferences, privacy, and system settings to customize your experience.</p>
                     </div>
 
 
@@ -567,6 +695,105 @@ const Settings: React.FC = () => {
 
                     </div>
 
+
+                </div>
+
+                <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
+                    <div>
+                        <div className='text-xl font-bold'>Feedback</div>
+                    </div>
+                    {isErrorAttach !== null && (
+                        <motion.div
+                            className='w-full bg-red-500 p-2 mt-2 rounded-lg max-w-[305px] flex items-center gap-2 break-all'
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            variants={messageVariants}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <span className='text-xl'><BiSolidError /></span> {isErrorAttach}
+                        </motion.div>
+                    )}
+                    {sentFeedback && (
+                        <motion.div
+                            className='w-full bg-green-500 p-2 rounded-lg max-w-[505px] my-2 flex items-center gap-2 break-all'
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            variants={messageVariants}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <FaCheck /> Your feedback has been successfully submitted.
+
+                        </motion.div>
+                    )}
+
+
+                    <div className="mb-4 mt-5 w-full max-w-[300px]">
+                        <label htmlFor="feedbackType" className="block text-[#888] font-medium mb-2">Feedback Type</label>
+                        <select
+                            id="feedbackType"
+                            value={feedbackType}
+                            onChange={(e) => setFeedbackType(e.target.value)}
+                            className="w-full p-2  bg-[#222] border-[1px]  border-[#535353] outline-none rounded-md"
+                        >
+                            <option value="General Feedback">General Feedback</option>
+                            <option value="Bug Report">Bug Report</option>
+                            <option value="Feature Request">Feature Request</option>
+                        </select>
+                    </div>
+
+                    <div className="mb-4 w-full max-w-[300px]">
+                        <label htmlFor="description" className="block text-[#888] outline-none font-medium mb-2">Description</label>
+                        <textarea
+                            id="description"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            required
+
+                            className="w-full p-2  outline-none  bg-[#222] border-[1px]  border-[#535353] rounded-md resize-none"
+                        />
+
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="attachment" className="block text-[#888] font-medium mb-2">Attachment (Optional)</label>
+                        <input
+                            ref={fileInputRefAttachment}
+                            className='bg-[#222] border-[1px] border-[#535353] p-1 rounded-md w-full max-w-[200px] text-sm'
+                            type="file"
+                            placeholder='inamo'
+                            accept="image/png, image/jpeg, image/jpg, image/gif" // Accept specific image types
+                            onChange={handleFileChangeAttachment}
+                        />
+                    </div>
+
+                    <div className="mb-4 w-full max-w-[300px]">
+                        <label className="block  text-[#888] font-medium mb-2">Rate Our System (1-5)</label>
+                        <input
+                            type="range"
+                            min="1"
+                            max="5"
+                            value={rating}
+                            accept="image/png, image/jpeg, image/jpg, image/gif" // Accept specific image types
+                            onChange={(e) => setRating(e.target.value)}
+                            className="w-full"
+                        />
+                        <div className="text-gray-700 mt-1">Rating: {rating}</div>
+                    </div>
+
+                    <div
+                        onClick={() => {!loadingFeedBacks && sendFeedbacks() }}
+                        className='w-full max-w-[200px] bg-green-500 flex items-center justify-center rounded-lg text-center cursor-pointer border-[1px] border-[#535353] p-1'>
+                        {
+                            loadingFeedBacks ?
+                                <div className='w-[20px] h-[20px]'>
+                                    <Loader />
+                                </div>
+                                :
+                                "Send"
+                        }
+
+                    </div>
 
                 </div>
             </div>
