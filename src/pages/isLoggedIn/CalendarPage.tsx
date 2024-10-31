@@ -8,23 +8,30 @@ import { MdOutlineClass } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import { motion } from 'framer-motion'
 
+import Confetti from 'react-confetti'
+import Loader from '../../comps/Loader';
 
 const CalendarPage: React.FC = () => {
     const [user] = IsLoggedIn();
     const [events, setEvents] = useState<any>([]);
     const [currentWeekStart, setCurrentWeekStart] = useState<Date>(startOfWeek(new Date()));
+    const endOfWeek = addDays(currentWeekStart, 6);
+    const [isLoaded, setIsLoaded] = useState(false)
 
     useEffect(() => {
         if (user) {
             fetchAllDatas();
         }
-    }, [user]);
+    }, [user, isLoaded]);
 
     async function fetchAllDatas() {
         const tasks = await fetchUserTasks();
         const goals = await fetchUserGoals();
         const projects = await fetchUserProjects();
 
+        if (tasks && goals && projects) {
+            setIsLoaded(true)
+        }
         // Map combined data to event format required by the calendar
         const combinedData = [
             ...(tasks || []).map(item => {
@@ -121,6 +128,8 @@ const CalendarPage: React.FC = () => {
         setCurrentWeekStart(addDays(currentWeekStart, -7));
     };
 
+
+
     const renderDays = () => {
         const days = [];
         let hasEvents = false; // Flag to check if any events exist during the week
@@ -134,9 +143,9 @@ const CalendarPage: React.FC = () => {
             const day = addDays(currentWeekStart, i);
             const dailyEvents = events.filter((event: any) =>
                 format(event.start, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
-            );   
+            );
             const today = new Date();
-             const isToday = isSameDay(day, today);
+            const isToday = isSameDay(day, today);
 
             const dayLabel = isToday ? `${format(day, 'EEEE, MMMM do')} (today)` : format(day, 'EEEE, MMMM do');
 
@@ -192,51 +201,70 @@ const CalendarPage: React.FC = () => {
                         variants={itemAnimation}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
                     >
-                    <span className="font-bold text-lg mb-3">{dayLabel} </span>
-                        <div className='my-1 text-gray-500'>No Events</div>
+                        <span className="font-bold text-lg mb-3">{dayLabel} </span>
+                        <div className='my-1 text-gray-500'>No Deadlines</div>
                     </motion.div>
                 );
             }
         }
 
-        // Check if there were no events for the entire week
-        if (!hasEvents) {
+
+        if (isLoaded) {
+            if (!hasEvents && events != null) {
+                return (
+                    <motion.div
+                        className="col-span-full p-5 my-1 bg-[#313131] overflow-hidden rounded-lg h-full flex items-center justify-center text-center text-lg"
+                        initial="hidden"
+                        animate="visible"
+                        variants={itemAnimation}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
+                        Yahoo! no deadlines for this week.
+
+                        <Confetti
+                            width={window.innerWidth}
+                            height={window.innerHeight}
+                            numberOfPieces={100}
+                        />
+
+                    </motion.div>
+                );
+            }
+        } else {
             return (
-                <motion.div
-                    className="col-span-full my-1 bg-[#313131] rounded-lg h-full flex items-center justify-center text-center text-lg"
-                    initial="hidden"
-                    animate="visible"
-                    variants={itemAnimation}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                >
-                    Yahoo! No events for this week.
-                </motion.div>
-            );
+                <div className='w-[20px] h-[20px]'>
+                  <Loader />
+                </div>
+            )
         }
+
+        // Check if there were no events for the entire week
+
 
         return days;
     };
+
 
     return (
         <div>
             <Sidebar location='Events' />
             <div className={`ml-[86px] p-3 flex gap-3 flex-col h-[100dvh]  mr-[0px]`}>
                 <div className='h-auto w-full'>
-                    <div className='text-2xl font-bold'>Events</div>
+                    <div className='text-2xl font-bold'>Deadlines</div>
                     <div className='text-sm text-[#888]'>
                         Easily create, edit, and organize your notes in this section for a streamlined experience.
                     </div>
                 </div>
 
-              <div className='flex justify-start gap-2 flex-col-reverse items-start mt-2 sm:flex-row sm:justify-between'>
-              <div className="flex mb-4">
-                    <button onClick={prevWeek} className="bg-[#111] border-[1px] border-[#535353] p-2 rounded-lg mr-2">Previous Week</button>
-                    <button onClick={nextWeek} className="bg-[#111] border-[1px] border-[#535353] p-2 rounded-lg ">Next Week</button>
+                <div className='flex justify-start gap-2 flex-col-reverse items-start mt-2 sm:flex-row sm:justify-between'>
+                    <div className="flex mb-4">
+                        <button onClick={prevWeek} className="bg-[#111] hover:bg-[#222] border-[1px] border-[#535353] p-2 rounded-lg mr-2">Previous Week</button>
+                        <button onClick={nextWeek} className="bg-[#111] hover:bg-[#222]  border-[1px] border-[#535353] p-2 rounded-lg ">Next Week</button>
+                    </div>
+                    <div className="text-sm font-bold text-[#888]">
+                        ({format(currentWeekStart, 'MMM dd')} - {format(endOfWeek, 'MMM dd, yyyy')})
+                    </div>
                 </div>
-                <div className="text-sm font-bold text-[#888]">
-                    ({format(currentWeekStart, 'MMMM yyyy')})
-                </div>
-              </div>
                 <div className="flex flex-col h-full overflow-auto text-[#888]">
                     {renderDays()}
                 </div>

@@ -47,23 +47,21 @@ const Goals: React.FC = () => {
     const [originalData, setOriginalData] = useState<dataType[] | null>(null); // To store unfiltered data
     const nav = useNavigate()
     const [user] = IsLoggedIn()
+
     const [isSort, setSort] = useState(false)
     const [sortVal, setSortVal] = useState<string | null>(null);
 
-
+    const [isLoaded, setIsLoaded] = useState(false)
     const [sortMethodLoaded, setSortMethodLoaded] = useState<boolean>(false);
     const sortMethod = localStorage.getItem('sortMethodGoals');
 
 
     useEffect(() => {
-        console.log(sortMethod)
-
-        if (user && sortMethod && !sortMethodLoaded) {
+        if (user && sortMethod && !sortMethodLoaded && isLoaded) {
             setSortVal(sortMethod);
             setSortMethodLoaded(true); // Mark that the sort method has been loaded
-            console.log("Sort method loaded on initial render:", sortMethod);
         }
-    }, [user, sortMethod, sortMethodLoaded, sortVal]);
+    }, [user, sortMethod, sortMethodLoaded, isLoaded]);
 
 
 
@@ -85,7 +83,7 @@ const Goals: React.FC = () => {
 
 
     useEffect(() => {
-        if (user && sortVal) {
+        if (user || sortVal) {
             fetchGoalsByID()
             const subscription = supabase
                 .channel('public:goals')
@@ -129,6 +127,16 @@ const Goals: React.FC = () => {
         }
     };
 
+    function parseCategory(categoryString: string) {
+        const match = categoryString.match(/(.*) \((.*)\)/);
+        if (match) {
+            return {
+                type: match[1].trim(),
+                value: match[2].trim(),
+            };
+        }
+        return { type: '', value: '' };
+    }
 
     function returnSortTitle() {
         switch (sortVal) {
@@ -137,20 +145,23 @@ const Goals: React.FC = () => {
             case "Creation Date":
                 return "created_at";
             case "In progress":
-                return "deadline";  // Sort by deadline for active tasks
+                return "deadline";
             case "Completed":
             case "Failed":
-                return "is_done";  // Completed/Failed based on is_done and deadline
+                return "is_done";
             default:
+                if (sortVal?.startsWith("Category")) {
+                    return "category";
+                }
                 return "created_at";
         }
     }
 
-
     async function fetchGoalsByID() {
         try {
+            setIsLoaded(false)
             const columnName = returnSortTitle();
-    
+
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
@@ -158,48 +169,58 @@ const Goals: React.FC = () => {
                 .order(columnName || "created_at", {
                     ascending: sortVal === "Completed" ? false : sortVal === "Failed" ? true : true,
                 });
-    
+
+
+
             if (error) {
                 console.error('Error fetching data:', error);
+
             } else {
-                // Separate goals based on sortVal criteria and then combine
+                console.log(data)
                 let primaryGoals: any = [];
-                let otherGoals:any= [];
-    
+                let otherGoals: any = [];
+                setIsLoaded(true)
                 const now = new Date();
-    
+                // Extract the target category from sortVal, if applicable
+                const targetCategory = sortVal?.split(" (")[1]?.slice(0, -1); // Extract the type from sortVal
+
                 data.forEach(goal => {
                     const deadline = new Date(goal.deadline);
-                    
+                    const categoryParsed = parseCategory(`Category (${goal?.category})`);
+                    // Sorting logic based on sortVal
                     if (sortVal === "In progress" && deadline > now && !goal.is_done) {
                         primaryGoals.push(goal);
                     } else if (sortVal === "Failed" && deadline < now && !goal.is_done) {
                         primaryGoals.push(goal);
                     } else if (sortVal === "Completed" && goal.is_done) {
                         primaryGoals.push(goal);
+                    } else if (targetCategory && categoryParsed.value === targetCategory) {
+
+                        primaryGoals.push(goal);
                     } else {
-                        // Place any goals that don’t match sortVal criteria here
                         otherGoals.push(goal);
                     }
                 });
-    
-                // Combine primary and other goals so primaryGoals are shown first
+
+                // Combine primary and other goals
                 const sortedData = [...primaryGoals, ...otherGoals];
-    
-                // Reverse if sorting by "Creation Date"
-                if (sortVal === 'Creation Date') {
-                    setFetchedData(sortedData.reverse());
-                } else {
-                    setFetchedData(sortedData);
+
+                // Check if sorting is by Creation Date, reverse if necessary
+                if (isLoaded) {
+                    if (sortVal === 'Creation Date') {
+                        setFetchedData(sortedData.reverse());
+                    } else {
+                        setFetchedData(sortedData);
+                    }
                 }
-                
+
+                // Store original data for potential future use
                 setOriginalData(sortedData);
             }
         } catch (err) {
-            console.log(err);
+            console.error('An error occurred:', err);
         }
     }
-    
 
     function determineDate(date: string): string {
         const deadline = new Date(date);
@@ -263,38 +284,38 @@ const Goals: React.FC = () => {
     }
 
 
-        function isFailed(deadlineString: string, boolVal: boolean) {
+    function isFailed(deadlineString: string, boolVal: boolean) {
 
-            const deadline = new Date(deadlineString);
-            const now = new Date();
-            deadline.setHours(0, 0, 0, 0);
-            now.setHours(0, 0, 0, 0);
+        const deadline = new Date(deadlineString);
+        const now = new Date();
+        deadline.setHours(0, 0, 0, 0);
+        now.setHours(0, 0, 0, 0);
 
-            // Calculate difference in time
-            const timeDiff = deadline.getTime() - now.getTime();
-            const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        // Calculate difference in time
+        const timeDiff = deadline.getTime() - now.getTime();
+        const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-            if (daysDiff > 0 && !boolVal) {
-                // If the deadline is in the future
-                return (
-                    <>                                           <MdOutlineQueryStats />In progress</>
-                );
-            } else if (daysDiff > 0 && boolVal) {
-                return (
-                    <div className='text-sm text-[#2ecc71] flex gap-1 items-center'>
-                        <MdOutlineQueryStats />   Completed
-                    </div>
-                )
-            }
-
-            else {
-                return (
-                    <div className='text-sm text-[#cc0e00] flex gap-1 items-center'>
-                        <MdOutlineQueryStats />     Failed
-                    </div>
-                );
-            }
+        if (daysDiff > 0 && !boolVal) {
+            // If the deadline is in the future
+            return (
+                <>                                           <MdOutlineQueryStats />In progress</>
+            );
+        } else if (daysDiff > 0 && boolVal) {
+            return (
+                <div className='text-sm text-[#2ecc71] flex gap-1 items-center'>
+                    <MdOutlineQueryStats />   Completed
+                </div>
+            )
         }
+
+        else {
+            return (
+                <div className='text-sm text-[#cc0e00] flex gap-1 items-center'>
+                    <MdOutlineQueryStats />     Failed
+                </div>
+            );
+        }
+    }
 
 
 
@@ -351,9 +372,14 @@ const Goals: React.FC = () => {
                         />
                     </div>
                     <div className='flex flex-wrap gap-3 mt-2 pb-5'>
-                        {fetchedData?.length === 0 &&
+                        {fetchedData?.length === 0 && searchVal != "" &&
                             <div className='text-sm text-[#888] mt-2'>
                                 No result
+                            </div>
+                        }
+                        {fetchedData?.length === 0 && searchVal === "" &&
+                            <div className='text-sm text-[#888] mt-2'>
+                                Create your first goal!
                             </div>
                         }
                         {

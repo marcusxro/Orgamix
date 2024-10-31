@@ -21,6 +21,7 @@ import useNotification from './comps/Notifs';
 import { supabase } from './supabase/supabaseClient';
 import IsLoggedIn from './firebase/IsLoggedIn';
 import CalendarPage from './pages/isLoggedIn/CalendarPage';
+import Settings from './pages/isLoggedIn/Settings';
 
 
 function App() {
@@ -138,6 +139,10 @@ function Main() {
         <Route path='/user/projects/view/:uid/:time' element={<Samp />} />
 
         <Route path='/user/calendar' element={<CalendarPage />} />
+        
+        <Route path='/user/settings' element={<Settings />} />
+
+
         <Route path='/test' element={<TestUpload />} />
 
       </Routes>

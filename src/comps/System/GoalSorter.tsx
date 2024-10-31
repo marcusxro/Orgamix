@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import useStore from '../../Zustand/UseStore';
 
@@ -8,7 +8,8 @@ interface closerType {
 
 const GoalSorter: React.FC<closerType> = ({ closer }) => {
     const [isExiting, setIsExiting] = useState(false);
-
+    const [CaterSelect, setCater] = useState<string>("")
+    
     const [selectedSort, setSelectedSort] = useState<string>(localStorage.getItem('sortMethodGoals') || '')
 
     const handleOutsideClick = () => {
@@ -18,12 +19,40 @@ const GoalSorter: React.FC<closerType> = ({ closer }) => {
             setIsExiting(false);
         }, 300);
     };
+    function parseCategory(categoryString: string) {
+        const match = categoryString.match(/(.*) \((.*)\)/);
+        if (match) {
+            return {
+                type: match[1].trim(),
+                value: match[2].trim(),
+            };
+        }
+        return { type: '', value: '' };
+    }
+    useEffect(() => {
+        if (selectedSort && selectedSort.includes("Category (")) {
+            const data = parseCategory(selectedSort);
+            setCater(data.value);
+            setSelectedSort(data.type || "");
+        }
+    }, [selectedSort]);
+
 
     function saveSortMethod() {
         try {
-            localStorage.setItem('sortMethodGoals', selectedSort);
-            closer(false);
-            window.location.reload()
+
+            if(selectedSort === "Category") {
+                if(CaterSelect === "") return
+                const newVal = `Category (${CaterSelect})`
+                console.log(newVal)
+                localStorage.setItem('sortMethodGoals', newVal);
+                closer(false);
+                window.location.reload()
+            } else {
+                localStorage.setItem('sortMethodGoals', selectedSort);
+                closer(false);
+                window.location.reload()
+            }
         } catch (error) {
             console.error('Failed to save the sort method', error);
         }
@@ -80,7 +109,7 @@ const GoalSorter: React.FC<closerType> = ({ closer }) => {
                                 className={`${selectedSort === 'In progress' && 'bg-blue-500'} px-5 py-1 border-[#535353] border-[1px] rounded-lg cursor-pointer`}>
                                 In progress</div>
 
-                                <div
+                            <div
                                 onClick={() => {
                                     setSelectedSort('Completed')
                                 }}
@@ -88,12 +117,19 @@ const GoalSorter: React.FC<closerType> = ({ closer }) => {
                                 Completed</div>
 
 
-                                <div
+                            <div
                                 onClick={() => {
                                     setSelectedSort('Failed')
                                 }}
                                 className={`${selectedSort === 'Failed' && 'bg-blue-500'} px-5 py-1 border-[#535353] border-[1px] rounded-lg cursor-pointer`}>
                                 Failed</div>
+
+                            <div
+                                onClick={() => {
+                                    setSelectedSort('Category')
+                                }}
+                                className={`${selectedSort === 'Category' && 'bg-blue-500'} px-5 py-1 border-[#535353] border-[1px] rounded-lg cursor-pointer`}>
+                                Category</div>
 
                             {/* <div
                     onClick={() => {
@@ -126,17 +162,43 @@ const GoalSorter: React.FC<closerType> = ({ closer }) => {
                                 None</div>
 
                         </div>
-
+                        {
+                            selectedSort === 'Category' &&
+                            <select
+                                value={CaterSelect}
+                                onChange={(e) => { setCater(e.target.value) }}
+                                className='p-2 rounded-lg border-[#535353] border-[1px] outline-none'>
+                                <option value="">Select Category</option>
+                                <option value="Work">Work</option>
+                                <option value="Personal">Personal</option>
+                                <option value="Fitness">Fitness</option>
+                                <option value="Education">Education</option>
+                                <option value="Health">Health</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Travel">Travel</option>
+                                <option value="Hobbies">Hobbies</option>
+                                <option value="Relationships">Relationships</option>
+                                <option value="Spiritual">Spiritual</option>
+                                <option value="Career">Career</option>
+                                <option value="Self-Development">Self-Development</option>
+                                <option value="Home">Home</option>
+                                <option value="Community">Community</option>
+                                <option value="Creativity">Creativity</option>
+                                <option value="Environment">Environment</option>
+                                <option value="Volunteering">Volunteering</option>
+                                <option value="Family">Family</option>
+                            </select>
+                        }
                         <div className='flex gap-2 mt-auto'>
+                        <div
+                                onClick={() => { handleOutsideClick() }}
+                                className='w-full p-2 bg-[#684444] text-center rounded-lg border-[#535353] border-[1px] hover:bg-[#535353] cursor-pointer'>
+                                Close
+                            </div>
                             <div
                                 onClick={() => { saveSortMethod() }}
                                 className={`w-full p-2 border-[#535353] border-[1px]  bg-[#43573e] text-center rounded-lg hover:bg-[#535353] cursor-pointer`}>
                                 Save
-                            </div>
-                            <div
-                                onClick={() => { handleOutsideClick() }}
-                                className='w-full p-2 bg-[#684444] text-center rounded-lg border-[#535353] border-[1px] hover:bg-[#535353] cursor-pointer'>
-                                Close
                             </div>
                         </div>
                     </motion.div>

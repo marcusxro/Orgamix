@@ -137,7 +137,7 @@ const Notes = () => {
                 console.error(error)
             } else {
                 const sortedData = sortVal === 'Creation Date' ? data.reverse() : data;
-
+                console.log(data)
                 setFetchedData(sortedData)
                 setFilteredData(sortedData)
             }
@@ -221,18 +221,23 @@ const Notes = () => {
                             </div>
                         </div>
 
-                        <div className='flex gap-3 flex-wrap w-full'>
+                        <div className='flex gap-3 mt-5 flex-wrap w-full'>
                             {
                                 filteredData?.length === 0 && searchVal != "" &&
                                 <div className='text-sm text-[#888]'>No result</div>
                             }
+                              {
+                                filteredData?.length === 0 && searchVal === ""  &&
+                                <div className='text-sm text-[#888]'>Write your first note!</div>
+                            }
+
+                            
                             {
                                 filteredData === null ?
                                     <div className='w-[20px] h-[20px]'>
                                         <Loader />
                                     </div>
                                     :
-
                                     <AnimatePresence>
                                         {
                                             filteredData && filteredData?.map((itm: fetchedDataType, idx: number) => (

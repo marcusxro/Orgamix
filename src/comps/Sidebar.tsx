@@ -4,7 +4,7 @@ import { GoTasklist } from "react-icons/go";
 import { FaRegNoteSticky } from "react-icons/fa6";
 import { LuGoal } from "react-icons/lu";
 import { GoProjectSymlink } from "react-icons/go";
-import { AiOutlineAudit } from "react-icons/ai";
+import { MdDateRange } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { supabase } from '../supabase/supabaseClient';
 import IsLoggedIn from '../firebase/IsLoggedIn';
@@ -351,9 +351,9 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
                     className={`${location === "Events" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
 
                     <div className='text-2xl'>
-                        <AiOutlineAudit />
+                        <MdDateRange />
                     </div>
-                    <span>Events</span>
+                    <span>Deadlines</span>
                 </div>
 
             </div>
@@ -361,7 +361,7 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
             <div className='border-t-[.1px] border-t-[#303030] mt-auto pt-1'>
                 <div
                     onClick={() => { viewNotifFunc() }}
-                    className={`${location === "Settings" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
+                    className={`${location === "Notfication" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
                     <div className='text-2xl relative'>
                         <IoIosNotifications />
                         {
@@ -378,8 +378,8 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
 
                 </div>
                 <div
-                    onClick={() => { navigateToPages("/user/tasks") }}
-                    className={`${location === "Settings" && 'bg-[#414141]'}  btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
+                    onClick={() => { navigateToPages("/user/settings") }}
+                    className={`${location === "Settings" && 'bg-[#414141]'} mt-2  btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}>
                     <div className='text-2xl'>
                         <IoSettingsOutline />
                     </div>

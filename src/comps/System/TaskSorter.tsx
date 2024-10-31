@@ -108,16 +108,17 @@ const TaskSorter: React.FC<closerType> = ({ closer }) => {
                         </div>
 
                         <div className='flex gap-2 mt-auto'>
+                        <div
+                                onClick={() => { handleOutsideClick() }}
+                                className='w-full p-2 bg-[#684444] text-center rounded-lg border-[#535353] border-[1px] hover:bg-[#535353] cursor-pointer'>
+                                Close
+                            </div>
                             <div
                                 onClick={() => { saveSortMethod() }}
                                 className={`w-full p-2 border-[#535353] border-[1px]  bg-[#43573e] text-center rounded-lg hover:bg-[#535353] cursor-pointer`}>
                                 Save
                             </div>
-                            <div
-                                onClick={() => { handleOutsideClick() }}
-                                className='w-full p-2 bg-[#684444] text-center rounded-lg border-[#535353] border-[1px] hover:bg-[#535353] cursor-pointer'>
-                                Close
-                            </div>
+
                         </div>
                     </motion.div>
                 </motion.div>

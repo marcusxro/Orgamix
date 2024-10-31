@@ -302,7 +302,7 @@ const Tasks: React.FC = () => {
 
     const { isShowAdd, setIsShowAdd }: any = useStore();
     const { viewTask, setViewTask } = useStore();
-    
+
     return (
         <div className='w-full h-full relative'>
             <Sidebar location='Tasks' />
@@ -382,12 +382,20 @@ const Tasks: React.FC = () => {
 
                     <div className='mt-4 grid gap-3 grid-cols-1 w-full xs:hidden sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 pb-[10px]'>
                         {
-                            tabItem === 'Pending' && filteredObj && filteredObj.length === 0 &&
+                            tabItem === 'Pending' && filteredObj && filteredObj.length === 0 && searchVal != "" &&
                             <div className='text-sm text-[#888]'>No result</div>
+                        }
+                        {
+                            tabItem === 'Pending' && filteredObj && filteredObj.length === 0 && searchVal === "" &&
+                            <div className='text-sm text-[#888]'>Create your first task!</div>
                         }
 
                         {
-                            tabItem !== 'Pending' && filteredComp && filteredComp.length === 0 &&
+                            tabItem !== 'Pending' && filteredComp && filteredComp.length === 0 && searchVal === "" &&
+                            <div className='text-sm text-[#888]'>No completed tasks yet</div>
+                        }
+                          {
+                            tabItem !== 'Pending' && filteredComp && filteredComp.length === 0 && searchVal != "" &&
                             <div className='text-sm text-[#888]'>No result</div>
                         }
                         {
