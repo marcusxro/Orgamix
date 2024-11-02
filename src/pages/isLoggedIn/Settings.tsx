@@ -10,6 +10,8 @@ import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 
 import { BiSolidError } from "react-icons/bi";
 import { FaCheck } from "react-icons/fa";
 import { motion } from 'framer-motion';
+import { IoIosLogOut } from "react-icons/io";
+import Footer from '../../comps/Footer'
 
 interface pubsType {
     publicUrl: string
@@ -191,22 +193,19 @@ const Settings: React.FC = () => {
     const [loadingFeedBacks, setLoadingFeedBacks] = useState<boolean>(false)
 
     const uploadImageAttachment = async () => {
-        console.log("proceeding")
-        console.log(fileAttachment)
+        setLoadingFeedBacks(true)
 
         if (!fileAttachment || !user) {
             return false; // Return false if no file or user
         }
 
-        console.log("proceeding")
+
         try {
             const compressedFile = await imageCompression(fileAttachment, {
                 maxSizeMB: 0.2,
                 useWebWorker: true,
                 maxWidthOrHeight: 500
             });
-
-            console.log("proceeding")
             const timestamp = Date.now(); // Get the current timestamp
             const newFileName = `${timestamp}-${fileAttachment.name}`; // Create a unique file name
             const filePath = `attachments/${user.uid}/${newFileName}`; // Use the new unique file name
@@ -223,7 +222,6 @@ const Settings: React.FC = () => {
                 console.log('File uploaded successfully:', data);
                 setFileAttachment(null);
                 setIsErrorAttach(null)
-                setLoadingFeedBacks(true)
                 if (fileInputRefAttachment.current) {
                     fileInputRefAttachment.current.value = ''; // Clear file input
                 }
@@ -239,12 +237,13 @@ const Settings: React.FC = () => {
     const [sentFeedback, setIsSet] = useState<boolean>(false)
 
     async function sendFeedbacks() {
-        // First, upload the image and check if it was successful
-        setLoadingFeedBacks(false)
 
         const uploadSuccessful = await uploadImageAttachment();
 
-        if (!feedbackType || !description || !rating) return
+        if (!feedbackType || !description || !rating) {
+            setLoadingFeedBacks(false)
+            return
+        }
 
         try {
             const { error } = await supabase
@@ -260,7 +259,7 @@ const Settings: React.FC = () => {
 
             if (error) {
                 console.error('Error inserting feedback:', error);
-                setLoadingFeedBacks(true)
+                setLoadingFeedBacks(false)
             } else {
                 console.log('Feedback submitted successfully.');
                 setFeedbackType("General Feedback")
@@ -270,8 +269,8 @@ const Settings: React.FC = () => {
                 setIsSet(true)
             }
         } catch (err) {
-            setLoadingFeedBacks(true)
-            console.log('Error in sendFeedbacks():', err);
+            setLoadingFeedBacks(false)
+            console.log('Error in sendFeedbacks:', err);
         }
     }
 
@@ -436,366 +435,381 @@ const Settings: React.FC = () => {
 
 
     return (
-        <div className='mb-5'>
+        <div>
             <Sidebar location='Settings' />
 
-            <div className={`ml-[86px] p-3 flex gap-3 flex-col h-[100dvh] mr-[0px]`}>
-                <div>
-                    <div className='text-2xl font-bold'>Settings</div>
-                    <p className="text-[#888] text-sm">Manage your account preferences, privacy, and system settings to customize your experience.</p>
-                </div>
-
-                <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
-                    <div className=''>
-                        <div className='text-xl font-bold'>Profile Details</div>
+            <div className='flex flex-col w-full max-w-[1300px] mx-auto'>
+                <div className={`ml-[86px] p-3  flex gap-3 flex-col h-auto `}>
+                    <div>
+                        <div className='text-2xl font-bold'>Settings</div>
+                        <p className="text-[#888] text-sm">Manage your account preferences, privacy, and system settings to customize your experience.</p>
                     </div>
 
-                    <div className='mt-8'>
-                        {isCompletedPfp && (
-                            <motion.div
-                                className='w-full bg-green-500 p-2 rounded-lg max-w-[305px] my-2 flex items-center gap-2 break-all'
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit"
-                                variants={messageVariants}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <FaCheck /> Profile successfully changed!
-                            </motion.div>
-                        )}
-
-                        {isErrorPfp !== null && (
-                            <motion.div
-                                className='w-full bg-red-500 p-2 rounded-lg mb-2 max-w-[305px] flex items-center gap-2 break-all'
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit"
-                                variants={messageVariants}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <span className='text-xl'><BiSolidError /></span> {isErrorPfp}
-                            </motion.div>
-                        )}
-
-                        <div className='flex gap-7 items-center'>
-                            <div className='flex flex-col gap-2'>
-
-                                <div className='h-[5em] w-[5em] rounded-full border-[1px] bg-white border-[#535353]'>
-                                    {
-                                        imageUrl && imageUrl.publicUrl ? (
-                                            <img src={changedImage || imageUrl.publicUrl} alt="Profile Preview" className='w-full h-full rounded-full object-cover' />
-                                        ) : (
-                                            <img src={changedImage ? changedImage : NoUserProfile} className='w-full h-full rounded-full object-cover' />
-                                        )
-                                    }
-
-                                </div>
-                            </div>
-
-
-                            <div className='flex gap-2 flex-col'>
-                                <input
-                                    ref={fileInputRef}
-                                    className='bg-[#222] border-[1px] border-[#535353] p-1 rounded-md w-full max-w-[200px] text-sm'
-                                    type="file"
-                                    placeholder='inamo'
-                                    accept="image/png, image/jpeg, image/jpg, image/gif" // Accept specific image types
-                                    onChange={handleFileChange}
-                                />
-                                <div
-                                    onClick={() => { isAllowed && !loading && uploadImage() }}
-                                    className={`${isAllowed ? 'bg-[#222] cursor-pointer' : 'bg-[#888] cursor-not-allowed'}  hover:bg-[#888] flex items-center justify-center border-[1px] 
-                                border-[#535353] p-1 rounded-md w-full max-w-[200px] text-sm`}>
-                                    {
-                                        loading ?
-                                            <div className='w-[20px] h-[20px]'>
-                                                <Loader />
-                                            </div>
-                                            :
-                                            "Upload"
-                                    }
-
-                                </div>
-                            </div>
-
+                    <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
+                        <div className=''>
+                            <div className='text-xl font-bold'>Profile Details</div>
                         </div>
 
-
-                        <div className='mt-9 border-t-[1px] border-t-[#535353] pt-3'>
-                            <div className='mb-5'>Edit account</div>
-                            {isCompletedName && (
+                        <div className='mt-8'>
+                            {isCompletedPfp && (
                                 <motion.div
-                                    className='w-full bg-green-500 p-2 rounded-lg max-w-[605px] my-2 flex items-center gap-2 break-all'
+                                    className='w-full bg-green-500 p-2 rounded-lg max-w-[305px] my-2 flex items-center gap-2 break-all'
                                     initial="hidden"
                                     animate="visible"
                                     exit="exit"
                                     variants={messageVariants}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    <FaCheck /> Details successfully changed!
+                                    <FaCheck /> Profile successfully changed!
                                 </motion.div>
                             )}
-                            <div className='flex gap-2'>
-                                <div className='flex gap-2 flex-col w-full max-w-[300px]'>
-                                    <input
-                                        readOnly={isEdit}
-                                        value={username}
-                                        onChange={(e) => { setUsername(e.target.value) }}
-                                        className={`${isEdit === true ? "text-[#888]" : "text-white"} bg-[#222] border-[1px] border-[#535353] w-full rounded-lg py-1 px-3 outline-none`}
-                                        type="text" placeholder='Username' />
-                                    <input
-                                        value={fetchedData != null && fetchedData[0]?.userid || ""}
-                                        className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'
-                                        type="text" placeholder='Full name' />
-                                </div>
 
+                            {isErrorPfp !== null && (
+                                <motion.div
+                                    className='w-full bg-red-500 p-2 rounded-lg mb-2 max-w-[305px] flex items-center gap-2 break-all'
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                    variants={messageVariants}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <span className='text-xl'><BiSolidError /></span> {isErrorPfp}
+                                </motion.div>
+                            )}
 
-                                <div className='flex gap-2 flex-col items-start w-full max-w-[300px]'>
-                                    <input
-                                        value={fetchedData != null && fetchedData[0]?.email || ""}
-                                        className='bg-[#222] border-[1px] border-[#535353] text-[#888] w-full rounded-lg py-1 px-3 outline-none'
-                                        type="text" placeholder='Email' />
-                                    <div className='flex gap-2 w-full '>
-                                        <button
-                                            onClick={() => { setIsEdit(prevs => !prevs) }}
-                                            className={`${isEdit ? "bg-blue-500" : "bg-red-500"}  border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none`}>
-                                            {
-                                                isEdit ?
-                                                    "Edit"
-                                                    :
-                                                    "Cancel"
-                                            }
-                                        </button>
+                            <div className='flex gap-7 items-center'>
+                                <div className='flex flex-col gap-2'>
+
+                                    <div className='h-[5em] w-[5em] rounded-full border-[1px] bg-white border-[#535353]'>
                                         {
-                                            !isEdit &&
-                                            <button
-                                                onClick={() => { editUserName() }}
-                                                className={`bg-green-500 flex items-center justify-center  border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none`}>
-                                                {
-                                                    isLoadingName ?
-                                                        <div className='w-[20px] h-[20px]'>
-                                                            <Loader />
-                                                        </div>
-                                                        :
-                                                        "Save"
-                                                }
-                                            </button>
+                                            imageUrl && imageUrl.publicUrl ? (
+                                                <img src={changedImage || imageUrl.publicUrl} alt="Profile Preview" className='w-full h-full rounded-full object-cover' />
+                                            ) : (
+                                                <img src={changedImage ? changedImage : NoUserProfile} className='w-full h-full rounded-full object-cover' />
+                                            )
                                         }
 
                                     </div>
                                 </div>
+
+
+                                <div className='flex gap-2 flex-col'>
+                                    <input
+                                        ref={fileInputRef}
+                                        className='bg-[#222] border-[1px] border-[#535353] p-1 rounded-md w-full max-w-[200px] text-sm'
+                                        type="file"
+                                        placeholder='inamo'
+                                        accept="image/png, image/jpeg, image/jpg, image/gif" // Accept specific image types
+                                        onChange={handleFileChange}
+                                    />
+                                    <div
+                                        onClick={() => { isAllowed && !loading && uploadImage() }}
+                                        className={`${isAllowed ? 'bg-[#222] cursor-pointer' : 'bg-[#888] cursor-not-allowed'}  hover:bg-[#888] flex items-center justify-center border-[1px] 
+                                border-[#535353] p-1 rounded-md w-full max-w-[200px] text-sm`}>
+                                        {
+                                            loading ?
+                                                <div className='w-[20px] h-[20px]'>
+                                                    <Loader />
+                                                </div>
+                                                :
+                                                "Upload"
+                                        }
+
+                                    </div>
+                                </div>
+
                             </div>
+
 
                             <div className='mt-9 border-t-[1px] border-t-[#535353] pt-3'>
-
-                                <div className='mb-2'>Other information</div>
-                                <div className='pt-3 flex gap-2'>
-
-
-                                    <div className='w-full max-w-[300px] flex flex-col gap-2'>
-                                        <div className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'>
-                                            Banned: <span>False</span>
-                                        </div>
-                                        <div className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'>
-                                            Created at:  <span>{moment(user?.metadata?.createdAt * (user?.metadata?.createdAt.toString().length === 10 ? 1000 : 1)).format('MMMM Do YYYY, h:mm a')}</span>                                  </div>
+                                <div className='mb-5'>Edit account</div>
+                                {isCompletedName && (
+                                    <motion.div
+                                        className='w-full bg-green-500 p-2 rounded-lg max-w-[605px] my-2 flex items-center gap-2 break-all'
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="exit"
+                                        variants={messageVariants}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <FaCheck /> Details successfully changed!
+                                    </motion.div>
+                                )}
+                                <div className='flex gap-2'>
+                                    <div className='flex gap-2 flex-col w-full max-w-[300px]'>
+                                        <input
+                                            readOnly={isEdit}
+                                            value={username}
+                                            onChange={(e) => { setUsername(e.target.value) }}
+                                            className={`${isEdit === true ? "text-[#888]" : "text-white"} bg-[#222] border-[1px] border-[#535353] w-full rounded-lg py-1 px-3 outline-none`}
+                                            type="text" placeholder='Username' />
+                                        <input
+                                            value={fetchedData != null && fetchedData[0]?.userid || ""}
+                                            className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'
+                                            type="text" placeholder='Full name' />
                                     </div>
-                                    <div className='w-full max-w-[300px] flex flex-col gap-2'>
-                                        <div className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'>
-                                            Provider: <span>{user?.providerData[0]?.providerId}</span>
-                                        </div>
-                                        <div className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'>
-                                            Created at:  <span>{moment(user?.metadata?.createdAt * (user?.metadata?.createdAt.toString().length === 10 ? 1000 : 1)).format('MMMM Do YYYY, h:mm a')}</span>                                  </div>
-                                    </div>
 
+
+                                    <div className='flex gap-2 flex-col items-start w-full max-w-[300px]'>
+                                        <input
+                                            value={fetchedData != null && fetchedData[0]?.email || ""}
+                                            className='bg-[#222] border-[1px] border-[#535353] text-[#888] w-full rounded-lg py-1 px-3 outline-none'
+                                            type="text" placeholder='Email' />
+                                        <div className='flex gap-2 w-full '>
+                                            <button
+                                                onClick={() => { setIsEdit(prevs => !prevs) }}
+                                                className={`${isEdit ? "bg-blue-500" : "bg-red-500"}  border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none`}>
+                                                {
+                                                    isEdit ?
+                                                        "Edit"
+                                                        :
+                                                        "Cancel"
+                                                }
+                                            </button>
+                                            {
+                                                !isEdit &&
+                                                <button
+                                                    onClick={() => { editUserName() }}
+                                                    className={`bg-green-500 flex items-center justify-center  border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none`}>
+                                                    {
+                                                        isLoadingName ?
+                                                            <div className='w-[20px] h-[20px]'>
+                                                                <Loader />
+                                                            </div>
+                                                            :
+                                                            "Save"
+                                                    }
+                                                </button>
+                                            }
+
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+
+                                <div className='mt-9 border-t-[1px] border-t-[#535353] pt-3'>
+
+                                    <div className='mb-2'>Other information</div>
+                                    <div className='pt-3 flex gap-2'>
 
 
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-
-                <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
-                    <div>
-                        <div className='text-xl font-bold'>Password</div>
-                    </div>
-
-
-
-                    <div className='mt-9 border-t-[1px] border-t-[#535353] pt-3 flex flex-col gap-2'>
-                        {/* Error Message */}
-                        {IsError !== null && (
-                            <motion.div
-                                className='w-full bg-red-500 p-2 rounded-lg max-w-[605px] flex items-center gap-2 break-all'
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit"
-                                variants={messageVariants}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <span className='text-xl'><BiSolidError /></span> {IsError}
-                            </motion.div>
-                        )}
-
-                        {/* Success Message */}
-                        {completed && (
-                            <motion.div
-                                className='w-full bg-green-500 p-2 rounded-lg max-w-[605px] flex items-center gap-2 break-all'
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit"
-                                variants={messageVariants}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <FaCheck /> Password successfully changed!
-                            </motion.div>
-                        )}
-
-                        <div className='flex gap-2 flex-col sm:flex-row'>
-                            <div className='w-full max-w-[full] sm:max-w-[300px] flex gap-2 flex-col'>
-                                <input
-                                    value={currentPassword}
-                                    onChange={(e) => { setCurr(e.target.value) }}
-                                    className='bg-[#222] border-[1px]  border-[#535353] w-full rounded-lg py-1 px-3 outline-none'
-                                    type="text" placeholder='Current password' />
-                                <input
-                                    value={newPass}
-                                    onChange={(e) => { setNewPass(e.target.value) }}
-                                    className={`${newPass != confirmPass && "text-red-500"} bg-[#222] border-[1px]  border-[#535353] w-full rounded-lg py-1 px-3 outline-none`}
-                                    type="text" placeholder='New password' />
-                            </div>
-
-                            <div className='w-full max-w-[full] sm:max-w-[300px] flex gap-2 flex-col'>
-                                <input
-                                    value={confirmPass}
-                                    onChange={(e) => { setConfirmPass(e.target.value) }}
-                                    className={`${newPass != confirmPass && "text-red-500"} bg-[#222] border-[1px]  border-[#535353] w-full rounded-lg py-1 px-3 outline-none`}
-                                    type="text" placeholder='Confirm password' />
-
-                                <button
-                                    onClick={() => {
-                                        (currentPassword != "" && newPass === confirmPass && newPass != "" && confirmPass != "") && handleChangePass()
-                                    }}
-                                    className={`${(currentPassword != "" && newPass === confirmPass && newPass != "" && confirmPass != "") ? "bg-green-500" : "bg-[#888]"} flex items-center justify-center  h-full rounded-lg w-full max-w-[200px] p-1`}>
-                                    {
-                                        loadingPass ?
-                                            <div className='w-[20px] h-[20px]'>
-                                                <Loader />
+                                        <div className='w-full max-w-[300px] flex flex-col gap-2'>
+                                            <div className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'>
+                                                Banned: <span>False</span>
                                             </div>
-                                            :
-                                            " Change password"
-                                    }
-                                </button>
+                                            <div className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'>
+                                                Created at:  <span>{moment(user?.metadata?.createdAt * (user?.metadata?.createdAt.toString().length === 10 ? 1000 : 1)).format('MMMM Do YYYY, h:mm a')}</span>                                  </div>
+                                        </div>
+                                        <div className='w-full max-w-[300px] flex flex-col gap-2'>
+                                            <div className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'>
+                                                Provider: <span>{user?.providerData[0]?.providerId}</span>
+                                            </div>
+                                            <div className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'>
+                                                Created at:  <span>{moment(user?.metadata?.createdAt * (user?.metadata?.createdAt.toString().length === 10 ? 1000 : 1)).format('MMMM Do YYYY, h:mm a')}</span>                                  </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
                             </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
+                        <div>
+                            <div className='text-xl font-bold'>Password</div>
+                        </div>
+
+
+
+                        <div className='mt-9 border-t-[1px] border-t-[#535353] pt-3 flex flex-col gap-2'>
+                            {/* Error Message */}
+                            {IsError !== null && (
+                                <motion.div
+                                    className='w-full bg-red-500 p-2 rounded-lg max-w-[605px] flex items-center gap-2 break-all'
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                    variants={messageVariants}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <span className='text-xl'><BiSolidError /></span> {IsError}
+                                </motion.div>
+                            )}
+
+                            {/* Success Message */}
+                            {completed && (
+                                <motion.div
+                                    className='w-full bg-green-500 p-2 rounded-lg max-w-[605px] flex items-center gap-2 break-all'
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                    variants={messageVariants}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <FaCheck /> Password successfully changed!
+                                </motion.div>
+                            )}
+
+                            <div className='flex gap-2 flex-col sm:flex-row'>
+                                <div className='w-full max-w-[full] sm:max-w-[300px] flex gap-2 flex-col'>
+                                    <input
+                                        value={currentPassword}
+                                        onChange={(e) => { setCurr(e.target.value) }}
+                                        className='bg-[#222] border-[1px]  border-[#535353] w-full rounded-lg py-1 px-3 outline-none'
+                                        type="text" placeholder='Current password' />
+                                    <input
+                                        value={newPass}
+                                        onChange={(e) => { setNewPass(e.target.value) }}
+                                        className={`${newPass != confirmPass && "text-red-500"} bg-[#222] border-[1px]  border-[#535353] w-full rounded-lg py-1 px-3 outline-none`}
+                                        type="text" placeholder='New password' />
+                                </div>
+
+                                <div className='w-full max-w-[full] sm:max-w-[300px] flex gap-2 flex-col'>
+                                    <input
+                                        value={confirmPass}
+                                        onChange={(e) => { setConfirmPass(e.target.value) }}
+                                        className={`${newPass != confirmPass && "text-red-500"} bg-[#222] border-[1px]  border-[#535353] w-full rounded-lg py-1 px-3 outline-none`}
+                                        type="text" placeholder='Confirm password' />
+
+                                    <button
+                                        onClick={() => {
+                                            (currentPassword != "" && newPass === confirmPass && newPass != "" && confirmPass != "") && handleChangePass()
+                                        }}
+                                        className={`${(currentPassword != "" && newPass === confirmPass && newPass != "" && confirmPass != "") ? "bg-green-500" : "bg-[#888]"} flex items-center justify-center  h-full rounded-lg w-full max-w-[200px] p-1`}>
+                                        {
+                                            loadingPass ?
+                                                <div className='w-[20px] h-[20px]'>
+                                                    <Loader />
+                                                </div>
+                                                :
+                                                " Change password"
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                    <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
+                        <div>
+                            <div className='text-xl font-bold'>Feedback</div>
+                        </div>
+                        {isErrorAttach !== null && (
+                            <motion.div
+                                className='w-full bg-red-500 p-2 mt-2 rounded-lg max-w-[305px] flex items-center gap-2 break-all'
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit"
+                                variants={messageVariants}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <span className='text-xl'><BiSolidError /></span> {isErrorAttach}
+                            </motion.div>
+                        )}
+                        {sentFeedback && (
+                            <motion.div
+                                className='w-full bg-green-500 p-2 rounded-lg max-w-[505px] my-2 flex items-center gap-2 break-all'
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit"
+                                variants={messageVariants}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <FaCheck /> Your feedback has been successfully submitted.
+
+                            </motion.div>
+                        )}
+
+
+                        <div className="mb-4 mt-5 w-full max-w-[300px]">
+                            <label htmlFor="feedbackType" className="block text-[#888] font-medium mb-2">Feedback Type</label>
+                            <select
+                                id="feedbackType"
+                                value={feedbackType}
+                                onChange={(e) => setFeedbackType(e.target.value)}
+                                className="w-full p-2  bg-[#222] border-[1px]  border-[#535353] outline-none rounded-md"
+                            >
+                                <option value="General Feedback">General Feedback</option>
+                                <option value="Bug Report">Bug Report</option>
+                                <option value="Feature Request">Feature Request</option>
+                            </select>
+                        </div>
+
+                        <div className="mb-4 w-full max-w-[300px]">
+                            <label htmlFor="description" className="block text-[#888] outline-none font-medium mb-2">Description</label>
+                            <textarea
+                                id="description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                required
+
+                                className="w-full p-2  outline-none  bg-[#222] border-[1px]  border-[#535353] rounded-md resize-none"
+                            />
+
+                        </div>
+                        <div className="mb-4">
+                            <label htmlFor="attachment" className="block text-[#888] font-medium mb-2">Attachment (Optional)</label>
+                            <input
+                                ref={fileInputRefAttachment}
+                                className='bg-[#222] border-[1px] border-[#535353] p-1 rounded-md w-full max-w-[200px] text-sm'
+                                type="file"
+                                placeholder='inamo'
+                                accept="image/png, image/jpeg, image/jpg, image/gif" // Accept specific image types
+                                onChange={handleFileChangeAttachment}
+                            />
+                        </div>
+
+                        <div className="mb-4 w-full max-w-[300px]">
+                            <label className="block  text-[#888] font-medium mb-2">Rate Our System (1-5)</label>
+                            <input
+                                type="range"
+                                min="1"
+                                max="5"
+                                value={rating}
+                                accept="image/png, image/jpeg, image/jpg, image/gif" // Accept specific image types
+                                onChange={(e) => setRating(e.target.value)}
+                                className="w-full"
+                            />
+                            <div className="text-gray-700 mt-1">Rating: {rating}</div>
+                        </div>
+
+                        <div
+                            onClick={() => { !loadingFeedBacks && sendFeedbacks() }}
+                            className={`${!description || !feedbackType ? 'bg-[#888]' : 'bg-green-500 '} w-full max-w-[200px] flex items-center justify-center rounded-lg text-center cursor-pointer border-[1px] border-[#535353] p-1`}>
+                            {
+                                loadingFeedBacks ?
+                                    <div className='w-[20px] h-[20px]'>
+                                        <Loader />
+                                    </div>
+                                    :
+                                    "Send"
+                            }
+
                         </div>
 
                     </div>
 
-
+                    <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
+                        <div className='flex gap-5 items-center'>
+                            <div className='text-xl font-bold'>Logout</div>
+                            <div className='bg-red-500 text-white p-3 rounded-lg cursor-pointer hover:bg-[#888]'>
+                                <IoIosLogOut />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
-                    <div>
-                        <div className='text-xl font-bold'>Feedback</div>
-                    </div>
-                    {isErrorAttach !== null && (
-                        <motion.div
-                            className='w-full bg-red-500 p-2 mt-2 rounded-lg max-w-[305px] flex items-center gap-2 break-all'
-                            initial="hidden"
-                            animate="visible"
-                            exit="exit"
-                            variants={messageVariants}
-                            transition={{ duration: 0.2 }}
-                        >
-                            <span className='text-xl'><BiSolidError /></span> {isErrorAttach}
-                        </motion.div>
-                    )}
-                    {sentFeedback && (
-                        <motion.div
-                            className='w-full bg-green-500 p-2 rounded-lg max-w-[505px] my-2 flex items-center gap-2 break-all'
-                            initial="hidden"
-                            animate="visible"
-                            exit="exit"
-                            variants={messageVariants}
-                            transition={{ duration: 0.2 }}
-                        >
-                            <FaCheck /> Your feedback has been successfully submitted.
-
-                        </motion.div>
-                    )}
-
-
-                    <div className="mb-4 mt-5 w-full max-w-[300px]">
-                        <label htmlFor="feedbackType" className="block text-[#888] font-medium mb-2">Feedback Type</label>
-                        <select
-                            id="feedbackType"
-                            value={feedbackType}
-                            onChange={(e) => setFeedbackType(e.target.value)}
-                            className="w-full p-2  bg-[#222] border-[1px]  border-[#535353] outline-none rounded-md"
-                        >
-                            <option value="General Feedback">General Feedback</option>
-                            <option value="Bug Report">Bug Report</option>
-                            <option value="Feature Request">Feature Request</option>
-                        </select>
-                    </div>
-
-                    <div className="mb-4 w-full max-w-[300px]">
-                        <label htmlFor="description" className="block text-[#888] outline-none font-medium mb-2">Description</label>
-                        <textarea
-                            id="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            required
-
-                            className="w-full p-2  outline-none  bg-[#222] border-[1px]  border-[#535353] rounded-md resize-none"
-                        />
-
-                    </div>
-                    <div className="mb-4">
-                        <label htmlFor="attachment" className="block text-[#888] font-medium mb-2">Attachment (Optional)</label>
-                        <input
-                            ref={fileInputRefAttachment}
-                            className='bg-[#222] border-[1px] border-[#535353] p-1 rounded-md w-full max-w-[200px] text-sm'
-                            type="file"
-                            placeholder='inamo'
-                            accept="image/png, image/jpeg, image/jpg, image/gif" // Accept specific image types
-                            onChange={handleFileChangeAttachment}
-                        />
-                    </div>
-
-                    <div className="mb-4 w-full max-w-[300px]">
-                        <label className="block  text-[#888] font-medium mb-2">Rate Our System (1-5)</label>
-                        <input
-                            type="range"
-                            min="1"
-                            max="5"
-                            value={rating}
-                            accept="image/png, image/jpeg, image/jpg, image/gif" // Accept specific image types
-                            onChange={(e) => setRating(e.target.value)}
-                            className="w-full"
-                        />
-                        <div className="text-gray-700 mt-1">Rating: {rating}</div>
-                    </div>
-
-                    <div
-                        onClick={() => {!loadingFeedBacks && sendFeedbacks() }}
-                        className='w-full max-w-[200px] bg-green-500 flex items-center justify-center rounded-lg text-center cursor-pointer border-[1px] border-[#535353] p-1'>
-                        {
-                            loadingFeedBacks ?
-                                <div className='w-[20px] h-[20px]'>
-                                    <Loader />
-                                </div>
-                                :
-                                "Send"
-                        }
-
-                    </div>
-
-                </div>
+            </div>
+            <div className='ml-[81px]'>
+                <Footer />
             </div>
         </div>
     )

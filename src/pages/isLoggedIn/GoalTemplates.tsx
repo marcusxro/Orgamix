@@ -22,6 +22,7 @@ import GetAuthor from '../../comps/System/GetAuthor';
 import ViewTemplate from '../../comps/System/ViewTemplate';
 import ReportGoal from '../../comps/System/ReportGoal';
 import { motion, AnimatePresence } from 'framer-motion';
+import Footer from '../../comps/Footer';
 
 
 interface subtaskType {
@@ -251,7 +252,7 @@ const GoalTemplates: React.FC = () => {
             </header>
 
 
-            <div className='mt-3 mx-auto max-w-[1200px] p-3'>
+            <div className='mt-3 mx-auto max-w-[1200px] p-3 min-h-[100vh]'>
                 <div className='flex flex-col gap-2'>
                     <div className='text-xl font-bold'>
                         Choose templates
@@ -472,7 +473,7 @@ const GoalTemplates: React.FC = () => {
             </div>
 
 
-
+            <Footer />
         </div>
     )
 }

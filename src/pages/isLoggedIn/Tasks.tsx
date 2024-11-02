@@ -14,6 +14,7 @@ import TaskSorter from '../../comps/System/TaskSorter'
 import Loader from '../../comps/Loader'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../../Zustand/UseStore'
+import { CiRepeat } from "react-icons/ci";
 
 
 interface taskDataType {
@@ -427,7 +428,9 @@ const Tasks: React.FC = () => {
                                                             <p className='text-[#888] break-all text-sm'>{itm?.description != '' ? itm?.description : 'No Description'}</p>
 
                                                             {itm?.repeat != '' &&
-                                                                <p className='text-[#888] break-all text-sm'>{itm?.repeat != '' && itm?.repeat}</p>
+                                                                <p className='text-[#888] flex gap-1  items-center my-2 break-all text-sm'> 
+                                                                <CiRepeat /> {itm?.repeat != '' && itm?.repeat}
+                                                                </p>
                                                             }
 
                                                             <div className='mt-auto pt-2 flex gap-4 text-[10px] md:text-sm'>

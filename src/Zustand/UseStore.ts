@@ -48,23 +48,21 @@ interface AppState {
     setIsSidebarHover: (params: boolean) => void;
     loading: boolean | null;
     setLoading: (params: boolean) => void;
-    
     viewEditTask: taskDataType | null;
     setViewEditTask: (params: taskDataType | null) => void;
-
-
     viewTask: taskDataType | null;
     setViewTask: (task: taskDataType | null) => void;
-
-
     isSort: boolean | null;
     setSort: (params: boolean) => void;
 
 
-    
 
     isShowAdd: boolean | null;
     setIsShowAdd: (params: boolean) => void;
+
+    
+    showMenu: boolean | null;
+    setShowMenu: (params: boolean) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -99,13 +97,10 @@ const useStore = create<AppState>((set) => ({
     setViewNotifs: (params: boolean) => set({ viewNotifs: params }),
     isSidebarHover: null,
     setIsSidebarHover: (params: boolean) => set({ isSidebarHover: params }),
-
     loading: null,
     setLoading: (params: boolean) => set({ loading: params }),
-
     viewEditTask: null,
     setViewEditTask: (taskData) => set({ viewEditTask: taskData }),
-            
     viewTask: null,
     setViewTask: (task) => set({ viewTask: task }),
 
@@ -114,6 +109,9 @@ const useStore = create<AppState>((set) => ({
 
     isShowAdd: false,
     setIsShowAdd: (params: boolean) => set({ isShowAdd: params }),
+
+    showMenu: false,
+    setShowMenu: (params: boolean) => set({ showMenu: params }),
 
 }));
 

@@ -33,6 +33,11 @@ body {
   background-color: #242424;
 }
 
+
+.reducedHeight{
+  line-height: 90%;
+}
+
 .centeredItem {
   position: absolute;
   left: 50%;
@@ -86,4 +91,11 @@ body {
   position: absolute;
   right: 0;
   top: 0;
+}
+
+
+.grid-overlay {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 35px 35px; /*  size of the grid cells */
 }

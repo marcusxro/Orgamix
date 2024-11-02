@@ -389,6 +389,7 @@ export default function Samp() {
             setWorkEnd("");
             setWorkStart("");
             setPriority("");
+            setSubtasks([])
 
         } catch (err) {
             console.log("Error adding task:", err);
