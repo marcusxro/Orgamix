@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 const Menu: React.FC = () => {
     const { showMenu, setShowMenu }: any = useStore()
     const [user] = IsLoggedIn()
-    const nav= useNavigate()
+    const nav = useNavigate()
     return (
         <div className='h-[100dvh] block md:hidden py-4 overflow-auto bg-[#111] fixed top-0 left-0 w-full z-[50000] p-3'>
             <header className='flex gap-5 items-center justify-between'>
@@ -37,26 +37,26 @@ const Menu: React.FC = () => {
             </header>
 
             <div className='mt-9 flex gap-2 flex-col '>
-              {
-                user ?
-                <div 
-                onClick={() => {nav('/user/dashboard')}}
-                className='w-full bg-white p-3 rounded-lg text-black font-bold text-center'>
-                Dashboard
-            </div> :
-            <div className='flex gap-2'>
-                  <div
-                          onClick={() => {nav('/sign-in')}}
-                   className='w-full bg-white p-3 rounded-lg text-black font-bold text-center'>
-                    Sign in
-                </div>
-                <div 
-                        onClick={() => {nav('/sign-up')}}
-                className='w-full bg-white p-3 rounded-lg text-black font-bold text-center'>
-                    Sign up
-                </div>
-            </div>
-              }
+                {
+                    user ?
+                        <div
+                            onClick={() => { nav('/user/dashboard'); setShowMenu(!showMenu) }}
+                            className='w-full bg-white p-3 rounded-lg text-black font-bold text-center'>
+                            Dashboard
+                        </div> :
+                        <div className='flex gap-2'>
+                            <div
+                                onClick={() => { nav('/sign-in'); setShowMenu(!showMenu) }}
+                                className='w-full bg-white p-3 rounded-lg text-black font-bold text-center'>
+                                Sign in
+                            </div>
+                            <div
+                                onClick={() => { nav('/sign-up'); setShowMenu(!showMenu) }}
+                                className='w-full bg-white p-3 rounded-lg text-black font-bold text-center'>
+                                Sign up
+                            </div>
+                        </div>
+                }
                 <div className='w-full mt-2 bg-[#1f1f1f]  border-[1px] border-[#414141] text-white p-3 rounded-lg  font-bold text-center'>
                     Contact
                 </div>
@@ -72,77 +72,77 @@ const Menu: React.FC = () => {
                         </div>
                     </div>
 
-                    <div 
-                       onClick={() => {nav('/user/dashboard')}}
-                    className='flex gap-2 justify-between'>
+                    <div
+                        onClick={() => { nav('/user/dashboard'); setShowMenu(!showMenu) }}
+                        className='flex gap-2 justify-between'>
                         <div>
-                        Dashboard
+                            Dashboard
                         </div>
 
                         <div className='text-xl text-[#888]'>
-                            <LuLayoutDashboard/>
+                            <LuLayoutDashboard />
                         </div>
                     </div>
 
-                    <div 
-                       onClick={() => {nav('/user/tasks')}}
-                    className='flex gap-2 justify-between'>
+                    <div
+                        onClick={() => { nav('/user/tasks'); setShowMenu(!showMenu) }}
+                        className='flex gap-2 justify-between'>
                         <div>
-                        Tasks
+                            Tasks
                         </div>
 
-                        <div 
+                        <div
 
-                        className='text-xl text-[#888]'>
-                            <GoTasklist/>
+                            className='text-xl text-[#888]'>
+                            <GoTasklist />
                         </div>
                     </div>
 
-                    <div 
-                       onClick={() => {nav('/user/notes')}}
-                    className='flex gap-2 justify-between'>
+                    <div
+                        onClick={() => { nav('/user/notes'); setShowMenu(!showMenu) }}
+                        className='flex gap-2 justify-between'>
                         <div>
-                        Notes
+                            Notes
                         </div>
 
                         <div className='text-xl text-[#888]'>
-                            <FaRegNoteSticky/>
+                            <FaRegNoteSticky />
                         </div>
                     </div>
 
-                     <div 
-                        onClick={() => {nav('/user/goals')}}
-                     className='flex gap-2 justify-between'>
+                    <div
+                        onClick={() => { nav('/user/goals'); setShowMenu(!showMenu) }}
+                        className='flex gap-2 justify-between'>
                         <div>
-                        Goals
+                            Goals
                         </div>
 
                         <div className='text-xl text-[#888]'>
-                            <LuGoal/>
+                            <LuGoal />
                         </div>
                     </div>
 
-                    <div 
-                       onClick={() => {nav('/user/projects')}}
-                    className='flex gap-2 justify-between'>
+                    <div
+                        onClick={() => { nav('/user/projects'); setShowMenu(!showMenu) }}
+                        className='flex gap-2 justify-between'>
                         <div>
-                        Projects
+                            Projects
                         </div>
 
                         <div className='text-xl text-[#888]'>
-                            <GoProjectSymlink/>
+                            <GoProjectSymlink />
                         </div>
                     </div>
 
-                    <div 
-                       onClick={() => {nav('/user/settings')}}
-                    className='flex gap-2 justify-between'>
+                    <div
+                        onClick={() => { nav('/user/settings'); setShowMenu(!showMenu) }}
+                        className='flex gap-2 justify-between'>
                         <div>
-                        Settings
+                            Settings
                         </div>
 
                         <div className='text-xl text-[#888]'>
-                            <IoSettingsOutline/>
+                            <IoSettingsOutline />
                         </div>
                     </div>
 
@@ -152,18 +152,18 @@ const Menu: React.FC = () => {
 
 
             <div className='mt-9 flex gap-5 flex-col border-t-[1px] border-t-[#414141] pt-4'>
-            <div>
-                Home
-            </div>
-            <div>
-                Documentation
-            </div>
-            <div>
-                About
-            </div>
-            <div>
-                Contact
-            </div>
+                <div>
+                    Home
+                </div>
+                <div>
+                    Documentation
+                </div>
+                <div>
+                    About
+                </div>
+                <div>
+                    Contact
+                </div>
             </div>
 
 

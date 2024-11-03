@@ -63,6 +63,10 @@ interface AppState {
     
     showMenu: boolean | null;
     setShowMenu: (params: boolean) => void;
+    
+    
+    isProgress: string | null;
+    setProgress: (params: string) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -113,6 +117,8 @@ const useStore = create<AppState>((set) => ({
     showMenu: false,
     setShowMenu: (params: boolean) => set({ showMenu: params }),
 
+    isProgress: "tutorial",
+    setProgress: (params: string) => set({ isProgress: params }),
 }));
 
 export default useStore;

@@ -22,6 +22,7 @@ const Homepage: React.FC = () => {
   const [user] = IsLoggedIn()
   const nav = useNavigate()
   const {showMenu}: any = useStore()
+  
   return (
     <div className='h-auto relative bg-[#222] min-h-[100vh] '>
       <Header />

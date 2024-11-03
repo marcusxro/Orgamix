@@ -12,6 +12,7 @@ import { FaCheck } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import { IoIosLogOut } from "react-icons/io";
 import Footer from '../../comps/Footer'
+import { signOut, getAuth } from 'firebase/auth'
 
 interface pubsType {
     publicUrl: string
@@ -434,6 +435,19 @@ const Settings: React.FC = () => {
     const [rating, setRating] = useState<number | any>(3);
 
 
+    function logOutUser() {
+        const auth = getAuth()
+        const signOutUserFunc = signOut(auth)
+        .then(() => {
+            console.log("completed")
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+
+        return () => {signOutUserFunc}
+    }
+
     return (
         <div>
             <Sidebar location='Settings' />
@@ -800,7 +814,9 @@ const Settings: React.FC = () => {
                     <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
                         <div className='flex gap-5 items-center'>
                             <div className='text-xl font-bold'>Logout</div>
-                            <div className='bg-red-500 text-white p-3 rounded-lg cursor-pointer hover:bg-[#888]'>
+                            <div
+                            onClick={logOutUser} 
+                             className='bg-red-500 text-white p-3 rounded-lg cursor-pointer hover:bg-[#888]'>
                                 <IoIosLogOut />
                             </div>
                         </div>

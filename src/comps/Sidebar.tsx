@@ -9,7 +9,6 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { supabase } from '../supabase/supabaseClient';
 import IsLoggedIn from '../firebase/IsLoggedIn';
 import gsap from 'gsap'
-import userNoProfile from '../assets/UserNoProfile.jpg'
 import { useNavigate } from 'react-router-dom';
 import { IoIosNotifications } from "react-icons/io";
 import useStore from '../Zustand/UseStore';

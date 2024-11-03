@@ -2,21 +2,14 @@ import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/
 import React, { FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { firebaseAuthKey } from '../../firebase/FirebaseKey'
-import axios from 'axios'
 import Loader from '../../comps/Loader'
 import { supabase } from '../../supabase/supabaseClient'
-
+import {motion} from 'framer-motion'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-interface dataType {
-    userid: string;
-    username: string;
-    password: string;
-    email: string;
-    id: number;
-    fullname: string;
-}
+import Header from '../../comps/Header'
+import Menu from '../../comps/Menu'
+import useStore from '../../Zustand/UseStore'
 
 
 
@@ -141,21 +134,36 @@ const SignUp: React.FC = () => {
         setSeePass(prevs => !prevs)
         console.log(seePass)
     }
+    const { showMenu }: any = useStore()
+    
     return (
         <div className='w-full h-[100dvh] p-3 items-center flex justify-center'>
             <ToastContainer />
-            <form
+            {
+                showMenu &&
+                <Menu />
+            }
+            <div className='fixed top-0 left-0 w-full bg-[#222] z-[20]'>
+                <Header />
+            </div>
+            <div className="absolute inset-0 w-full h-full bg-transparent z-10 opacity-40 grid-overlay"></div>
+            <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-transparent via-transparent to-[#333] z-10 opacity-100"></div>
+
+            <motion.form
+               initial={{ scale: 0.95, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
+               exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
                 onSubmit={createUserAccount}
-                className='w-full flex flex-col gap-2 max-w-[400px] p-3 rounded-lg bg-[#2e2e2e] border-[1px] border-[#414141]'
+                className='w-full flex flex-col gap-2 z-[12] max-w-[400px] p-3 rounded-lg bg-[#2e2e2e] border-[1px] border-[#414141]'
                 action="submit">
-                <div className='w-full text-center'>Create your account</div>
+                <div className='w-full text-center'>Create your orgamix account</div>
                 <input
                     value={email}
                     onChange={(e) => {
                         setEmail(e.target.value)
                     }}
                     required
-                    className='p-2 rounded-md outline-none'
+                    className='p-2 rounded-md outline-none border-[1px] border-[#414141]'
                     type="email" placeholder='Email' />
                 <input
                     value={Username}
@@ -164,7 +172,7 @@ const SignUp: React.FC = () => {
                     }}
                     maxLength={20}
                     required
-                    className='p-2 rounded-md outline-none'
+                    className='p-2 rounded-md outline-none border-[1px] border-[#414141]'
                     type="text" placeholder='Username' />
                 <input
                     value={password}
@@ -173,7 +181,7 @@ const SignUp: React.FC = () => {
                         setPassword(e.target.value)
                     }}
                     required
-                    className='p-2 rounded-md outline-none '
+                    className='p-2 rounded-md outline-none border-[1px] border-[#414141] '
                     type={`${seePass ? "text" : "password"}`} placeholder='Password' />
                 <input
                     value={repPassword}
@@ -182,7 +190,7 @@ const SignUp: React.FC = () => {
                         setRepPassword(e.target.value)
                     }}
                     required
-                    className='p-2 rounded-md outline-none '
+                    className='p-2 rounded-md outline-none border-[1px] border-[#414141] '
                     type={`${seePass ? "text" : "password"}`} placeholder='Repeat Password' />
                 <div className='gap-2 flex px-1 w-auto items-center'>
                     <input
@@ -193,9 +201,9 @@ const SignUp: React.FC = () => {
                         onClick={() => {
                             changeValueOfCheck()
                         }}
-                        className='cursor-pointer'>See Password</div>
+                        className='cursor-pointer selectionNone'>See Password</div>
                 </div>
-                <button className={`${isLoading && 'bg-[#414141]'}bg-[#242424] py-2 rounded-md flex items-center justify-center  border-[1px] border-[#414141] mt-1 hover:bg-[#414141]`}>
+                <button className={`${isLoading && 'bg-[#414141]'} bg-[#242424] py-2 rounded-md flex items-center justify-center  border-[1px] border-[#414141] mt-1 hover:bg-[#414141]`}>
                     {
                         isLoading ?
                             <div className='w-[30px] h-[30px]'>
@@ -215,12 +223,13 @@ const SignUp: React.FC = () => {
                         or
                     </div>
                 </div>
+ 
                 <button
                     onClick={() => {
                         nav('/sign-in')
                     }}
-                    className={`${isLoading && 'bg-[#414141]'}bg-[#242424] py-2 rounded-md  border-[1px] border-[#414141] mt-1 hover:bg-[#414141]`}>Sign in </button>
-            </form>
+                    className={`${isLoading && 'bg-[#414141]'}  bg-[#242424] py-2 rounded-md  border-[1px] border-[#414141] mt-1 hover:bg-[#414141]`}>Sign in </button>
+            </motion.form>
 
         </div>
     )

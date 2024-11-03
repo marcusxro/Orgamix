@@ -398,8 +398,6 @@ export default function Samp() {
     }
 
 
-
-
     // Find the value of the items
     function findValueOfItems(id: UniqueIdentifier | undefined, type: string) {
         if (!fetchedData) return

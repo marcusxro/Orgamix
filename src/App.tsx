@@ -22,6 +22,9 @@ import { supabase } from './supabase/supabaseClient';
 import IsLoggedIn from './firebase/IsLoggedIn';
 import CalendarPage from './pages/isLoggedIn/CalendarPage';
 import Settings from './pages/isLoggedIn/Settings';
+import SendDetails from './comps/System/NewUserModal/SendDetails';
+import Tutorial from './comps/System/NewUserModal/Tutorial';
+import CongratsModal from './comps/System/NewUserModal/CongratsModal';
 
 
 function App() {
@@ -39,18 +42,33 @@ interface dataType {
   uid: string;
   linkofpage: string;
 }
+interface AccType {
+  userid: string;
+  username: string;
+  password: string;
+  email: string;
+  id: number;
+  fullname: string;
+  is_done: boolean;
+}
+
+interface pubsType {
+  publicUrl: string | null;
+}
 
 function Main() {
   const location = useLocation();
   const { viewNotifs }: any = useStore();
   const { notifyUser } = useNotification();
   const [_, setNotifications] = useState<dataType[]>([]);
-  const [user] = IsLoggedIn()
+  const [user]: any = IsLoggedIn()
+  const [fetchedData, setFetchedData] = useState<AccType[] | null>(null);
+  const [imageUrl, setImageUrl] = useState<pubsType | null>(null);
 
   useEffect(() => {
-
-    if(user){
+    if (user) {
       getNotifs();
+      fetchImage()
       const subscription = supabase
         .channel('public:notification')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'notification' }, (payload) => {
@@ -62,9 +80,60 @@ function Main() {
       return () => {
         subscription.unsubscribe();
       };
-    
+
     }
   }, [user]);
+
+
+  useEffect(() => {
+    if (user) {
+      getAccounts()
+      const subscription = supabase
+        .channel('public:accounts')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, (payload) => {
+          console.log('Realtime event:', payload);
+          handleRealtiveForAccounts(payload);
+        })
+        .subscribe();
+
+      return () => {
+        subscription.unsubscribe();
+      };
+
+    }
+  }, [user])
+
+  const handleRealtiveForAccounts = (payload: any) => {
+    console.log('Received payload:', payload); // Check the payload structure
+
+    switch (payload.eventType) {
+      case 'INSERT':
+          setFetchedData((prevData) =>
+              prevData ? [...prevData, payload.new] : [payload.new]
+          );
+          break;
+      case 'UPDATE':
+          setFetchedData((prevData) =>
+              prevData
+                  ? prevData.map((item) =>
+                      item.id === payload.new.id ? payload.new : item
+                  )
+                  : [payload.new]
+          );
+          break;
+      case 'DELETE':
+          console.log("DELETED")
+          setFetchedData((prevData) =>
+              prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
+          );
+          break;
+      default:
+          break;
+        }
+  }
+
+
+
 
   const handleClick = (tetx: string, link: string) => {
     notifyUser(tetx, link);
@@ -79,9 +148,11 @@ function Main() {
       switch (payload.eventType) {
         case 'INSERT':
           updatedData.push(payload.new); // Add new notification
+          fetchImage()
           handleClick(payload?.new?.content, payload?.new?.linkofpage)
           break;
         case 'UPDATE':
+          fetchImage()
           updatedData = updatedData.map((item) =>
             item.id === payload.new.id ? payload.new : item
           );
@@ -120,11 +191,67 @@ function Main() {
     }
   }
 
+
+  async function getAccounts() {
+    try {
+      const { data, error } = await supabase.from('accounts')
+        .select('*')
+        .eq('userid', user?.uid);
+      if (error) {
+        console.error('Error fetching data:', error);
+      } else {
+        setFetchedData(data);
+        console.log(data)
+
+        if (data.length === 0) {
+          console.log("----------NO DATA----------")
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const fetchImage = async () => {
+    if (!user) return;
+    try {
+      // Check if the profile picture exists in the specified folder
+      const { data: files, error: listError } = await supabase
+        .storage
+        .from('profile')
+        .list(`images/${user?.uid}`, { limit: 1, search: 'profile_picture.jpg' });
+
+      if (listError || !files || files.length === 0) {
+        console.log('Profile picture not found.');
+        setImageUrl({ publicUrl: null });
+      } else {
+        // Get the public URL if the profile picture exists
+        const { data: publicData, error: urlError }: any = supabase
+          .storage
+          .from('profile')
+          .getPublicUrl(`images/${user?.uid}/profile_picture.jpg`);
+
+        if (urlError) {
+          console.error('Error getting public URL:', urlError.message);
+          setImageUrl({ publicUrl: null });
+        } else {
+          setImageUrl({ publicUrl: `${publicData.publicUrl}?t=${Date.now()}` });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching image:', error);
+    }
+  };
+
+
+  const { isProgress }: any = useStore()
+
   return (
     <div className="App">
       <ScrollToTop />
       <Routes>
         <Route path='/' element={<Homepage />} />
+
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/recover' element={<ForgotPassword />} />
@@ -139,13 +266,33 @@ function Main() {
         <Route path='/user/projects/view/:uid/:time' element={<Samp />} />
 
         <Route path='/user/calendar' element={<CalendarPage />} />
-        
+
         <Route path='/user/settings' element={<Settings />} />
 
 
         <Route path='/test' element={<TestUpload />} />
 
       </Routes>
+
+      {
+        location.pathname.includes('/user') && fetchedData && imageUrl && 
+        (fetchedData?.length === 0 && user) && isProgress != "Completed" &&
+        <SendDetails />
+
+      }
+      {
+        location.pathname.includes('/user') && fetchedData &&
+        (fetchedData[0]?.is_done === false && (fetchedData != null || imageUrl?.publicUrl != null)) && isProgress === "tutorial" &&
+        <Tutorial />
+
+      }
+      {
+        location.pathname.includes('/user') && fetchedData &&
+        (fetchedData[0]?.is_done === true && (fetchedData != null || imageUrl?.publicUrl != null) && isProgress === "Completed") &&
+        <CongratsModal />
+      } 
+    
+
 
       {/* Render Notification outside of Routes */}
       {viewNotifs && location.pathname.includes('/user') && <Notification />}
