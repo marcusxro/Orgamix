@@ -26,7 +26,7 @@ const Tutorial: React.FC = () => {
         setProgressNum(((index + 1) / totalSlides) * 100);
     };
 
-    const { isProgress, setProgress }: any = useStore()
+    const { setProgress }: any = useStore()
 
 
 

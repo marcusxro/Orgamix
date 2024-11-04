@@ -55,7 +55,6 @@ const GoalsLength:React.FC = () => {
             console.error("Error fetching tasks:", err);
         }
     }
-    console.log(taskData);
     return taskData?.length ? ( <div className='text-md text-[#888]'>({taskData.length})</div> ) : ( <div>(0)</div> );
   
 }
