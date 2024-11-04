@@ -29,7 +29,7 @@ const Notes = () => {
     const [fetchedData, setFetchedData] = useState<fetchedDataType[] | null>(null)
     const [filteredData, setFilteredData] = useState<fetchedDataType[] | null | undefined>(null)
     const [showAdd, setShowAdd] = useState<boolean>(true)
-    const [mobileShow, setMobileShow] = useState<boolean>(false)
+    const {mobileShow, setMobileShow}: any = useStore()
     const { editTask } = useStore()
     const [action, setAction] = useState<number | null>(null)
     const [searchVal, setSearchVal] = useState<string>("")
@@ -202,7 +202,7 @@ const Notes = () => {
                         <div className='flex gap-2 justify-between w-full'>
                             <div className='flex gap-2 justify-between items-center w-full max-w-[300px]'>
                                 <div
-                                    onClick={() => { setShowAdd(prevs => !prevs); setMobileShow(prevs => !prevs) }}
+                                    onClick={() => { setShowAdd(prevs => !prevs); setMobileShow(!mobileShow) }}
                                     className='w-auto p-3
                             flex items-center justify-center bg-[#111] border-[#535353] border-[1px] cursor-pointer rounded-lg  hover:bg-[#222]'>
                                     <IoMdAdd />

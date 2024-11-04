@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, Tooltip, ResponsiveContainer } from 'recharts';
 import { supabase } from '../../../../supabase/supabaseClient';
 import IsLoggedIn from '../../../../firebase/IsLoggedIn';
+import AnalyticsLoader from './Loader/AnalyticsLoader';
+import NoData from './Loader/NoData';
 
 interface subtaskType {
     is_done: boolean;
@@ -79,6 +81,9 @@ const GoalsAnalytics: React.FC = () => {
                     titles: categorizedGoals[status].titles,
                 }));
 
+                if (data.length === 0) {
+                    return setFetchedData([]);
+                }
                 setFetchedData(categorizedData);
             }
         } catch (err) {
@@ -88,46 +93,66 @@ const GoalsAnalytics: React.FC = () => {
 
 
     return (
-            <ResponsiveContainer width="100%" height='100%'>
-                <BarChart data={fetchedData || []}>
-                    <Bar
-                        dataKey="count"
-                        fill="#222"
-                        stroke="#535353"
-                        strokeWidth={1}
-                        radius={[5, 5, 0, 0]}
-                        isAnimationActive={true}
-                    />
-                    <Tooltip
-                        content={({ payload }) => {
-                            if (payload && payload.length) {
-                                const { category, count, titles } = payload[0].payload;
-                                return (
-                                    <div
-                                        className='z-[2000000000000000] relative'
-                                        style={{
-                                            backgroundColor: '#222',
-                                            zIndex: '10000',
-                                            position: 'relative',
-                                            padding: '10px',
-                                            borderRadius: '10px',
-                                            border: '2px solid #535353'
-                                        }}
-                                    >
-                                        <strong>{category}</strong><br />
-                                        Count: {count}<br />
-                                        Titles:
-                                        <div className='flex flex-wrap gap-2 mt-2'>
-                                            {titles.join(', ')} {/* Display the titles here */}
-                                        </div>
-                                    </div>
-                                );
-                            }
-                            return null;
-                        }}
-                    />
-                </BarChart>
-            </ResponsiveContainer>
+        <>
+            {
+                fetchedData === null && (
+               <AnalyticsLoader />
+                )
+            }
+
+            {
+                fetchedData && fetchedData.length > 0 && (
+                    <ResponsiveContainer width="100%" height='100%'>
+                        <BarChart data={fetchedData || []}>
+                            <Bar
+                                dataKey="count"
+                                fill="#222"
+                                stroke="#535353"
+                                strokeWidth={1}
+                                radius={[5, 5, 0, 0]}
+                                isAnimationActive={true}
+                            />
+                            <Tooltip
+                                content={({ payload }) => {
+                                    if (payload && payload.length) {
+                                        const { category, count, titles } = payload[0].payload;
+                                        return (
+                                            <div
+                                                className='z-[2000000000000000] relative'
+                                                style={{
+                                                    backgroundColor: '#222',
+                                                    zIndex: '10000',
+                                                    position: 'relative',
+                                                    padding: '10px',
+                                                    borderRadius: '10px',
+                                                    border: '2px solid #535353'
+                                                }}
+                                            >
+                                                <strong>{category}</strong><br />
+                                                Count: {count}<br />
+                                                Titles:
+                                                <div className='flex flex-wrap gap-2 mt-2'>
+                                                    {titles.join(', ')} {/* Display the titles here */}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                }}
+                            />
+                        </BarChart>
+                    </ResponsiveContainer>
+                )
+            }
+
+
+            {
+                fetchedData !== null && fetchedData.length === 0 && (
+
+                 <NoData propsText='No goals found' />
+                )
+            }
+        </>
     );
 };
 

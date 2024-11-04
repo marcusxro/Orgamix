@@ -8,7 +8,13 @@ import { parse } from 'date-fns';
 const WeeklyActivity: React.FC = () => {
   const [user] = IsLoggedIn();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [weeklyData, setWeeklyData] = useState([]);
+  interface WeeklyData {
+    day: string;
+    percentage: number;
+    titles: string[];
+  }
+  
+  const [weeklyData, setWeeklyData] = useState<WeeklyData[]>([]);
 
   useEffect(() => {
     if (user) fetchAllData();
@@ -33,7 +39,7 @@ const WeeklyActivity: React.FC = () => {
     // Set the start and end of the current week
     const startOfCurrentWeek = moment().startOf('isoWeek'); // Current Monday
     const endOfCurrentWeek = moment().endOf('isoWeek'); // Current Sunday
-  
+
     const weeklyCounts: any = {
       Mon: { count: 0, titles: [] },
       Tues: { count: 0, titles: [] },
@@ -43,12 +49,12 @@ const WeeklyActivity: React.FC = () => {
       Sat: { count: 0, titles: [] },
       Sun: { count: 0, titles: [] },
     };
-  
+
     data.forEach((item: any) => {
       const createdAt = item.created_at ? moment(parseInt(item.created_at)) :
         item.createdAt ? moment(parseInt(item.createdAt)) :
           item.createdat ? moment(parseInt(item.createdat)) : null;
-  
+
       if (createdAt && createdAt.isBetween(startOfCurrentWeek, endOfCurrentWeek, 'day', '[]')) {
         const dayName = createdAt.format('ddd'); // Get the short name for the day
         if (weeklyCounts[dayName] !== undefined) {
@@ -59,17 +65,17 @@ const WeeklyActivity: React.FC = () => {
         }
       }
     });
-  
+
     const maxCount = Math.max(...Object.values(weeklyCounts).map((day: any) => day.count));
     const weeklyDataFormatted: any = Object.keys(weeklyCounts).map((day) => ({
       day: day.substring(0, 3), // Take only the first three letters
       percentage: maxCount ? (weeklyCounts[day].count / maxCount) * 100 : 0,
       titles: weeklyCounts[day].titles
     }));
-  
+
     setWeeklyData(weeklyDataFormatted);
   }
-  
+
 
 
 
@@ -102,6 +108,27 @@ const WeeklyActivity: React.FC = () => {
     return data;
   }
 
+  const CustomBarLabel = ({ x, y, value, height }: any) => {
+    const centerY = y + height; // Position the labels at the bottom of the bar
+  
+    // Check if the value is greater than 0 to display the label
+    if (value <= 0) return null; // Hide label if value is 0
+  
+    return (
+      <g>
+        <text
+          x={x + 5} 
+          y={centerY - 8} // Adjust y position for percentage label
+          fill="green"
+          fontSize={10}
+        >
+          {`${value.toFixed(2)}%`}
+        </text>
+      </g>
+    );
+  };
+  
+  
   return (
     <>
       {isLoaded ? (
@@ -147,12 +174,15 @@ const WeeklyActivity: React.FC = () => {
               }}
               formatter={(value: number) => `${value.toFixed(2)}%`} />
             <Bar
-           dataKey="percentage" 
-           fill="#222"
-           stroke="#535353"
-           strokeWidth={1}
-           radius={[5, 5, 0, 0]}
-           isAnimationActive={true} />
+              dataKey="percentage"
+              fill="#222"
+              stroke="#535353"
+              strokeWidth={1}
+              radius={[5, 5, 0, 0]}
+              isAnimationActive={true}
+              label={(props: any) => <CustomBarLabel {...props} day={weeklyData[props.index].day} />}
+            />
+
           </BarChart>
         </ResponsiveContainer>
       ) : (

@@ -304,6 +304,7 @@ const Tasks: React.FC = () => {
     const { isShowAdd, setIsShowAdd }: any = useStore();
     const { viewTask, setViewTask } = useStore();
 
+
     return (
         <div className='w-full h-full relative'>
             <Sidebar location='Tasks' />

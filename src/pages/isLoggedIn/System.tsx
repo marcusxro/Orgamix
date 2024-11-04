@@ -76,7 +76,7 @@ const System: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:flex gap-3 h-[auto] lg:h-[30vh]'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 xl:flex gap-3 h-[auto] xl:h-[30vh]'>
                         <div className='bg-[#313131] p-5 w-full h-full rounded-lg border-[1px] min-h-[200px]
                      border-[#535353] hover:bg-[#535353] cursor-pointer justify-between flex flex-col'>
                             <div>

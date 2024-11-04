@@ -64,7 +64,7 @@ const TaskData: React.FC = () => {
         <div className='flex  flex-col gap-4'>
 
             <div className='flex gap-2 flex-col border-l-[2px] border-l-[#1d9e44] pl-2'>
-                <h2>Tasks for Today</h2>
+                <h2 className='font-bold mb-2'>Tasks for Today</h2>
                 {groupedTasks.today.length > 0 ? (
                     <div className='grid grid-cols-2 gap-2'>
 
@@ -122,7 +122,7 @@ const TaskData: React.FC = () => {
 
             </div>
             <div className='flex gap-2 flex-col border-l-[2px] border-l-[#1d559e] pl-2'>
-                <h2>Tasks for Tomorrow</h2>
+                <h2 className='font-bold mb-2'>Tasks for Tomorrow</h2>
                 {groupedTasks.tomorrow.length > 0 ? (
                 <div className='grid grid-cols-2 gap-2'>
                         {groupedTasks.tomorrow.map((task, idx: number) => (
