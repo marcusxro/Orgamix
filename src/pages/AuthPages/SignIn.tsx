@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useState } from 'react'
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import { firebaseAuthKey } from '../../firebase/FirebaseKey'
 import { ToastContainer, toast } from 'react-toastify';
@@ -80,11 +80,14 @@ const SignIn: React.FC = () => {
 
                 if (!isVerified) {
                     setLoading(false)
-                    return errorNotif("Please verify your email first!")
+                    errorNotif("Please verify your email first!")
                 } else {
+                    window.location.reload()
                     console.log("User signed in!!!", user)
                     setLoading(false)
+                    nav('/user/dashboard')
                 }
+
             }).catch((err) => {
                 console.log(err)
                 setLoading(false)

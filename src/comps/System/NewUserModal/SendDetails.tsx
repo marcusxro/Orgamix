@@ -7,9 +7,17 @@ import projectImage from '../../../assets/ProjectImages/Untitled design (3).png'
 import imageCompression from 'browser-image-compression';
 import { supabase } from '../../../supabase/supabaseClient';
 import Loader from '../../Loader';
+import { set } from 'date-fns';
 
-interface pubsType {
-    publicUrl: string
+interface AccType {
+    userid: string;
+    username: string;
+    password: string;
+    email: string;
+    id: number;
+    fullname: string;
+    is_done: boolean;
+    has_pfp: boolean
 }
 
 const SendDetails: React.FC = () => {
@@ -19,10 +27,40 @@ const SendDetails: React.FC = () => {
     const MAX_FILE_SIZE = 200 * 1024; // 200 KB
     const [isErrorPfp, setIsErrorPfp] = useState<string | null>(null)
     const [file, setFile] = useState<File | null>(null);
-    const [isAllowed, setIsAllowed] = useState<boolean>(false)
     const [changedImage, setChangedImg] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null); // Add ref for the file input
     const [loading, setLoading] = useState<boolean>(false);
+
+    const [fetchedData, setFetchedData] = useState<AccType[] | null>(null);
+
+
+    useEffect(() => {
+        if (user) {
+            getAccounts()
+        }
+    }, [user])
+
+
+    async function getAccounts() {
+        try {
+            const { data, error } = await supabase.from('accounts')
+                .select('*')
+                .eq('userid', user?.uid);
+            if (error) {
+                console.error('Error fetching data:', error);
+            } else {
+                setFetchedData(data);
+                console.log(data)
+                setUserName(data?.[0]?.username || "")
+                if (data.length === 0) {
+                    console.log("----------NO DATA----------")
+                }
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0] || null;
@@ -35,18 +73,15 @@ const SendDetails: React.FC = () => {
             if (!isImage) {
                 setIsErrorPfp('Please select an image file.');
                 setFile(null);
-                setIsAllowed(false)
                 return;
             }
 
             if (!isUnderLimit) {
                 setIsErrorPfp('File size must be less than 200 KB.');
                 setFile(null);
-                setIsAllowed(false)
                 return;
             }
             console.log(selectedFile)
-            setIsAllowed(true)
             setFile(selectedFile);
             setChangedImg(URL.createObjectURL(selectedFile)); // Set image preview URL
         }
@@ -74,8 +109,8 @@ const SendDetails: React.FC = () => {
             setLoading(false)
             return
         };
-        
-        
+
+
         try {
             const imageToUpload = file ? file : await fetch(NoUserProfile).then(res => res.blob()).then(blob => new File([blob], "default_profile.jpg", { type: "image/jpeg" }));
 
@@ -121,35 +156,56 @@ const SendDetails: React.FC = () => {
 
 
     async function createUserForGoogle() {
-        if(loading) return
+        if (loading) return
 
-        if(user?.providerData[0]?.providerId != 'google.com'){
-            setLoading(false)
-            setIsErrorPfp("You are not signed in with Google")
-            return
-        }
+
         const isDoneUploading = await uploadImage()
 
 
         if (!isDoneUploading) {
             setLoading(false)
             setIsErrorPfp("Error occured, please try again later")
-           return
+            return
         }
         try {
-            const { error } = await supabase.from('accounts').insert({
-                userid: user?.uid,
-                username: userName,
-                password: "GoogleProvider",
-                email: fullName,
-            })
-            if (error) {
-                console.error('Error inserting data:', error);
-                setLoading(false)
-                setIsErrorPfp("Error occured, please try again later")
+            if (user?.providerData[0]?.providerId !== 'google.com') {
+                const { error } = await supabase
+                    .from('accounts')
+                    .update({
+                        username: userName,
+                        has_pfp: true,
+                    })
+                    .eq('userid', user?.uid)
+                if (error) {
+                    console.log(error)
+                    setLoading(false)
+                }
+                else {
+                    setLoading(false)
+                    console.log("------tutorial completed------")
+                    setUserName("")
+                }
             } else {
-                setUserName("")
-                setFullName("")
+                if (user?.providerData[0]?.providerId != 'google.com') {
+                    setLoading(false)
+                    setIsErrorPfp("You are not signed in with Google")
+                    return
+                }
+                const { error } = await supabase.from('accounts').insert({
+                    userid: user?.uid,
+                    username: userName,
+                    password: "GoogleProvider",
+                    email: user?.email,
+                    has_pfp: true,
+                })
+                if (error) {
+                    console.error('Error inserting data:', error);
+                    setLoading(false)
+                    setIsErrorPfp("Error occured, please try again later")
+                } else {
+                    setUserName("")
+                    setFullName("")
+                }
             }
         } catch (err) {
             console.log(err);
@@ -178,8 +234,8 @@ const SendDetails: React.FC = () => {
 
                         <div className='w-full h-full overflow-hidden'>
                             <img
-                            className='w-full h-full object-cover object-top center'
-                            src={projectImage} alt="" />
+                                className='w-full h-full object-cover object-top center'
+                                src={projectImage} alt="" />
                         </div>
 
                         <div className='flex items-start w-full absolute -bottom-10  px-3'>
@@ -195,7 +251,7 @@ const SendDetails: React.FC = () => {
                     <div className='mt-[3rem] px-5'>
                         <div className='text-md font-bold'>
                             {
-                                fullName != '' ? fullName : ""
+                                userName != '' ? userName : ""
                             }
                         </div>
                         <div className='text-sm text-[#888]'>
@@ -230,21 +286,7 @@ const SendDetails: React.FC = () => {
                                     type="text" />
                             </div>
                         </div>
-                        <div className='flex gap-5 justify-between border-t-[#535353] border-t-[1px] pt-6'>
-                            <div className='w-full max-w-[100px] text-[#888]'>Name</div>
-                            <div className='flex gap-5 w-full max-w-[300px]'>
 
-                                <input
-                                    maxLength={30}
-                                    value={fullName}
-                                    onChange={(e) => { setFullName(e.target.value) }}
-                                    className='w-full px-2 py-3 rounded-lg outline-none text-white border-[#535353] border-[1px] bg-[#111]'
-                                    placeholder='Full name'
-                                    type="text" />
-
-
-                            </div>
-                        </div>
                         <div className='flex gap-5 justify-between border-t-[#535353] border-t-[1px] pt-6'>
                             <div className='w-full max-w-[100px] text-[#888]'>Username</div>
                             <div className='flex gap-5 w-full max-w-[300px]'>
@@ -294,15 +336,15 @@ const SendDetails: React.FC = () => {
 
                 <div className='w-full flex items-center justify-end p-3'>
                     <div
-                    onClick={() => { !loading &&  userName && fullName && createUserForGoogle() }}
-                     className={`px-5 py-2 ${!userName || !fullName ? "bg-[#222] cursor-not-allowed" : "bg-[#111]  cursor-pointer"} rounded-lg selectionNone border-[#535353] border-[1px] hover:bg-[#222]`}>
-                      {
-                        loading ?
-                        <div className='w-[20px] h-[20px]'>
-                            <Loader />
-                            </div>:
-                            "Save"
-                      }
+                        onClick={() => { !loading && userName && createUserForGoogle() }}
+                        className={`px-5 py-2 ${!userName ? "bg-[#222] cursor-not-allowed" : "bg-[#111]  cursor-pointer"} rounded-lg selectionNone border-[#535353] border-[1px] hover:bg-[#222]`}>
+                        {
+                            loading ?
+                                <div className='w-[20px] h-[20px]'>
+                                    <Loader />
+                                </div> :
+                                "Save"
+                        }
                     </div>
                 </div>
             </motion.div>

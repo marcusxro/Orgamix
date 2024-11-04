@@ -10,6 +10,11 @@ import useStore from '../../../Zustand/UseStore';
 import { supabase } from '../../../supabase/supabaseClient';
 import IsLoggedIn from '../../../firebase/IsLoggedIn';
 import Loader from '../../Loader';
+import { FaArrowAltCircleLeft } from "react-icons/fa";
+import { FaArrowAltCircleRight } from "react-icons/fa";
+
+const leftControl = <div className="text-2xl text-[#888]"><FaArrowAltCircleLeft /></div>
+const rightControl = <div className="text-2xl text-[#888]"><FaArrowAltCircleRight /></div>
 
 const Tutorial: React.FC = () => {
     const [progress, setProgressNum] = React.useState(0);
@@ -106,9 +111,6 @@ const Tutorial: React.FC = () => {
                     </div>
                     {/* Progress Bar */}
 
-                    <div onClick={() => { setProgress("Completed") }}>
-                        {isProgress}sds
-                    </div>
                     <Progress
                         className='w-full max-w-[500px] mx-auto'
                         progress={progress} />
@@ -118,8 +120,8 @@ const Tutorial: React.FC = () => {
                         pauseOnHover
                         className="w-full h-full max-h-[520px]  mx-auto max-w-[500px] custom-carousel  aspect-square mt-2"
                         onSlideChange={handleSlideChange}
-                        leftControl="◀" // Add left arrow control
-                        rightControl="▶" // Add right arrow control
+                        leftControl={leftControl}// Add left arrow control
+                        rightControl={rightControl} // Add right arrow control
                     >
                         <div className="h-full w-full">
                             <img

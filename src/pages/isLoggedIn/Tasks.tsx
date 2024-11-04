@@ -543,6 +543,11 @@ const Tasks: React.FC = () => {
                                                             </div>
                                                             <p className='text-[#888] break-all'>{itm?.description != '' ? itm?.description : 'No Description'}</p>
 
+                                                            {itm?.repeat != '' &&
+                                                                <p className='text-[#888] flex gap-1  items-center my-2 break-all text-sm'> 
+                                                                <CiRepeat /> {itm?.repeat != '' && itm?.repeat}
+                                                                </p>
+                                                            }
                                                             <div className='mt-auto pt-2 flex gap-4 text-[10px] md:text-sm'>
                                                                 {
                                                                     itm.deadline != '' &&
@@ -620,8 +625,8 @@ const Tasks: React.FC = () => {
                                                                             onClick={() => {
                                                                                 setIsComplete(itm?.id)
                                                                             }}
-                                                                            className=' bg-[#111111]  p-1 rounded-lg text-center text-green-500 w-full'>
-                                                                            Pending
+                                                                            className=' bg-[#111111]  p-1 rounded-lg text-center text-red-500 w-full'>
+                                                                            Undo
                                                                         </div>
                                                                 }
                                                             </div>

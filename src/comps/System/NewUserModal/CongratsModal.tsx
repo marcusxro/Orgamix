@@ -42,7 +42,7 @@ const CongratsModal: React.FC = () => {
                         onClick={() => {
                             setProgress("Working")
                         }}
-                     className='mt-5 bg-[#111] hover:bg-[#222] px-8 py-[5px] rounded-lg border-[#535353] border-[1px] cursor-pointer'>
+                     className='mt-5 bg-[#111] z-[20] hover:bg-[#222] px-8 py-[5px] rounded-lg border-[#535353] border-[1px] cursor-pointer'>
                         Let's go!
                     </div>
                 </div>

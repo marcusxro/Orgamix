@@ -50,6 +50,7 @@ interface AccType {
   id: number;
   fullname: string;
   is_done: boolean;
+  has_pfp: boolean
 }
 
 interface pubsType {
@@ -65,6 +66,9 @@ function Main() {
   const [fetchedData, setFetchedData] = useState<AccType[] | null>(null);
   const [imageUrl, setImageUrl] = useState<pubsType | null>(null);
 
+  useEffect(() => {
+    getNotifs();
+  }, [])
   useEffect(() => {
     if (user) {
       getNotifs();
@@ -86,8 +90,9 @@ function Main() {
 
 
   useEffect(() => {
-    if (user) {
+    if (user && location.pathname.includes('/user')) {
       getAccounts()
+      console.log(fetchedData)
       const subscription = supabase
         .channel('public:accounts')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, (payload) => {
@@ -101,35 +106,39 @@ function Main() {
       };
 
     }
-  }, [user])
+
+  }, [user, location.pathname, imageUrl]);
+
+
+  
 
   const handleRealtiveForAccounts = (payload: any) => {
     console.log('Received payload:', payload); // Check the payload structure
 
     switch (payload.eventType) {
       case 'INSERT':
-          setFetchedData((prevData) =>
-              prevData ? [...prevData, payload.new] : [payload.new]
-          );
-          break;
+        setFetchedData((prevData) =>
+          prevData ? [...prevData, payload.new] : [payload.new]
+        );
+        break;
       case 'UPDATE':
-          setFetchedData((prevData) =>
-              prevData
-                  ? prevData.map((item) =>
-                      item.id === payload.new.id ? payload.new : item
-                  )
-                  : [payload.new]
-          );
-          break;
+        setFetchedData((prevData) =>
+          prevData
+            ? prevData.map((item) =>
+              item.id === payload.new.id ? payload.new : item
+            )
+            : [payload.new]
+        );
+        break;
       case 'DELETE':
-          console.log("DELETED")
-          setFetchedData((prevData) =>
-              prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
-          );
-          break;
+        console.log("DELETED")
+        setFetchedData((prevData) =>
+          prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
+        );
+        break;
       default:
-          break;
-        }
+        break;
+    }
   }
 
 
@@ -193,7 +202,7 @@ function Main() {
 
 
   async function getAccounts() {
-    try {
+      try {
       const { data, error } = await supabase.from('accounts')
         .select('*')
         .eq('userid', user?.uid);
@@ -209,6 +218,7 @@ function Main() {
       }
     } catch (err) {
       console.log(err);
+    
     }
   }
 
@@ -244,6 +254,7 @@ function Main() {
   };
 
 
+
   const { isProgress }: any = useStore()
 
   return (
@@ -275,14 +286,14 @@ function Main() {
       </Routes>
 
       {
-        location.pathname.includes('/user') && fetchedData && imageUrl && 
-        (fetchedData?.length === 0 && user) && isProgress != "Completed" &&
+        location.pathname.includes('/user') && fetchedData && imageUrl && user &&
+        ((fetchedData?.length === 0 && user && fetchedData && fetchedData[0]?.has_pfp != true && fetchedData[0]?.is_done === false) || !(fetchedData && fetchedData[0]?.has_pfp)) && isProgress != "Completed" &&
         <SendDetails />
 
       }
       {
         location.pathname.includes('/user') && fetchedData &&
-        (fetchedData[0]?.is_done === false && (fetchedData != null || imageUrl?.publicUrl != null)) && isProgress === "tutorial" &&
+        (fetchedData[0]?.is_done === false && (fetchedData && fetchedData[0]?.has_pfp)) && isProgress === "tutorial" && fetchedData.length > 0 &&
         <Tutorial />
 
       }
@@ -290,8 +301,8 @@ function Main() {
         location.pathname.includes('/user') && fetchedData &&
         (fetchedData[0]?.is_done === true && (fetchedData != null || imageUrl?.publicUrl != null) && isProgress === "Completed") &&
         <CongratsModal />
-      } 
-    
+      }
+
 
 
       {/* Render Notification outside of Routes */}

@@ -81,7 +81,43 @@ const AddProject: React.FC = () => {
                 deadline: deadline,
                 is_shared: privacySel,
                 created_by: user?.uid,
-                category: category
+                category: category,
+                boards: [
+
+                    {
+                        "title": "Ready to start",
+                        "titleColor": "#05038c",
+                        "created_at": Date.now(),
+                        "board_uid": "container-6568e158-4bbc-4543-8608-d8ca3a7ab1f4",
+                        "created_by": user?.uid,
+                        "tasks": []
+                    },
+                    {
+                        "title": "In progress",
+                        "titleColor": "#b36800",
+                        "created_at": Date.now(),
+                        "board_uid": "container-c4ac2774-912a-48d0-9b4c-a74137190c1e",
+                        "created_by": user?.uid,
+                        "tasks": []
+                    },
+                    {
+                        "title": "Waiting for Review",
+                        "titleColor": "#004db3",
+                        "created_at": Date.now(),
+                        "board_uid": "container-db3eadff-1ff3-4c45-8d82-b5046e1e8789",
+                        "created_by": user?.uid,
+                        "tasks": []
+                    },
+                    {
+                        "title": "Completed",
+                        "titleColor": "#106100",
+                        "created_at": Date.now(),
+                        "board_uid": "container-89adf6d3-d28f-4fef-ba8a-ec1ed797177d",
+                        "created_by": user?.uid,
+                        "tasks": []
+                    }
+                ]
+
             });
 
             if (error) {

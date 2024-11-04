@@ -7,7 +7,6 @@ import IsLoggedIn from '../../firebase/IsLoggedIn';
 import Loader from '../Loader';
 import ShareNotes from './ShareNotes';
 import { MdModeEdit } from "react-icons/md";
-import { MdDelete } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 
 
