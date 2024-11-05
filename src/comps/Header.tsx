@@ -23,7 +23,7 @@ const Header: React.FC = () => {
                     </div>
 
                     <div className='hidden text-[13px] gap-3 ml-[2rem] md:flex'>
-                        <div>
+                        <div       onClick={() => { nav('/') }}>
                             Home
                         </div>
                         <div>
@@ -50,13 +50,13 @@ const Header: React.FC = () => {
                             :
                             <div className='flex gap-3 justify-between items-center'>
                                 <div
-                                    onClick={() => { nav('sign-in') }}
-                                    className={`bg-[#242424] py-2 rounded-md  px-4 border-[1px]
+                                    onClick={() => { nav('/sign-in') }}
+                                    className={`bg-[#242424] py-2 rounded-md  px-4 border-[1px] cursor-pointer
                      border-[#414141] mt-1 hover:bg-[#414141] hidden md:block`}>
                                     Sign in</div>
                                 <div
-                                    onClick={() => { nav('sign-up') }}
-                                    className={`bg-[#242424] py-2 rounded-md  px-4 border-[1px]
+                                    onClick={() => { nav('/sign-up') }}
+                                    className={`bg-[#242424] py-2 rounded-md  px-4 border-[1px] cursor-pointer
                      border-[#414141] mt-1 hover:bg-[#414141] hidden md:block`}>
                                     Sign   up</div>
                             </div>

@@ -303,15 +303,18 @@ const Chat:React.FC = () => {
 
     async function sendChat() {
         setLoading(true)
+        console.log("sending chat")
         if (loading) {
             setLoading(false)
             return
         }
         if (!chatText) {
+            console.log("no chat")
             setLoading(false)
             return
         };
         if (!myAccount) {
+            console.log("no account")
             setLoading(false)
             return
         }
@@ -371,19 +374,21 @@ const Chat:React.FC = () => {
                 .from('accounts')
                 .select('*')
                 .eq('userid', user?.uid)
-                .single();
-            if (data) {
-                setMyAccount(data)
+                .limit(1);  // Fetch only one row
+            
+            if (data && data.length > 0) {
+                setMyAccount(data[0]);  // Set the first item in the array
+                console.log(data[0]);
             }
-
+    
             if (error) {
-                console.log(error)
+                console.log(error);
             }
-        }
-        catch (err) {
-            console.log(err)
+        } catch (err) {
+            console.log(err);
         }
     }
+    
 
     // async function editChatNotif() {
     //     try {

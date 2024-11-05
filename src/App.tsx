@@ -59,7 +59,7 @@ interface pubsType {
 
 function Main() {
   const location = useLocation();
-  const { viewNotifs }: any = useStore();
+  const { viewNotifs, setNotifData}: any = useStore();
   const { notifyUser } = useNotification();
   const [_, setNotifications] = useState<dataType[]>([]);
   const [user]: any = IsLoggedIn()
@@ -69,6 +69,7 @@ function Main() {
   useEffect(() => {
     getNotifs();
   }, [])
+  
   useEffect(() => {
     if (user) {
       getNotifs();
@@ -190,6 +191,7 @@ function Main() {
 
       if (data) {
         setNotifications(data); // Set initial notifications
+        setNotifData(data)
       }
 
       if (error) {

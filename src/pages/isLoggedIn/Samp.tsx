@@ -162,37 +162,44 @@ export default function Samp() {
         }
     }, [user, openKanbanChat, openKanbanSettings, viewNotifs, settingsBoard, settingsTask, inviteToProject, loading]);
 
-
-
-
     const handleRealtimeEvent = (payload: any) => {
+        console.log(payload.new);
+        
+        // Check if the item matches the payload before switching
+        const matchingItem = fetchedData?.find(item => item.id === payload.new.id);
+        if (matchingItem) {
+            // Place any specific logic you want to handle with `created_by` here
+            if (matchingItem.created_by !== payload.new.created_by) {
+                console.log(`created_by changed from ${matchingItem.created_by} to ${payload.new.created_by}`);
+            }
+        }
+    
         switch (payload.eventType) {
             case 'INSERT':
                 setFetchedData((prevData) =>
                     prevData ? [...prevData, payload.new] : [payload.new]
                 );
-
                 break;
+    
             case 'UPDATE':
-                setFetchedData((prevData) =>
-                    prevData
-                        ? prevData.map((item) =>
-                            item.id === payload.new.id ? payload.new : item
-                        )
-                        : [payload.new]
-                );
-
+                if (fetchedData) {
+                    setFetchedData(fetchedData.map((item) => 
+                        item.id === payload.new.id ? payload.new : item
+                    ));
+                }
                 break;
+    
             case 'DELETE':
                 setFetchedData((prevData) =>
                     prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
                 );
                 break;
+    
             default:
                 break;
         }
     };
-
+    
 
     async function getProjects() {
 
@@ -243,11 +250,9 @@ export default function Samp() {
 
 
     async function onAddContainer() {
-        setLoading(true)
-        if (loading) {
-            return
-        };
-
+        if (loading) return; // Prevent multiple submissions
+        setLoading(true);
+    
 
         if (!containerName) {
             setLoading(false)
@@ -313,7 +318,9 @@ export default function Samp() {
     const [workType, setWorkType] = useState<string>("")
 
     async function onAddItem() {
+        if (loading) return; // Prevent multiple submissions
         setLoading(true);
+    
 
         if (!itemName || !assignee) {
             setLoading(false);

@@ -111,7 +111,7 @@ const NotesData: React.FC = () => {
                                             id={index.toString()}
                                             theme='snow'
                                             value={note?.notes}
-                                            className='w-full h-full rounded-lg break-all text-black bg-[#e7e7e7] overflow-auto border-[#535353] border-[1px]'
+                                            className='w-full h-full rounded-lg break-all text-black bg-[#a2a2a2] overflow-auto border-[#535353] border-[1px]'
                                             modules={combinedModules}
                                         />
                                     </div>

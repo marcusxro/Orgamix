@@ -19,7 +19,7 @@ interface dataType {
 const Notification: React.FC = () => {
   const { setViewNotifs }: any = useStore();
   const [isExiting, setIsExiting] = useState(false);
-  const [_, setNotifications] = useState<dataType[]>([]);
+  const [notifs, setNotifications] = useState<dataType[] | null>(null);
   const [groupedData, setGroupedData] = useState<{ [key: string]: dataType[] }>({});
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
@@ -55,7 +55,7 @@ const Notification: React.FC = () => {
   const handleRealtimeEvent = (payload: any) => {
     console.log('Received payload:', payload); // Check the payload structure
 
-    setNotifications((prevNotifs) => {
+    setNotifications((prevNotifs: any) => {
       let updatedData = [...prevNotifs]; // Start with current notifications
       setIsLoaded(prevs => !prevs)
       switch (payload.eventType) {
@@ -196,35 +196,78 @@ const Notification: React.FC = () => {
               </div>
             </div>
 
-            <div className='h-full flex flex-col gap-5 overflow-auto p-3'>
-              {groupedData && Object.keys(groupedData).map((key) => (
-                <div key={key} className={`${key === "Earlier" ? 'border-l-blue-500' : key === "Today" ? 'border-l-green-500' : ''} flex flex-col gap-2 pl-3 border-l-[2px]`}>
-                  <h3 className="font-bold">{key}</h3>
-                  {groupedData[key].map((itm: dataType, index) => (
-
-                    <div
-                      onClick={() => { getNavigated(itm.linkofpage) }}
-                      className='bg-[#222]  rounded-lg flex justify-between items-start flex-col'
-                      key={`${itm.id}-${index}`} // Using both id and index for uniqueness
-                    >
-                      <div
-                        className='p-3 rounded-lg flex justify-between gap-2 items-start w-full'>
-                        <span className='w-full max-w-[300px]'>{itm.content}</span>
-                        <span className="text-gray-400 text-sm whitespace-nowrap">
-                          {itm.created_at ? moment(itm.created_at).format('h:mm A') : 'No Creation date'}
-                        </span>
-                      </div>
-
-                      {
-                        moment().diff(moment(itm?.created_at), 'seconds') < 5 &&
-                        <div className='mx-3 my-2 border-1 border-[#535353] border-[1px] p-1 px-2 text-sm text-green-500 rounded-md'>new</div>
-                      }
-                    </div>
-                  ))}
-
+            {
+              notifs != null && notifs.length === 0 && (
+                <div className='h-full flex flex-col gap-5 overflow-auto p-3'>
+                  <div className='text-center text-[#888]'>No notifications found</div>
                 </div>
-              ))}
-            </div>
+              )
+            }
+
+            {
+              notifs == null && (
+                <div className='h-full flex flex-col gap-5 overflow-auto p-3'>
+           <div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+
+           </div>
+           <div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+
+</div>
+<div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+
+</div>
+<div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+
+</div>
+<div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+
+</div>
+                </div>
+              )
+            }
+            {
+              notifs != null && notifs.length > 0 && (
+                <div className='h-full flex flex-col gap-5 overflow-auto p-3'>
+                  {groupedData && Object.keys(groupedData).map((key) => (
+                    <motion.div
+                      key={key} // Ensure each group has a unique key
+                      initial={{ opacity: 0, y: 20 }} // Initial position and opacity
+                      animate={{ opacity: 1, y: 0 }} // End position and opacity
+                      transition={{ duration: 0.2 }} // Transition timing
+                    >
+                      <div className={`${key === "Earlier" ? 'border-l-blue-500' : key === "Today" ? 'border-l-green-500' : ''} flex flex-col gap-2 pl-3 border-l-[2px]`}>
+                        <h3 className="font-bold">{key}</h3>
+                        {groupedData[key].map((itm: dataType, index) => (
+                          <motion.div
+                            key={`${itm.id}-${index}`} // Using both id and index for uniqueness
+                            initial={{ y: 20, opacity: 0 }} // Initial position and opacity
+                            animate={{ y: 0, opacity: 1 }} // End position and opacity
+                            transition={{
+                              duration: 0.4,
+                              delay: index * 0.1 // Staggered animation for notifications
+                            }}
+                            onClick={() => { getNavigated(itm.linkofpage) }}
+                            className='bg-[#222] rounded-lg flex justify-between items-start flex-col'
+                          >
+                            <div className='p-3 rounded-lg flex justify-between gap-2 items-start w-full'>
+                              <span className='w-full max-w-[300px]'>{itm.content}</span>
+                              <span className="text-gray-400 text-sm whitespace-nowrap">
+                                {itm.created_at ? moment(itm.created_at).format('h:mm A') : 'No Creation date'}
+                              </span>
+                            </div>
+                            {
+                              moment().diff(moment(itm?.created_at), 'seconds') < 5 &&
+                              <div className='mx-3 my-2 border-1 border-[#535353] border-[1px] p-1 px-2 text-sm text-green-500 rounded-md'>new</div>
+                            }
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+              )
+            }
           </motion.div>
         </motion.div>
       )}

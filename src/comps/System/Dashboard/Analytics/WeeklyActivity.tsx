@@ -39,22 +39,22 @@ const WeeklyActivity: React.FC = () => {
     // Set the start and end of the current week
     const startOfCurrentWeek = moment().startOf('isoWeek'); // Current Monday
     const endOfCurrentWeek = moment().endOf('isoWeek'); // Current Sunday
-
+  
     const weeklyCounts: any = {
       Mon: { count: 0, titles: [] },
-      Tues: { count: 0, titles: [] },
+      Tue: { count: 0, titles: [] },
       Wed: { count: 0, titles: [] },
-      Thur: { count: 0, titles: [] },
+      Thu: { count: 0, titles: [] },
       Fri: { count: 0, titles: [] },
       Sat: { count: 0, titles: [] },
       Sun: { count: 0, titles: [] },
     };
-
+  
     data.forEach((item: any) => {
       const createdAt = item.created_at ? moment(parseInt(item.created_at)) :
         item.createdAt ? moment(parseInt(item.createdAt)) :
           item.createdat ? moment(parseInt(item.createdat)) : null;
-
+  
       if (createdAt && createdAt.isBetween(startOfCurrentWeek, endOfCurrentWeek, 'day', '[]')) {
         const dayName = createdAt.format('ddd'); // Get the short name for the day
         if (weeklyCounts[dayName] !== undefined) {
@@ -65,18 +65,17 @@ const WeeklyActivity: React.FC = () => {
         }
       }
     });
-
+  
     const maxCount = Math.max(...Object.values(weeklyCounts).map((day: any) => day.count));
     const weeklyDataFormatted: any = Object.keys(weeklyCounts).map((day) => ({
-      day: day.substring(0, 3), // Take only the first three letters
+      day: day, // Day name as the key (already in 3-letter format)
       percentage: maxCount ? (weeklyCounts[day].count / maxCount) * 100 : 0,
       titles: weeklyCounts[day].titles
     }));
-
+  
     setWeeklyData(weeklyDataFormatted);
   }
-
-
+  
 
 
   async function fetchUserTasks() {
