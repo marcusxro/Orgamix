@@ -93,7 +93,6 @@ function Main() {
   useEffect(() => {
     if (user && location.pathname.includes('/user')) {
       getAccounts()
-      console.log(fetchedData)
       const subscription = supabase
         .channel('public:accounts')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, (payload) => {
@@ -209,8 +208,6 @@ function Main() {
         console.error('Error fetching data:', error);
       } else {
         setFetchedData(data);
-        console.log(data)
-
         if (data.length === 0) {
           console.log("----------NO DATA----------")
         }

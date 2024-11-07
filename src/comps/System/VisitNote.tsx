@@ -104,7 +104,6 @@ const VisitNote = () => {
                 );
                 break;
             case 'UPDATE':
-                console.log(payload)
                 console.log("updated")
                 setFetchedData((prevData) =>
                     prevData
@@ -213,16 +212,18 @@ const VisitNote = () => {
                     itm?.title === title || itm?.title.startsWith(`${title} (`));
 
                 if (exactMatches.length > 0) {
-                    const maxIndex = exactMatches.reduce((acc, itm) => {
-                        const match = itm.title.match(/\((\d+)\)$/); // Check for pattern "renameGoal (index)"
-                        const index = match ? parseInt(match[1], 10) : 0;
-                        return Math.max(acc, index);
-                    }, 0);
+                    const rootExists = exactMatches.some(itm => itm.title === title);
 
-                    newTitle = `${title} (${maxIndex + 1})`;
+                    if (rootExists && !(exactMatches.length === 1 && exactMatches[0].createdat === params?.time)) {
+                        const maxIndex = exactMatches.reduce((acc, itm) => {
+                            const match = itm.title.match(/\((\d+)\)$/);
+                            const index = match ? parseInt(match[1], 10) : 0;
+                            return Math.max(acc, index);
+                        }, 0);
+
+                        newTitle = `${title} (${maxIndex + 1})`;
+                    }
                 }
-
-
             }
 
             // Step 3: Update the note with the updated title

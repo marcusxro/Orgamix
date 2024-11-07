@@ -3,6 +3,7 @@ import IsLoggedIn from '../../../../firebase/IsLoggedIn';
 import { supabase } from '../../../../supabase/supabaseClient';
 import moment from 'moment';
 import { BarChart, Bar, Tooltip, XAxis, ResponsiveContainer } from 'recharts';
+import AnalyticsLoader from './Loader/AnalyticsLoader';
 
 const WeeklyActivity: React.FC = () => {
   const [user] = IsLoggedIn();
@@ -184,7 +185,7 @@ const WeeklyActivity: React.FC = () => {
           </BarChart>
         </ResponsiveContainer>
       ) : (
-        <p>Loading...</p>
+        <AnalyticsLoader />
       )}
     </>
   );

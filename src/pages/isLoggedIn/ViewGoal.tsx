@@ -748,6 +748,7 @@ const ViewGoal: React.FC = () => {
                             Dashboard <LuLayoutDashboard />
                         </div>
                         <div
+                        onClick={() => { nav(`/user/settings`) }}
                             className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 md:p-2 px-3 hover:bg-[#222222] '>
                             <span className='hidden md:block'>Settings</span> <IoSettingsOutline />
                         </div>
@@ -925,7 +926,7 @@ const ViewGoal: React.FC = () => {
                                                                 }
 
                                                                 <p className={`${itm?.is_done && 'line-through'}  text-sm text-[#888]`}>
-                                                                    {itm?.startedAt}
+                                                                {itm?.startedAt ? moment(itm.startedAt).format("YYYY-MM-DD hh:mm A") : ""}
                                                                 </p>
                                                                 <p className={`${itm?.is_done ? "text-green-500" : "text-orange-500"} text-sm text-[#888]`}>
                                                                     {itm?.is_done ? "Completed" : "In progress"}

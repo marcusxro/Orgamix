@@ -251,7 +251,7 @@ const InvitedProjects: React.FC = () => {
                                 dataForPieChart?.map((item, index) => (
                                     <div
                                         data-tooltip-id={`hover-${index}${item.name}`}
-                                        className='flex flex-col gap-2 sm:flex-row overflow-auto items-center justify-between bg-[#222] cursor-pointer hover:bg-[#333] border-[1px] border-[#535353] p-2 rounded-lg text-sm'
+                                        className='flex flex-col gap-2 h-auto sm:h-[90px] sm:flex-row items-center justify-between bg-[#222] cursor-pointer hover:bg-[#333] border-[1px] border-[#535353] p-2 rounded-lg text-sm'
                                         key={index}>
 
                                         <p  className="font-bold text-sm text-left w-full" key={index}>{item.name}</p>

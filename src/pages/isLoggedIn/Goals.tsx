@@ -89,7 +89,6 @@ const Goals: React.FC = () => {
             const subscription = supabase
                 .channel('public:goals')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, (payload) => {
-                    console.log('Realtime event:', payload);
                     handleRealtimeEvent(payload);
                 })
                 .subscribe();
@@ -177,7 +176,6 @@ const Goals: React.FC = () => {
                 console.error('Error fetching data:', error);
 
             } else {
-                console.log(data)
                 let primaryGoals: any = [];
                 let otherGoals: any = [];
                 setIsLoaded(true)

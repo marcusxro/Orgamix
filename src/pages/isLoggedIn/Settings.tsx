@@ -58,6 +58,7 @@ const Settings: React.FC = () => {
 
     const [isErrorPfp, setIsErrorPfp] = useState<string | null>(null)
     const [isErrorAttach, setIsErrorAttach] = useState<string | null>(null)
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0] || null;
 
@@ -146,11 +147,12 @@ const Settings: React.FC = () => {
     const uploadImage = async () => {
 
         if (loading) return
-
+        setLoading(true)
         if (!file || !user) {
             setLoading(false)
             return
         };
+
         try {
             const compressedFile = await imageCompression(file, {
                 maxSizeMB: 0.2, // Compress to max size 200 KB
@@ -164,7 +166,7 @@ const Settings: React.FC = () => {
             await supabase.storage.from('profile').remove([filePath]);
 
             // Upload the image to the user's UID folder with a fixed name
-            const { data, error } = await supabase.storage
+            const { error } = await supabase.storage
                 .from('profile')
                 .upload(filePath, compressedFile); // No upsert; we remove the old one first
 
@@ -172,8 +174,6 @@ const Settings: React.FC = () => {
                 console.error('Error uploading file:', error.message);
                 setLoading(false)
             } else {
-                console.log('File uploaded successfully:', data);
-                // Fetch the new image URL after uploading
                 setLoading(false)
                 fetchImage();
                 setFile(null)
@@ -192,6 +192,8 @@ const Settings: React.FC = () => {
             setLoading(false)
         }
     };
+
+   
     const [loadingFeedBacks, setLoadingFeedBacks] = useState<boolean>(false)
 
     const uploadImageAttachment = async () => {
@@ -437,21 +439,21 @@ const Settings: React.FC = () => {
     function logOutUser() {
         const auth = getAuth()
         const signOutUserFunc = signOut(auth)
-        .then(() => {
-            console.log("completed")
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+            .then(() => {
+                console.log("completed")
+            })
+            .catch((err) => {
+                console.log(err)
+            })
 
-        return () => {signOutUserFunc}
+        return () => { signOutUserFunc }
     }
 
     return (
         <div>
             <Sidebar location='Settings' />
             {
-                user  &&
+                user &&
                 <MetaEditor
                     title={`Settings | ${user?.email}`}
                     description='Manage your account preferences, privacy, and system settings to customize your experience.'
@@ -625,7 +627,9 @@ const Settings: React.FC = () => {
                                                 Provider: <span>{user?.providerData[0]?.providerId}</span>
                                             </div>
                                             <div className='bg-[#222] border-[1px] text-[#888] border-[#535353] w-full rounded-lg py-1 px-3 outline-none'>
-                                                Created at:  <span>{moment(user?.metadata?.createdAt * (user?.metadata?.createdAt.toString().length === 10 ? 1000 : 1)).format('MMMM Do YYYY, h:mm a')}</span>                                  </div>
+                                                Last sign in:  <span>{moment(user?.metadata?.lastLoginAt
+                                                    * (user?.metadata?.lastLoginAt
+                                                        .toString().length === 10 ? 1000 : 1)).format('MMMM Do YYYY, h:mm a')}</span>                                  </div>
                                         </div>
 
                                     </div>
@@ -822,8 +826,8 @@ const Settings: React.FC = () => {
                         <div className='flex gap-5 items-center'>
                             <div className='text-xl font-bold'>Logout</div>
                             <div
-                            onClick={logOutUser} 
-                             className='bg-red-500 text-white p-3 rounded-lg cursor-pointer hover:bg-[#888]'>
+                                onClick={logOutUser}
+                                className='bg-red-500 text-white p-3 rounded-lg cursor-pointer hover:bg-[#888]'>
                                 <IoIosLogOut />
                             </div>
                         </div>

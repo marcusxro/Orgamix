@@ -13,6 +13,7 @@ import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { CiChat1 } from "react-icons/ci";
 import { FaArrowDown } from "react-icons/fa6";
 import Loader from '../../Loader';
+import FetchPFP from '../../FetchPFP';
 
 
 interface MessageType {
@@ -498,10 +499,8 @@ const Chat:React.FC = () => {
                                                             className={`${itm?.userid === user?.uid ? "ml-auto" : ""} flex gap-2 items-start justify-start`}>
                                                             {
                                                                 !(user?.uid === itm?.userid) && (!itm?.id.toString().includes('muted-')) &&
-                                                                <div className='w-[30px] h-[30px] rounded-full overflow-hidden'>
-                                                                    <img
-                                                                        className='w-full h-full object-cover'
-                                                                        src={UserNoProfile} alt="" />
+                                                                <div className='w-[30px] h-[30px] flex items-center justify-center rounded-full overflow-hidden'>
+                                                                 <FetchPFP userUid={itm?.userid} />
                                                                 </div>
                                                             }
                                                             <div className='flex flex-col gap-1 items-start justify-start'>

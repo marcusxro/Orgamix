@@ -23,19 +23,30 @@ const SignIn: React.FC = () => {
     const [password, setPassword] = useState<string>("")
     const [user] = IsLoggedIn()
     const [loading, setLoading] = useState(false)
-
+    const [isLoad, setIsLoad] = useState(false)
+    
     async function handleGoogleSignIn() {
-
+        if (loading) return; // Prevent multiple calls if already loading
+        setIsLoad(true);
+    
         try {
             const result = await signInWithPopup(firebaseAuthKey, provider);
             const user = result.user;
             console.log("User signed in:", user);
-            // You can perform additional actions here, like saving user info in the state
-        } catch (err) {
-
-            console.error("Error during sign-in:", err);
+            // Additional actions, like saving user info, can be done here
+    
+        } catch (err: any) {
+            console.log(err);
+            if (err.code === 'auth/popup-closed-by-user') {
+                setIsLoad(false); // Reset loading state if user closes the popup
+            } else {
+                console.error("Error during sign-in:", err);
+            }
+        } finally {
+            setIsLoad(false); // Reset loading state regardless of success or error
         }
     }
+    
 
     const nav = useNavigate()
 
@@ -195,9 +206,20 @@ const SignIn: React.FC = () => {
                 </div>
 
                 <div
-                    onClick={handleGoogleSignIn}
+                    onClick={() => {!isLoad && handleGoogleSignIn()}}
                     className='bg-[#242424] py-2 rounded-md selectionNone cursor-pointer  border-[1px] border-[#414141] mt-1 hover:bg-[#414141] flex gap-2 items-center justify-center'>
-                    <span className='text-md text-orange-500'><FaGoogle /></span> Sign in with Google
+
+                    {
+                        isLoad ?
+                            <div className='w-[20px] h-[20px]'>
+                                <Loader />
+                            </div>
+
+                            :
+                            <>
+                                <span className='text-md text-orange-500'>  <FaGoogle /></span> Sign in with Google
+                            </>
+                    }
 
                 </div>
 
