@@ -13,13 +13,7 @@ interface taskDataType {
     link: string[];
     category: string;
 }
-interface dataType {
-    id: number;
-    content: string;
-    created_at: any; // Assuming this is a timestamp in milliseconds
-    uid: string;
-    linkofpage: string;
-  }
+
 interface AppState {
     showNotif: boolean | null;
     setShowNotif: (params: boolean) => void;
