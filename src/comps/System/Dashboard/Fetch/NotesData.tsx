@@ -84,7 +84,7 @@ const NotesData: React.FC = () => {
     };
 
     const nav = useNavigate()
-    const {mobileShow, setMobileShow}: any = useStore()
+    const  {setMobileShow}: any = useStore()
 
     return (
         <div className='flex flex-col overflow-auto justify-between h-full'>
@@ -105,6 +105,7 @@ const NotesData: React.FC = () => {
                             {
                                 fetchedData && fetchedData?.map((note, index) => (
                                     <div
+                                    onClick={() => {nav(`/user/notes/${note.userid}/${note?.createdat}`)}}
                                         key={index}
                                         className='h-full w-full'>
                                         <ReactQuill

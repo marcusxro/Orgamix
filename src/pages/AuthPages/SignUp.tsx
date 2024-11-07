@@ -4,12 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import { firebaseAuthKey } from '../../firebase/FirebaseKey'
 import Loader from '../../comps/Loader'
 import { supabase } from '../../supabase/supabaseClient'
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Header from '../../comps/Header'
 import Menu from '../../comps/Menu'
 import useStore from '../../Zustand/UseStore'
+import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 
 
 
@@ -107,7 +108,7 @@ const SignUp: React.FC = () => {
                 if (user && !user.emailVerified) {
 
                     createUser(user?.uid)
-                 
+
                 }
 
 
@@ -135,9 +136,15 @@ const SignUp: React.FC = () => {
         console.log(seePass)
     }
     const { showMenu }: any = useStore()
-    
+
     return (
         <div className='w-full h-[100dvh] p-3 items-center flex justify-center'>
+            <MetaEditor
+                title="Orgamix | Sign Up"
+                description="Join Orgamix to start organizing your life with tools for projects, deadlines, and goal setting. Get started today!"
+                keywords='Orgamix, Sign Up, Dashboard, Tasks, Projects, Goals'
+            />
+
             <ToastContainer />
             {
                 showMenu &&
@@ -150,9 +157,9 @@ const SignUp: React.FC = () => {
             <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-transparent via-transparent to-[#333] z-10 opacity-100"></div>
 
             <motion.form
-               initial={{ scale: 0.95, opacity: 0 }}
-               animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
-               exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
+                exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
                 onSubmit={createUserAccount}
                 className='w-full flex flex-col gap-2 z-[12] max-w-[400px] p-3 rounded-lg bg-[#2e2e2e] border-[1px] border-[#414141]'
                 action="submit">
@@ -223,7 +230,7 @@ const SignUp: React.FC = () => {
                         or
                     </div>
                 </div>
- 
+
                 <button
                     onClick={() => {
                         nav('/sign-in')

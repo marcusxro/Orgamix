@@ -14,6 +14,7 @@ import Loader from '../../comps/Loader';
 import { motion, AnimatePresence } from 'framer-motion'
 import { GoSortAsc } from "react-icons/go";
 import GoalSorter from '../../comps/System/GoalSorter';
+import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 interface subtaskType {
     is_done: boolean;
@@ -321,6 +322,14 @@ const Goals: React.FC = () => {
 
     return (
         <div>
+            {
+                user &&
+                <MetaEditor
+                title={`Goals | ${user?.email}`}
+                description='Easily create, edit, and organize your notes in this section for a streamlined experience.'
+                keywords='goals, tasks, notes, projects, productivity, Coderplex'
+            />
+            }
             <Sidebar location='Goals' />
 
             {

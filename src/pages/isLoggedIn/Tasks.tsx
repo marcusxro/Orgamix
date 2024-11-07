@@ -15,6 +15,7 @@ import Loader from '../../comps/Loader'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../../Zustand/UseStore'
 import { CiRepeat } from "react-icons/ci";
+import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 
 
 interface taskDataType {
@@ -307,6 +308,13 @@ const Tasks: React.FC = () => {
 
     return (
         <div className='w-full h-full relative'>
+           {
+            user &&
+            <MetaEditor 
+            title={`Tasks | ${user?.email}`}
+                      description='Manage your daily to-do list.'
+                      />
+           }
             <Sidebar location='Tasks' />
             {
                 isSort &&

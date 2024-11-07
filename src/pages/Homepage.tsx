@@ -17,14 +17,20 @@ import IsLoggedIn from '../firebase/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../Zustand/UseStore';
 import Menu from '../comps/Menu';
+import MetaEditor from '../comps/MetaHeader/MetaEditor';
 
 const Homepage: React.FC = () => {
   const [user] = IsLoggedIn()
   const nav = useNavigate()
-  const {showMenu}: any = useStore()
-  
+  const { showMenu }: any = useStore()
+
   return (
     <div className='h-auto relative bg-[#222] min-h-[100vh] '>
+      <MetaEditor
+        title="Orgamix | Home"
+        description="Orgamix is a productivity web app designed to help you manage tasks, goals, notes, projects, and deadlines, all while supporting charitable causes."
+        keywords='Orgamix, productivity, tasks, goals, notes, projects, deadlines, charity, donations, web app, software, organization, management, planning, collaboration, real-time, projects, tasks, goals, notes, deadlines'
+     />
       <Header />
       {
         showMenu &&
@@ -54,9 +60,9 @@ const Homepage: React.FC = () => {
             <div className='flex relative z-10 gap-3 text-sm mt-5'>
               <div
                 onClick={() => {
-                  !user ? nav('/sign-in') : nav('/user/dashboard') 
-                  }}
-               className='bg-[#222] px-5 py-2 font-bold rounded-lg cursor-pointer hover:bg-[#888]'>
+                  !user ? nav('/sign-in') : nav('/user/dashboard')
+                }}
+                className='bg-[#222] px-5 py-2 font-bold rounded-lg cursor-pointer hover:bg-[#888]'>
                 Start now
               </div>
               <div className='bg-[#fff] text-black font-bold px-5 py-2 rounded-lg cursor-pointer hover:bg-[#888] hover:text-white'>
@@ -429,10 +435,10 @@ const Homepage: React.FC = () => {
             </div>
 
             <div
-            onClick={() => {
-            !user ? nav('/sign-in') : nav('/user/dashboard') 
-            }}
-             className='text-black  bg-white rounded-full p-5 px-7 cursor-pointer hover:bg-[#414141]  hover:text-white'>
+              onClick={() => {
+                !user ? nav('/sign-in') : nav('/user/dashboard')
+              }}
+              className='text-black  bg-white rounded-full p-5 px-7 cursor-pointer hover:bg-[#414141]  hover:text-white'>
               <MdOutlineArrowOutward />
             </div>
           </div>

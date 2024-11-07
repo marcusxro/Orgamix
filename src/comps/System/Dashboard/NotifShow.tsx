@@ -4,6 +4,7 @@ import { supabase } from '../../../supabase/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { motion, AnimatePresence } from 'framer-motion';
+import useStore from '../../../Zustand/UseStore';
 
 interface dataType {
     id: number;
@@ -89,6 +90,10 @@ const NotifShow: React.FC = () => {
         }
     }
     const nav = useNavigate()
+
+    const { setViewNotifs }: any = useStore()
+
+
     return (
         <div>
             <div className='font-bold mb-2'>
@@ -190,6 +195,7 @@ const NotifShow: React.FC = () => {
                         </motion.div>
                     ))}
                     <motion.div
+                        onClick={() => { setViewNotifs(true) }}
                         className='bg-[#111] p-2 text-green-500 rounded-lg border-[1px] border-[#535353] cursor-pointer'
                         whileHover={{ scale: 1.05 }} // Hover effect for extra interactivity
                     >

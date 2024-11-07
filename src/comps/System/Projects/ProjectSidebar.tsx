@@ -7,7 +7,7 @@ import IsLoggedIn from '../../../firebase/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
 import { BsShareFill } from "react-icons/bs";
 import Loader from '../../Loader';
-
+import { motion } from 'framer-motion'
 interface propsType {
     isUid: string | undefined
 }
@@ -92,7 +92,7 @@ const ProjectSidebar: React.FC<propsType> = ({ isUid }) => {
 
     const [isMobile, setIsMobile] = useState(window.innerWidth >= 768);
 
-  
+
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth >= 768);
@@ -264,19 +264,25 @@ const ProjectSidebar: React.FC<propsType> = ({ isUid }) => {
                     }
                     {
                         user && fetchedData && filteredData?.map((itm: dataType, idx: number) => (
-                            <div
-                                key={idx}
+                            <motion.div
+                                key={`${itm.id}-${idx}`} // Using both id and idx for uniqueness
+                                initial={{ y: 20, opacity: 0 }} // Initial position and opacity
+                                animate={{ y: 0, opacity: 1 }} // End position and opacity
+                                transition={{
+                                    duration: 0.2,
+                                    delay: idx * 0.1 // Staggered animation for notifications
+                                }}
                                 onClick={() => { nav(`/user/projects/view/${itm?.created_by}/${itm?.created_at}`); }}
 
                                 className={`${isUid != undefined && isUid === itm?.created_at.toString() && 'bg-[#535353] rounded-lg text-white'} border-[#535353] border-[1px]  bg-[#1b1b1b] rounded-lg  p-2 text-[#888] cursor-pointer`}>
-                                    <div className='text-white'>
+                                <div className='text-white'>
                                     {itm?.name.length >= 20 ? itm?.name.slice(0, 20) + "..." : itm.name}
-                                    </div>
+                                </div>
 
                                 <div>
                                     {itm?.is_shared}
                                 </div>
-                            </div>
+                            </motion.div>
                         ))
                     }
                 </div>

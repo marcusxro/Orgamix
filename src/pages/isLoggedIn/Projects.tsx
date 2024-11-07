@@ -14,6 +14,7 @@ import moment from 'moment';
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Loader from '../../comps/Loader'
+import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 
 
 interface invitedEmails {
@@ -226,6 +227,14 @@ const Projects: React.FC = () => {
     return (
         <div className='h-auto'>
             <Sidebar location='Projects' />
+         {
+            user && 
+            <MetaEditor
+            title={`Projects | ${user?.email}`}
+            description='Projects to manage your workflow with ease.'
+            keywords='Projects, Manage, Workflow, Orgamix'
+        />
+         }
 
             {
                 openNew &&

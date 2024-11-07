@@ -74,9 +74,6 @@ const Notification: React.FC = () => {
           console.warn('Unhandled event type:', payload.eventType);
           return prevNotifs;
       }
-
-      console.log('Updated notifications:', updatedData); // Log updated notifications
-
       groupNotifs(updatedData); // Regroup notifications after update
       return updatedData; // Return the updated notification list to setNotifications
     });
@@ -91,8 +88,8 @@ const Notification: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (data) {
-        setNotifications(data); // Set initial notifications
-        groupNotifs(data); // Group the notifications right after fetching
+        setNotifications(data); 
+        groupNotifs(data); 
       }
 
       if (error) {
@@ -106,11 +103,9 @@ const Notification: React.FC = () => {
   const groupNotifs = (notifications: dataType[]) => {
     const grouped: { [key: string]: dataType[] } = {};
     const today = new Date();
-
     notifications.forEach((notif) => {
       const createdAt = new Date(notif.created_at);
       let key = '';
-
       if (isToday(createdAt, today)) {
         key = 'Today';
       } else if (isYesterday(createdAt, today)) {
@@ -122,13 +117,11 @@ const Notification: React.FC = () => {
       } else {
         key = 'Earlier';
       }
-
       if (!grouped[key]) {
         grouped[key] = [];
       }
       grouped[key].push(notif);
     });
-
     setGroupedData(grouped); // Update the grouped notifications state
   };
 
@@ -207,21 +200,21 @@ const Notification: React.FC = () => {
             {
               notifs == null && (
                 <div className='h-full flex flex-col gap-5 overflow-auto p-3'>
-           <div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+                  <div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
 
-           </div>
-           <div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+                  </div>
+                  <div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
 
-</div>
-<div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+                  </div>
+                  <div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
 
-</div>
-<div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+                  </div>
+                  <div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
 
-</div>
-<div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
+                  </div>
+                  <div className='bg-[#888] rounded-lg min-h-[60px] animate-pulse'>
 
-</div>
+                  </div>
                 </div>
               )
             }
@@ -247,7 +240,7 @@ const Notification: React.FC = () => {
                               delay: index * 0.1 // Staggered animation for notifications
                             }}
                             onClick={() => { getNavigated(itm.linkofpage) }}
-                            className='bg-[#222] rounded-lg flex justify-between items-start flex-col'
+                            className='bg-[#222] rounded-lg flex justify-between items-start flex-col hover:bg-[#292929] border-[1px] border-[#535353] cursor-pointer'
                           >
                             <div className='p-3 rounded-lg flex justify-between gap-2 items-start w-full'>
                               <span className='w-full max-w-[300px]'>{itm.content}</span>

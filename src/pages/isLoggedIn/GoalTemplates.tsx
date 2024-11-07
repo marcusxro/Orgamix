@@ -23,6 +23,7 @@ import ViewTemplate from '../../comps/System/ViewTemplate';
 import ReportGoal from '../../comps/System/ReportGoal';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '../../comps/Footer';
+import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 
 interface subtaskType {
@@ -195,6 +196,14 @@ const GoalTemplates: React.FC = () => {
         <div
             onClick={() => { setViewEllip(null) }}
             className='w-full h-full'>
+           {
+            user &&
+            <MetaEditor
+            title={`Goal Templates | ${user?.email}`}
+            description='Choose from a variety of pre-defined goal templates to help you stay organized and motivated. Easily import a template that aligns with your objectives, whether for personal development, fitness, or work projects.'
+            keywords='Orgamix, Goal Template, Templates, Goals, Projects, Tasks'
+            />
+           }
             {
                 isOpenCreate &&
                 <ChooseMethod closer={setIsOpenCreate} />
@@ -344,129 +353,129 @@ const GoalTemplates: React.FC = () => {
                                         <div>No result :(</div>
                                     </div>
                                 }
-                               <AnimatePresence>
-                               {
-                                    fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
-                                        <motion.div
-                                        layout
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 10 }}
-                              transition={{ duration: 0.3 }}
-                                            onClick={() => {
-                                                setTemplateID(itm?.created_at)
-                                            }}
-                                            key={idx}
-                                            className='w-full  bg-[#313131] border-[#535353] relative border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>
-                                         
-                                            <div className='flex h-auto items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
-                                                <div
-                                                    className={`w-[2px] h-full`}>
-                                                </div>
+                                <AnimatePresence>
+                                    {
+                                        fetchedData && fetchedData?.map((itm: dataType, idx: number) => (
+                                            <motion.div
+                                                layout
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 10 }}
+                                                transition={{ duration: 0.3 }}
+                                                onClick={() => {
+                                                    setTemplateID(itm?.created_at)
+                                                }}
+                                                key={idx}
+                                                className='w-full  bg-[#313131] border-[#535353] relative border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>
 
-                                                <div
-                                                 className='flex flex-col p-3 w-full'>
-                                                    {
-                                                        viewEllip === idx && isDelete === null &&
-                                                        (<div
-                                                            onClick={(e) => { e.stopPropagation() }}
-                                                            className=' bg-[#111111] border-[#535353] border-[1px] flex flex-col toRight overflow-hidden rounded-md'>
-                                                            <div
-                                                                onClick={() => {
-                                                                    setTemplateID(itm?.created_at)
-                                                                }}
-                                                                className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>View</div>
-                                                            <div
-                                                                onClick={() => {
-                                                                    setIsReport(itm?.created_at);
-                                                                    setGoalToReport(itm)
-                                                                }}
-                                                                className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Report</div>
+                                                <div className='flex h-auto items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
+                                                    <div
+                                                        className={`w-[2px] h-full`}>
+                                                    </div>
 
-                                                            {itm?.authorUid === user?.uid &&
+                                                    <div
+                                                        className='flex flex-col p-3 w-full'>
+                                                        {
+                                                            viewEllip === idx && isDelete === null &&
+                                                            (<div
+                                                                onClick={(e) => { e.stopPropagation() }}
+                                                                className=' bg-[#111111] border-[#535353] border-[1px] flex flex-col toRight overflow-hidden rounded-md'>
                                                                 <div
-                                                                    onClick={() => { setIsDelete(idx) }}
-                                                                    className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Delete</div>}
-                                                            <div
-                                                                onClick={() => { setViewEllip(null) }}
-                                                                className='px-2 py-1 border-b-[#535353] border-b-[1px] text-red-500 hover:bg-[#222222]'>Close</div>
-                                                        </div>)
-                                                    }
-                                                    {
-                                                        isDelete === idx && itm?.authorUid === user?.uid && viewEllip === idx &&
-                                                        (<div
-                                                            onClick={(e) => { e.stopPropagation() }}
-                                                            className=' bg-[#111111] border-[#535353] border-[1px] flex flex-col toRight overflow-hidden rounded-md'>
-                                                            <div
-                                                                onClick={() => { setIsDelete(null) }}
-                                                                className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Cancel</div>
-                                                            <div
-                                                                onClick={() => { deleteGoalsByID(itm?.created_at, itm?.authorUid) }}
-                                                                className='px-2 py-1 text-red-500 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Delete</div>
-                                                        </div>)
-                                                    }
+                                                                    onClick={() => {
+                                                                        setTemplateID(itm?.created_at)
+                                                                    }}
+                                                                    className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>View</div>
+                                                                <div
+                                                                    onClick={() => {
+                                                                        setIsReport(itm?.created_at);
+                                                                        setGoalToReport(itm)
+                                                                    }}
+                                                                    className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Report</div>
 
-                                                    <div className='flex gap-3 justify-between w-full'>
-                                                        <div className='font-bold mb-1'>
-                                                            {itm?.title.length >= 25 ? itm?.title.slice(0, 25) + '...' : itm?.title}
-                                                        </div>
-                                                        <div>
+                                                                {itm?.authorUid === user?.uid &&
+                                                                    <div
+                                                                        onClick={() => { setIsDelete(idx) }}
+                                                                        className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Delete</div>}
+                                                                <div
+                                                                    onClick={() => { setViewEllip(null) }}
+                                                                    className='px-2 py-1 border-b-[#535353] border-b-[1px] text-red-500 hover:bg-[#222222]'>Close</div>
+                                                            </div>)
+                                                        }
+                                                        {
+                                                            isDelete === idx && itm?.authorUid === user?.uid && viewEllip === idx &&
+                                                            (<div
+                                                                onClick={(e) => { e.stopPropagation() }}
+                                                                className=' bg-[#111111] border-[#535353] border-[1px] flex flex-col toRight overflow-hidden rounded-md'>
+                                                                <div
+                                                                    onClick={() => { setIsDelete(null) }}
+                                                                    className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Cancel</div>
+                                                                <div
+                                                                    onClick={() => { deleteGoalsByID(itm?.created_at, itm?.authorUid) }}
+                                                                    className='px-2 py-1 text-red-500 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Delete</div>
+                                                            </div>)
+                                                        }
 
-                                                            <div
-                                                                onClick={(e) => { e.stopPropagation(); setViewEllip(idx) }}
-                                                                className='text-[#888] hover:text-[#fff]'>
-                                                                <FaEllipsisH />
+                                                        <div className='flex gap-3 justify-between w-full'>
+                                                            <div className='font-bold mb-1'>
+                                                                {itm?.title.length >= 25 ? itm?.title.slice(0, 25) + '...' : itm?.title}
                                                             </div>
+                                                            <div>
 
+                                                                <div
+                                                                    onClick={(e) => { e.stopPropagation(); setViewEllip(idx) }}
+                                                                    className='text-[#888] hover:text-[#fff]'>
+                                                                    <FaEllipsisH />
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                            <BiCategory />{itm?.category}
+                                                        </div>
+                                                        <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                            <GetAuthor authorUid={itm?.authorUid} />
+                                                        </div>
+                                                        <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                            <MdOutlineFileDownload /> {itm?.download_count}  <p>
+                                                                {itm?.download_count >= 1000 ? (
+                                                                    <span className="label label-top-choice">🌟 Top Download</span>
+                                                                ) : itm?.download_count >= 500 ? (
+                                                                    <span className="label label-highly-rated">⭐ Highly Rated</span>
+                                                                ) : itm?.download_count >= 300 ? (
+                                                                    <span className="label label-best-choice">🔥 Best User Choice</span>
+                                                                ) : itm?.download_count >= 100 ? (
+                                                                    <span className="label label-trending">📈 Trending Now</span>
+                                                                ) : itm?.download_count >= 50 ? (
+                                                                    <span className="label label-popular">✨ Popular</span>
+                                                                ) : (
+                                                                    <span className="label label-default"></span>
+                                                                )}
+                                                            </p>
                                                         </div>
                                                     </div>
-
-                                                    <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                        <BiCategory />{itm?.category}
-                                                    </div>
-                                                    <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                        <GetAuthor authorUid={itm?.authorUid} />
-                                                    </div>
-                                                    <div className='text-[#888] text-sm flex gap-1 items-center'>
-                                                        <MdOutlineFileDownload /> {itm?.download_count}  <p>
-                                                            {itm?.download_count >= 1000 ? (
-                                                                <span className="label label-top-choice">🌟 Top Download</span>
-                                                            ) : itm?.download_count >= 500 ? (
-                                                                <span className="label label-highly-rated">⭐ Highly Rated</span>
-                                                            ) : itm?.download_count >= 300 ? (
-                                                                <span className="label label-best-choice">🔥 Best User Choice</span>
-                                                            ) : itm?.download_count >= 100 ? (
-                                                                <span className="label label-trending">📈 Trending Now</span>
-                                                            ) : itm?.download_count >= 50 ? (
-                                                                <span className="label label-popular">✨ Popular</span>
-                                                            ) : (
-                                                                <span className="label label-default"></span>
-                                                            )}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className='flex justify-between items-center p-3 text-[#888] gap-2'>
-                                                <div>
-                                                    {itm?.sub_tasks.filter((itmz) => itmz.is_done).length}
-                                                    /
-                                                    {itm?.sub_tasks.length}
                                                 </div>
 
+                                                <div className='flex justify-between items-center p-3 text-[#888] gap-2'>
+                                                    <div>
+                                                        {itm?.sub_tasks.filter((itmz) => itmz.is_done).length}
+                                                        /
+                                                        {itm?.sub_tasks.length}
+                                                    </div>
 
-                                                <div>
-                                                    {itm?.created_at
-                                                        ? moment(parseInt(itm?.created_at.toString())).format('MMMM Do YYYY')
-                                                        : 'No Creation date'}
+
+                                                    <div>
+                                                        {itm?.created_at
+                                                            ? moment(parseInt(itm?.created_at.toString())).format('MMMM Do YYYY')
+                                                            : 'No Creation date'}
+                                                    </div>
                                                 </div>
-                                            </div>
 
 
-                                        </motion.div>
-                                    ))
-                                }
-                               </AnimatePresence>
+                                            </motion.div>
+                                        ))
+                                    }
+                                </AnimatePresence>
                             </>
                     }
                 </div>

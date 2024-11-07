@@ -90,7 +90,7 @@ const ViewTask: React.FC<propsType> = ({ objPass }) => {
 
                                     <div className='w-[10px] h-[10px] bg-red-500'>
                                     </div>
-                                    {objPass?.category ? objPass?.category : 'No Ctegory'}
+                                    {objPass?.category ? objPass?.category : 'No Category'}
                                 </div>
                             </div>
                             <div className='flex gap-2'>

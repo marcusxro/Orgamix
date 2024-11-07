@@ -8,6 +8,7 @@ import Loader from '../Loader';
 import ShareNotes from './ShareNotes';
 import { MdModeEdit } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
+import MetaEditor from '../MetaHeader/MetaEditor';
 
 
 const fontOptions = [
@@ -255,6 +256,14 @@ const VisitNote = () => {
 
     return (
         <div className={`${!fetchedData && 'items-center justify-center'} p-4 h-[100dvh]  overflow-auto flex flex-col gap-2`}>
+            {
+                user && fetchedData &&
+                <MetaEditor
+                    title={`${fetchedData[0]?.title} | ${user?.email}`}
+                    description='Create and edit notes with Orgamix.'
+                    keywords='Orgamix, Notes, Edit, Create, Share, Title, Content, Text, Font, Size, Bold, Italic, Underline, Strike, Blockquote, Link, Color, Background, Align, Clean'
+                />
+            }
             {
                 isShare &&
 

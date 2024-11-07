@@ -13,6 +13,7 @@ import Loader from '../../comps/Loader';
 import { motion, AnimatePresence } from 'framer-motion'
 import { GoSortAsc } from "react-icons/go";
 import NoteSorter from '../../comps/NoteSorter';
+import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 
 interface fetchedDataType {
@@ -29,7 +30,7 @@ const Notes = () => {
     const [fetchedData, setFetchedData] = useState<fetchedDataType[] | null>(null)
     const [filteredData, setFilteredData] = useState<fetchedDataType[] | null | undefined>(null)
     const [showAdd, setShowAdd] = useState<boolean>(true)
-    const {mobileShow, setMobileShow}: any = useStore()
+    const { mobileShow, setMobileShow }: any = useStore()
     const { editTask } = useStore()
     const [action, setAction] = useState<number | null>(null)
     const [searchVal, setSearchVal] = useState<string>("")
@@ -131,7 +132,7 @@ const Notes = () => {
             const { data, error } = await supabase.from("notes")
                 .select("*")
                 .eq('userid', user?.uid)
-                .order(columnName === null? "createdat" : columnName, { ascending: true });
+                .order(columnName === null ? "createdat" : columnName, { ascending: true });
 
             if (error) {
                 console.error(error)
@@ -178,6 +179,13 @@ const Notes = () => {
 
     return (
         <div className='flex'>
+         {
+            user && 
+            <MetaEditor
+            title={`Notes | ${user?.email}`}
+            description='Easily create, edit, and organize your notes in this section for a streamlined experience.'
+        />
+         }
             <Sidebar location='Notes' />
             {
                 isSort &&
@@ -226,12 +234,12 @@ const Notes = () => {
                                 filteredData?.length === 0 && searchVal != "" &&
                                 <div className='text-sm text-[#888]'>No result</div>
                             }
-                              {
-                                filteredData?.length === 0 && searchVal === ""  &&
+                            {
+                                filteredData?.length === 0 && searchVal === "" &&
                                 <div className='text-sm text-[#888]'>Write your first note!</div>
                             }
 
-                            
+
                             {
                                 filteredData === null ?
                                     <div className='w-[20px] h-[20px]'>

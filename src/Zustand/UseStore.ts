@@ -82,6 +82,10 @@ interface AppState {
 
     notifData: taskDataType | null;
     setNotifData: (task: taskDataType | null) => void;
+
+    showActivity: boolean | null;
+    setShowActivity: (params: boolean) => void;
+
 }
 
 const useStore = create<AppState>((set) => ({
@@ -141,6 +145,11 @@ const useStore = create<AppState>((set) => ({
 
     notifData: null,
     setNotifData: (task) => set({ notifData: task }),
+
+
+    showActivity: null,
+    setShowActivity: (task) => set({ showActivity: task }),
+
 
 }));
 

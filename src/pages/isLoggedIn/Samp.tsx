@@ -50,6 +50,7 @@ import EditContainer from '../../comps/System/Projects/EditContainer';
 import InviteToProjects from '../../comps/System/Projects/InviteToProjects';
 import ProjectSettings from '../../comps/System/Projects/ProjectSettings';
 import Chat from '../../comps/System/Projects/Chat';
+import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 
 interface invitedEmails {
@@ -164,7 +165,7 @@ export default function Samp() {
 
     const handleRealtimeEvent = (payload: any) => {
         console.log(payload.new);
-        
+
         // Check if the item matches the payload before switching
         const matchingItem = fetchedData?.find(item => item.id === payload.new.id);
         if (matchingItem) {
@@ -173,33 +174,33 @@ export default function Samp() {
                 console.log(`created_by changed from ${matchingItem.created_by} to ${payload.new.created_by}`);
             }
         }
-    
+
         switch (payload.eventType) {
             case 'INSERT':
                 setFetchedData((prevData) =>
                     prevData ? [...prevData, payload.new] : [payload.new]
                 );
                 break;
-    
+
             case 'UPDATE':
                 if (fetchedData) {
-                    setFetchedData(fetchedData.map((item) => 
+                    setFetchedData(fetchedData.map((item) =>
                         item.id === payload.new.id ? payload.new : item
                     ));
                 }
                 break;
-    
+
             case 'DELETE':
                 setFetchedData((prevData) =>
                     prevData ? prevData.filter((item) => item.id !== payload.old.id) : null
                 );
                 break;
-    
+
             default:
                 break;
         }
     };
-    
+
 
     async function getProjects() {
 
@@ -252,7 +253,7 @@ export default function Samp() {
     async function onAddContainer() {
         if (loading) return; // Prevent multiple submissions
         setLoading(true);
-    
+
 
         if (!containerName) {
             setLoading(false)
@@ -320,7 +321,7 @@ export default function Samp() {
     async function onAddItem() {
         if (loading) return; // Prevent multiple submissions
         setLoading(true);
-    
+
 
         if (!itemName || !assignee) {
             setLoading(false);
@@ -832,11 +833,18 @@ export default function Samp() {
         setEditedTask("");
     };
 
-  
-    
+
+
     return (
         <div className=' flex flex-col h-[100dvh] overflow-hidden md:flex-row'>
-
+            {
+                user && fetchedData &&
+                <MetaEditor
+                    title={`${fetchedData && fetchedData[0]?.name || "Not found"} | ${user?.email}`}
+                    description='Projects to manage your workflow with ease.'
+                    keywords='Projects, Manage, Workflow, Orgamix'
+                />
+            }
             {
                 //closes the modal if its in private, and not included in shareable invited_emails
                 (fetchedData && fetchedData.length > 0 && (
@@ -1247,7 +1255,7 @@ export default function Samp() {
 
                                                     </div>
                                                 }
-         
+
 
                                                 <div className='mt-5'>
                                                     <div className="grid p-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">

@@ -9,12 +9,13 @@ import { FaEyeSlash } from "react-icons/fa";
 import Header from '../../comps/Header';
 import useStore from '../../Zustand/UseStore';
 import Menu from '../../comps/Menu';
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion'
 import { FaGoogle } from "react-icons/fa";
 
 import { provider } from '../../firebase/FirebaseKey';
 import Loader from '../../comps/Loader';
 import IsLoggedIn from '../../firebase/IsLoggedIn';
+import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 const SignIn: React.FC = () => {
 
@@ -24,23 +25,23 @@ const SignIn: React.FC = () => {
     const [loading, setLoading] = useState(false)
 
     async function handleGoogleSignIn() {
-    
+
         try {
-          const result = await signInWithPopup(firebaseAuthKey, provider);
-          const user = result.user;
-          console.log("User signed in:", user);
-          // You can perform additional actions here, like saving user info in the state
+            const result = await signInWithPopup(firebaseAuthKey, provider);
+            const user = result.user;
+            console.log("User signed in:", user);
+            // You can perform additional actions here, like saving user info in the state
         } catch (err) {
 
-          console.error("Error during sign-in:", err);
+            console.error("Error during sign-in:", err);
         }
-      }
-      
+    }
+
     const nav = useNavigate()
 
 
     useEffect(() => {
-        if(user?.emailVerified) {
+        if (user?.emailVerified) {
             nav('/user/dashboard')
         }
     }, [user])
@@ -64,7 +65,7 @@ const SignIn: React.FC = () => {
     function signIn(e: FormEvent) {
         e.preventDefault()
         setLoading(true)
-        if(loading) {
+        if (loading) {
             return
         }
         if (!email || !password) {
@@ -110,6 +111,12 @@ const SignIn: React.FC = () => {
     const { showMenu }: any = useStore()
     return (
         <div className='w-full h-[100dvh] p-3 items-center flex justify-center'>
+            <MetaEditor
+                title="Orgamix | Sign In"
+                description="Access your Orgamix dashboard to manage and track your tasks, projects, and personal goals with ease."
+                keywords='Orgamix, Sign In, Dashboard, Tasks, Projects, Goals'
+            />
+
             <ToastContainer />
             <div className="absolute inset-0 w-full h-full bg-transparent z-10 opacity-40 grid-overlay"></div>
             <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-transparent via-transparent to-[#333] z-10 opacity-100"></div>
@@ -122,9 +129,9 @@ const SignIn: React.FC = () => {
                 <Header />
             </div>
             <motion.form
-               initial={{ scale: 0.95, opacity: 0 }}
-               animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
-               exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
+                exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
                 onSubmit={signIn}
                 className='w-full flex z-[12] flex-col gap-2 max-w-[400px] p-3 rounded-lg bg-[#2e2e2e] border-[1px] border-[#414141]'
                 action="submit">
@@ -171,11 +178,11 @@ const SignIn: React.FC = () => {
                 <button className='bg-[#242424] flex items-center justify-center py-2 rounded-md  border-[1px] border-[#414141] hover:bg-[#414141]'>
                     {
                         loading ?
-                        <div className='w-[20px] h-[20px]'>
-                            <Loader />
-                        </div>
-                        :
-                        "Sign in"
+                            <div className='w-[20px] h-[20px]'>
+                                <Loader />
+                            </div>
+                            :
+                            "Sign in"
                     }
                 </button>
                 <div className='relative'>
@@ -187,11 +194,11 @@ const SignIn: React.FC = () => {
                     </div>
                 </div>
 
-                <div 
-                onClick={handleGoogleSignIn}
-                className='bg-[#242424] py-2 rounded-md selectionNone cursor-pointer  border-[1px] border-[#414141] mt-1 hover:bg-[#414141] flex gap-2 items-center justify-center'>
-                <span className='text-md text-orange-500'><FaGoogle/></span> Sign in with Google
-                
+                <div
+                    onClick={handleGoogleSignIn}
+                    className='bg-[#242424] py-2 rounded-md selectionNone cursor-pointer  border-[1px] border-[#414141] mt-1 hover:bg-[#414141] flex gap-2 items-center justify-center'>
+                    <span className='text-md text-orange-500'><FaGoogle /></span> Sign in with Google
+
                 </div>
 
                 <button
