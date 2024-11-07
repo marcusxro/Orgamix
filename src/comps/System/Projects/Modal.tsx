@@ -1,13 +1,9 @@
-'use client';
-
+import React from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import FocusTrap from 'focus-trap-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 import { Dispatch, SetStateAction } from 'react';
-
-// Types
-
 interface ModalProps {
     children: React.ReactNode;
     showModal: boolean;
