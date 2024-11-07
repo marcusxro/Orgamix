@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-
+* {
+  user-select: none; /* Prevents text selection */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  touch-action: manipulation; /* Prevents touch actions like zooming */
+}
 
 .selectionNone{
   user-select: none; /* Prevents text selection */

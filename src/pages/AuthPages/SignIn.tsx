@@ -153,7 +153,7 @@ const SignIn: React.FC = () => {
                         setEmail(e.target.value)
                     }}
                     required
-                    className='p-2 rounded-md outline-none border-[1px] border-[#414141]'
+                    className='p-2 rounded-md outline-none border-[1px] border-[#414141] bg-[#111]'
                     type="email" placeholder='Email' />
 
                 <div className='w-full relative'>
@@ -163,7 +163,7 @@ const SignIn: React.FC = () => {
                             setPassword(e.target.value)
                         }}
                         required
-                        className='p-2 pr-9 rounded-md outline-none w-full relative border-[1px] border-[#414141]'
+                        className='p-2 pr-9 rounded-md outline-none w-full relative border-[1px] border-[#414141] bg-[#111]'
                         type={`${isSee ? 'text' : 'password'}`} placeholder='Password' />
 
                     <div
