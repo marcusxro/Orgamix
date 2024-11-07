@@ -68,7 +68,7 @@ interface accountType {
     id: number;
     fullname: string;
 }
-const ProjectSettings = () => {
+const ProjectSettings:React.FC = () => {
     const [isExiting, setIsExiting] = useState(false);
     const { setOpenKanbanSettings}: any = useStore()
     const params = useParams()

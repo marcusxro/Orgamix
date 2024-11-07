@@ -15,7 +15,6 @@ import Projects from './pages/isLoggedIn/Projects';
 import Samp from './pages/isLoggedIn/Samp';
 import useStore from './Zustand/UseStore';
 import Notification from './comps/System/Notification';
-import TestUpload from './pages/TestUpload';
 import { useEffect, useState } from 'react';
 import useNotification from './comps/Notifs';
 import { supabase } from './supabase/supabaseClient';
@@ -25,6 +24,7 @@ import Settings from './pages/isLoggedIn/Settings';
 import SendDetails from './comps/System/NewUserModal/SendDetails';
 import Tutorial from './comps/System/NewUserModal/Tutorial';
 import CongratsModal from './comps/System/NewUserModal/CongratsModal';
+import TabChangeTitle from './comps/MetaHeader/TabChangeTitle';
 
 
 function App() {
@@ -175,9 +175,6 @@ function Main() {
           return prevNotifs;
       }
 
-      console.log('Updated notifications:', updatedData); // Log updated notifications
-
-
       return updatedData; // Return the updated notification list to setNotifications
     });
   };
@@ -255,6 +252,9 @@ function Main() {
     }
   };
 
+ 
+
+ 
 
 
   const { isProgress }: any = useStore()
@@ -282,11 +282,11 @@ function Main() {
 
         <Route path='/user/settings' element={<Settings />} />
 
-
-        <Route path='/test' element={<TestUpload />} />
-
       </Routes>
-
+    {
+      location.pathname.includes('/user') &&
+      <TabChangeTitle />
+    }
       {
         location.pathname.includes('/user') && fetchedData && imageUrl && user &&
         ((fetchedData?.length === 0 && user && fetchedData && fetchedData[0]?.has_pfp != true && fetchedData[0]?.is_done === false) || !(fetchedData && fetchedData[0]?.has_pfp)) && isProgress != "Completed" &&
@@ -304,7 +304,6 @@ function Main() {
         (fetchedData[0]?.is_done === true && (fetchedData != null || imageUrl?.publicUrl != null) && isProgress === "Completed") &&
         <CongratsModal />
       }
-
 
 
       {/* Render Notification outside of Routes */}

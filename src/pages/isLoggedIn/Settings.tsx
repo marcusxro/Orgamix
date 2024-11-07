@@ -13,6 +13,7 @@ import { motion } from 'framer-motion';
 import { IoIosLogOut } from "react-icons/io";
 import Footer from '../../comps/Footer'
 import { signOut, getAuth } from 'firebase/auth'
+import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 
 interface pubsType {
     publicUrl: string
@@ -414,8 +415,6 @@ const Settings: React.FC = () => {
         }
     }
 
-    // Zedmain00!
-
     useEffect(() => {
         if (completed) {
             setTimeout(() => {
@@ -451,6 +450,14 @@ const Settings: React.FC = () => {
     return (
         <div>
             <Sidebar location='Settings' />
+            {
+                user  &&
+                <MetaEditor
+                    title={`Settings | ${user?.email}`}
+                    description='Manage your account preferences, privacy, and system settings to customize your experience.'
+                    keywords='settings, account, preferences, privacy, system settings'
+                />
+            }
 
             <div className='flex flex-col w-full max-w-[1300px] mx-auto'>
                 <div className={`ml-[86px] p-3  flex gap-3 flex-col h-auto `}>

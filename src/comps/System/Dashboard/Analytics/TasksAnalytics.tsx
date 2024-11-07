@@ -89,12 +89,12 @@ const TasksAnalytics: React.FC = () => {
         <>
             {
                 taskData && taskData.length === 0 &&
-               <NoData propsText='No tasks found' />
+                <NoData propsText='No tasks found' />
             }
             {
                 taskData === null && (
 
-                        <AnalyticsLoader />
+                    <AnalyticsLoader />
                 )
 
 

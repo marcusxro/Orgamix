@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, Tooltip, ResponsiveContainer } from 'recharts';
 import { supabase } from '../../../../supabase/supabaseClient';
 import IsLoggedIn from '../../../../firebase/IsLoggedIn';
-import { motion } from 'framer-motion';
 import AnalyticsLoader from './Loader/AnalyticsLoader';
 import NoData from './Loader/NoData';
 

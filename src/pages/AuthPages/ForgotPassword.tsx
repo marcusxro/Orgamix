@@ -11,7 +11,7 @@ import useStore from '../../Zustand/UseStore';
 import Loader from '../../comps/Loader';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
-const ForgotPassword = () => {
+const ForgotPassword:React.FC = () => {
     const [email, setEmail] = useState<string>("")
     const [loading, setLoading] = useState(false)
 

@@ -23,6 +23,8 @@ const combinedModules = {
         [{ header: [1, 2, 3, 4, 5, 6, false] }],
         [{ font: fontOptions }], // Font options with custom fonts
         [{ size: [] }],
+        [{ color: [] }, { background: [] }],
+        [{ align: [] }],
         ["bold", "italic", "underline", "strike", "blockquote"],
         [
             { list: "ordered" },
@@ -31,8 +33,6 @@ const combinedModules = {
             { indent: "+1" }
         ],
         ["link"],
-        [{ color: [] }, { background: [] }],
-        [{ align: [] }],
         ["clean"]
     ],
 

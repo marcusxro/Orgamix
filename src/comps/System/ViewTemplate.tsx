@@ -338,7 +338,7 @@ const ViewTemplate = () => {
             };
 
         }
-    }, [user, templateID])
+    }, [user, templateID, loading])
 
 
     const handleRealtimeEvent = (payload: any) => {

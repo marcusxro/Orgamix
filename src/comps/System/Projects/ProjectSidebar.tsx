@@ -70,14 +70,7 @@ interface dataType {
     boards: boardsType[]
     chatArr: MessageType[]
 }
-interface accountType {
-    userid: string;
-    username: string;
-    password: string;
-    email: string;
-    id: number;
-    fullname: string;
-}
+
 
 const ProjectSidebar: React.FC<propsType> = ({ isUid }) => {
 

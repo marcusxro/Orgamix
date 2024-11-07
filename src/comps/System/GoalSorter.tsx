@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
-import useStore from '../../Zustand/UseStore';
 
 interface closerType {
     closer: React.Dispatch<React.SetStateAction<boolean>>

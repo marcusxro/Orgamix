@@ -7,7 +7,6 @@ import projectImage from '../../../assets/ProjectImages/Untitled design (3).png'
 import imageCompression from 'browser-image-compression';
 import { supabase } from '../../../supabase/supabaseClient';
 import Loader from '../../Loader';
-import { set } from 'date-fns';
 
 interface AccType {
     userid: string;
@@ -23,7 +22,6 @@ interface AccType {
 const SendDetails: React.FC = () => {
     const [user] = IsLoggedIn()
     const [userName, setUserName] = useState("")
-    const [fullName, setFullName] = useState("")
     const MAX_FILE_SIZE = 200 * 1024; // 200 KB
     const [isErrorPfp, setIsErrorPfp] = useState<string | null>(null)
     const [file, setFile] = useState<File | null>(null);
@@ -31,7 +29,7 @@ const SendDetails: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null); // Add ref for the file input
     const [loading, setLoading] = useState<boolean>(false);
 
-    const [fetchedData, setFetchedData] = useState<AccType[] | null>(null);
+    const [_, setFetchedData] = useState<AccType[] | null>(null);
 
 
     useEffect(() => {
@@ -204,7 +202,6 @@ const SendDetails: React.FC = () => {
                     setIsErrorPfp("Error occured, please try again later")
                 } else {
                     setUserName("")
-                    setFullName("")
                 }
             }
         } catch (err) {

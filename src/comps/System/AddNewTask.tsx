@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { supabase } from '../../supabase/supabaseClient'
 import Loader from '../Loader'
 import IsLoggedIn from '../../firebase/IsLoggedIn'
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { MdModeEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -75,20 +74,6 @@ const AddNewTask: React.FC<propsPurpose> = ({ purpose }) => {
             setEditingIndex(null);  // Reset editing index
         }
     };
-
-    const notif = (params: string) => {
-        toast.success(params, {
-            position: "top-left",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-        });
-    }
-
 
     async function createNewTask() {
         setLoading(true);
@@ -195,8 +180,6 @@ const AddNewTask: React.FC<propsPurpose> = ({ purpose }) => {
                         onClick={(e) => { e.stopPropagation() }}
                         className='w-full max-w-[350px] bg-[#313131] 
                         rounded-lg p-3 h-full border-[#535353] border-[1px] flex flex-col  justify-between gap-3 overflow-auto'>
-
-                        <ToastContainer />
 
                         <div className='flex flex-col gap-3 overflow-auto  mb-auto'>
                             <div className='mb-2'>

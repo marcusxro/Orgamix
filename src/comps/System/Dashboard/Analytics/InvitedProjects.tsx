@@ -251,11 +251,11 @@ const InvitedProjects: React.FC = () => {
                                 dataForPieChart?.map((item, index) => (
                                     <div
                                         data-tooltip-id={`hover-${index}${item.name}`}
-                                        className='flex gap-2 items-center justify-between bg-[#222] cursor-pointer hover:bg-[#333] border-[1px] border-[#535353] p-2 rounded-lg text-sm'
+                                        className='flex flex-col gap-2 sm:flex-row overflow-auto items-center justify-between bg-[#222] cursor-pointer hover:bg-[#333] border-[1px] border-[#535353] p-2 rounded-lg text-sm'
                                         key={index}>
-                                        <p key={index}>{item.name}</p>
-                                        <p>{item?.percentage}%</p>
 
+                                        <p  className="font-bold text-sm text-left w-full" key={index}>{item.name}</p>
+                                        <p className='text-sm text-green-500 text-left w-full sm:w-auto'>{item?.percentage}%</p>
 
                                         <ReactTooltip
                                             id={`hover-${index}${item.name}`}

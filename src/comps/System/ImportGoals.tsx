@@ -32,7 +32,7 @@ interface dataType {
 
 const ImportGoals: React.FC = () => {
 
-    const { showCreate, setShowCreate, createdAt, setCreatedAt }: any = useStore()
+    const { showCreate, setShowCreate, setCreatedAt }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [originalData, setoriginalData] = useState<dataType[] | null>(null);
     const [isEq, setIsEq] = useState<number | null>(null)

@@ -73,14 +73,7 @@ interface dataType {
   is_favorite: boolean;
   boards: boardsType[]
 }
-interface accountType {
-  userid: string;
-  username: string;
-  password: string;
-  email: string;
-  id: number;
-  fullname: string;
-}
+
 
 const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to, subTasksLength }: ItemsType) => {
   const {
@@ -117,7 +110,7 @@ const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to,
   }
   const { setSettingsTask }: any = useStore()
   const params = useParams()
-  const [fetchedData, setFetchedData] = useState<boardsType[] | null>(null);
+  const [_, setFetchedData] = useState<boardsType[] | null>(null);
   const [defaulData, setDefaultData] = useState<dataType[] | null>(null);
   const [user] = IsLoggedIn()
 

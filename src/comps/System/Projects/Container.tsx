@@ -9,7 +9,6 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import useStore from '../../../Zustand/UseStore';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
 
 
 
@@ -46,7 +45,7 @@ const Container = ({
     },
   });
   const { setSettingsBoard }:any = useStore()
-  const [user] = IsLoggedIn()
+
   return (
 
     <div

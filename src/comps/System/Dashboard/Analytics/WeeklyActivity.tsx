@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import IsLoggedIn from '../../../../firebase/IsLoggedIn';
 import { supabase } from '../../../../supabase/supabaseClient';
 import moment from 'moment';
-import { BarChart, Bar, Tooltip, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { parse } from 'date-fns';
+import { BarChart, Bar, Tooltip, XAxis, ResponsiveContainer } from 'recharts';
 
 const WeeklyActivity: React.FC = () => {
   const [user] = IsLoggedIn();

@@ -2,9 +2,6 @@ import React from 'react'
 import { MdAccountCircle } from "react-icons/md";
 import { MdOutlineSecurity } from "react-icons/md";
 
-interface locStringType {
-    locString:string
-}
 
 const SettingsSidebar:React.FC = () => {
 

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Loader = () => {
+const Loader:React.FC = () => {
     return (
         <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>
             <circle fill='#FFFFFF' stroke='#FFFFFF' stroke-width='15' r='15' cx='40' cy='100'>
