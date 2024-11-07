@@ -152,7 +152,7 @@ const Menu: React.FC = () => {
 
 
             <div className='mt-9 flex gap-5 flex-col border-t-[1px] border-t-[#414141] pt-4'>
-                <div onClick={() => {nav('/')}}>
+                <div onClick={() => {nav('/'); ; setShowMenu(!showMenu) }}>
                     Home
                 </div>
                 <div>
