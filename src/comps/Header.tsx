@@ -32,7 +32,7 @@ const Header: React.FC = () => {
                         <div onClick={() => { nav('/about') }}>
                             About
                         </div>
-                        <div>
+                        <div onClick={() => { nav('/contact') }}>
                             Contact
                         </div>
                     </div>

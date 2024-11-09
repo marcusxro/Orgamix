@@ -6,14 +6,23 @@ import Footer from '../../comps/Footer'
 import projcetImage from '../../assets/ProjectImages/Untitled design (4).png'
 import Marquee from 'react-fast-marquee'
 import layerImg from '../../assets/Art/LayerImg.png'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import Menu from '../../comps/Menu'
+import useStore from '../../Zustand/UseStore'
+
 
 
 const About: React.FC = () => {
 
     const nav = useNavigate()
+    const { showMenu }: any = useStore()
     return (
         <div className='relative invertedSelection'>
+            {
+                showMenu &&
+                <Menu />
+
+            }
+
             <Header />
             <MetaEditor
                 title='Orgamix | About'
@@ -30,7 +39,7 @@ const About: React.FC = () => {
                 <div className='w-full max-w-[1200px] mx-auto mt-[4rem]'>
                     <div className='flex flex-col gap-5  items-center justify-center'>
                         <div className='text-[3rem] font-bold'>
-                            About
+                            About Orgamix
                         </div>
                         <div className='text-sm text-[#888] w-full max-w-[800px] text-center'>
                             Orgamix is a software created by a solo engineer to raise funds through ads, with the earnings directed to those in need, like storm victims and other affected communities.
@@ -41,7 +50,7 @@ const About: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                   
+
                     <div className="mt-[8%] border-[1px] border-[#535353] flex flex-col md:flex-row items-center rounded-lg overflow-hidden">
                         <div className="w-full pt-[50%] h-[300px] overflow-auto sm:pt-[36.25%] bg-[#111] relative">
                             <div className="absolute flex inset-0 items-center justify-center p-5">
@@ -141,13 +150,10 @@ const About: React.FC = () => {
                             </div>
                         </div>
 
-
-
-
                     </div>
 
                     <div className='mt-[8%] font-semibold text-center text-2xl items-center justify-center flex'>
-                    Let's shape the future together
+                        Let's shape the future together
                     </div>
 
 

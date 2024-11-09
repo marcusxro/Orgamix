@@ -26,6 +26,7 @@ import Tutorial from './comps/System/NewUserModal/Tutorial';
 import CongratsModal from './comps/System/NewUserModal/CongratsModal';
 import TabChangeTitle from './comps/MetaHeader/TabChangeTitle';
 import About from './pages/Static/About';
+import Contact from './pages/Static/Contact';
 
 
 function App() {
@@ -264,7 +265,7 @@ function Main() {
         {/* static pages */}
         <Route path='/' element={<Homepage />} />
         <Route path='/about' element={<About />} />
-
+        <Route path='/contact' element={<Contact />} />
 
         {/* auth pages */}
         <Route path='/sign-in' element={<SignIn />} />
