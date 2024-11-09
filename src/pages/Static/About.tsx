@@ -38,7 +38,7 @@ const About: React.FC = () => {
 
                 <div className='w-full max-w-[1200px] mx-auto mt-[4rem]'>
                     <div className='flex flex-col gap-5  items-center justify-center'>
-                        <div className='text-[3rem] font-bold'>
+                        <div className='text-[3rem] font-bold text-center reducedHeight'>
                             About Orgamix
                         </div>
                         <div className='text-sm text-[#888] w-full max-w-[800px] text-center'>

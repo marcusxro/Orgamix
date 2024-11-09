@@ -8,14 +8,24 @@ import { FaPhoneAlt } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa6";
 import { FaGithub } from "react-icons/fa";
 import { FaInstagramSquare } from "react-icons/fa";
+import useStore from '../../Zustand/UseStore';
+import Menu from '../../comps/Menu';
 
 const Contact: React.FC = () => {
 
     const handleEmailClick = () => {
         window.location.href = 'mailto:orgamixteam@gmail.com'; // Triggers email client with the provided email
     };
+    const { showMenu }: any = useStore()
+
+
     return (
         <div className='relative'>
+              {
+                showMenu &&
+                <Menu />
+
+            }
             <Header />
             <MetaEditor
                 title='Orgamix | Contact'
