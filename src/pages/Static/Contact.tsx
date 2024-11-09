@@ -56,6 +56,7 @@ const Contact: React.FC = () => {
                             <div className='flex flex-col gap-2 w-full'>
                                 <div>What's your name?</div>
                                 <input
+                                placeholder='John Doe'
                                     className='w-full  outline-none outline border-[1px] border-[#535353] rounded-md bg-[#191919] px-3 py-3'
                                     type="text" />
                             </div>
@@ -67,6 +68,7 @@ const Contact: React.FC = () => {
                             <div className='flex flex-col gap-2 w-full'>
                                 <div>What's your email address?</div>
                                 <input
+                                placeholder='johndoe@gmail.com'
                                     className='w-full  outline-none outline border-[1px] border-[#535353] rounded-md bg-[#191919] px-3 py-3'
                                     type="text" />
                             </div>
@@ -77,8 +79,9 @@ const Contact: React.FC = () => {
                             <div className='flex flex-col gap-2 w-full'>
                                 <div>What's your phone number?</div>
                                 <input
+                                placeholder='09XXXXXXXXX'
                                     className='w-full  outline-none outline border-[1px] border-[#535353] rounded-md bg-[#191919] px-3 py-3'
-                                    type="text" />
+                                    type="number" />
                             </div>
                         </div>
 
@@ -113,7 +116,7 @@ const Contact: React.FC = () => {
                         </div>
 
                         <div className='flex items-start justify-end'>
-                            <div className='px-3 py-2 flex items-center gap-2 rounded-lg bg-[#111] border-[1px] border-[#535353] cursor-pointer hover:bg-[#222]'>
+                            <div className='px-3 selectionNone py-2 flex items-center gap-2 rounded-lg bg-[#111] border-[1px] border-[#535353] cursor-pointer hover:bg-[#222]'>
                                 Send  <FaLocationArrow />
                             </div>
                         </div>
