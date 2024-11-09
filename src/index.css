@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  user-select: none; /* Prevents text selection */
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none; /* Firefox */
-  touch-action: manipulation; /* Prevents touch actions like zooming */
-}
 
 .selectionNone{
   user-select: none; /* Prevents text selection */
@@ -15,9 +9,18 @@
   -moz-user-select: none; /* Firefox */
   touch-action: manipulation; /* Prevents touch actions like zooming */
 }
-.touchedPage {
-  touch-action: none; /* Prevent default touch behaviors that might interfere */
+.invertedSelection {
+  user-select: text; /* Allows text selection */
+  -webkit-user-select: text; /* Safari */
+  -moz-user-select: text; /* Firefox */
+  touch-action: auto; /* Allows touch actions like zooming */
 }
+
+.touchedPage {
+ 
+  user-select: all;
+}
+
 body {
   touch-action: auto; /* Enable default touch interactions, allowing scrolling */
 }

@@ -450,7 +450,7 @@ const Settings: React.FC = () => {
     }
 
     return (
-        <div>
+        <div className='selectionNone'>
             <Sidebar location='Settings' />
             {
                 user &&

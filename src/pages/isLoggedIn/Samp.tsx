@@ -836,7 +836,7 @@ export default function Samp() {
 
 
     return (
-        <div className=' flex flex-col h-[100dvh] overflow-hidden md:flex-row'>
+        <div className=' flex flex-col h-[100dvh] overflow-hidden md:flex-row selectionNone'>
             {
                 user && fetchedData &&
                 <MetaEditor

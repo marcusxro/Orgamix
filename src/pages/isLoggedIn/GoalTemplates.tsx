@@ -195,7 +195,7 @@ const GoalTemplates: React.FC = () => {
     return (
         <div
             onClick={() => { setViewEllip(null) }}
-            className='w-full h-full'>
+            className='w-full h-full selectionNone'>
            {
             user &&
             <MetaEditor

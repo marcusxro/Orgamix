@@ -25,6 +25,7 @@ import SendDetails from './comps/System/NewUserModal/SendDetails';
 import Tutorial from './comps/System/NewUserModal/Tutorial';
 import CongratsModal from './comps/System/NewUserModal/CongratsModal';
 import TabChangeTitle from './comps/MetaHeader/TabChangeTitle';
+import About from './pages/Static/About';
 
 
 function App() {
@@ -59,7 +60,7 @@ interface pubsType {
 
 function Main() {
   const location = useLocation();
-  const { viewNotifs, setNotifData}: any = useStore();
+  const { viewNotifs, setNotifData }: any = useStore();
   const { notifyUser } = useNotification();
   const [_, setNotifications] = useState<dataType[]>([]);
   const [user]: any = IsLoggedIn()
@@ -69,7 +70,7 @@ function Main() {
   useEffect(() => {
     getNotifs();
   }, [])
-  
+
   useEffect(() => {
     if (user) {
       getNotifs();
@@ -110,7 +111,7 @@ function Main() {
   }, [user, location.pathname, imageUrl]);
 
 
-  
+
 
   const handleRealtiveForAccounts = (payload: any) => {
     console.log('Received payload:', payload); // Check the payload structure
@@ -200,7 +201,7 @@ function Main() {
 
 
   async function getAccounts() {
-      try {
+    try {
       const { data, error } = await supabase.from('accounts')
         .select('*')
         .eq('userid', user?.uid);
@@ -214,7 +215,7 @@ function Main() {
       }
     } catch (err) {
       console.log(err);
-    
+
     }
   }
 
@@ -249,9 +250,9 @@ function Main() {
     }
   };
 
- 
 
- 
+
+
 
 
   const { isProgress }: any = useStore()
@@ -260,11 +261,17 @@ function Main() {
     <div className="App">
       <ScrollToTop />
       <Routes>
+        {/* static pages */}
         <Route path='/' element={<Homepage />} />
+        <Route path='/about' element={<About />} />
 
+
+        {/* auth pages */}
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/recover' element={<ForgotPassword />} />
+
+        {/* system pages */}
         <Route path='/user/dashboard' element={<System />} />
         <Route path='/user/tasks' element={<Tasks />} />
         <Route path='/user/notes' element={<Notes />} />
@@ -274,16 +281,17 @@ function Main() {
         <Route path='/user/goals/templates/:uid/:time' element={<ViewGoal />} />
         <Route path='/user/projects' element={<Projects />} />
         <Route path='/user/projects/view/:uid/:time' element={<Samp />} />
-
         <Route path='/user/calendar' element={<CalendarPage />} />
-
         <Route path='/user/settings' element={<Settings />} />
 
+
+
+
       </Routes>
-    {
-      location.pathname.includes('/user') &&
-      <TabChangeTitle />
-    }
+      {
+        location.pathname.includes('/user') &&
+        <TabChangeTitle />
+      }
       {
         location.pathname.includes('/user') && fetchedData && imageUrl && user &&
         ((fetchedData?.length === 0 && user && fetchedData && fetchedData[0]?.has_pfp != true && fetchedData[0]?.is_done === false) || !(fetchedData && fetchedData[0]?.has_pfp)) && isProgress != "Completed" &&

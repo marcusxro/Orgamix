@@ -59,7 +59,7 @@ const System: React.FC = () => {
 
 
     return (
-        <div className='h-auto'>
+        <div className='h-auto selectionNone'>
          {
             user && 
             <MetaEditor

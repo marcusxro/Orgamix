@@ -36,9 +36,9 @@ const Homepage: React.FC = () => {
         showMenu &&
         <Menu />
       }
-      <div className='p-3'>
+      <div className='px-5'>
 
-        <div className='w-full max-w-[1200px]   mx-auto mt-5  overflow-hidden '>
+        <div className='w-full max-w-[1200px]   mx-auto mt-8  overflow-hidden '>
           <div className="videoBg  rounded-md p-5 text-center gap-3 min-h-[400px] md:min-h-[500px] flex items-center flex-col justify-center bg-[#11]  relative overflow-hidden">
 
             <video

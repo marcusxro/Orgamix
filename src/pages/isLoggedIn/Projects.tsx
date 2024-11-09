@@ -225,7 +225,7 @@ const Projects: React.FC = () => {
 
 
     return (
-        <div className='h-auto'>
+        <div className='h-auto selectionNone'>
             <Sidebar location='Projects' />
          {
             user && 

@@ -720,7 +720,7 @@ const ViewGoal: React.FC = () => {
 
 
     return (
-        <div className='w-full h-full'>
+        <div className='w-full h-full selectionNone'>
 
             {
                 isDelete &&

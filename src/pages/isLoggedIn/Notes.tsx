@@ -178,7 +178,7 @@ const Notes = () => {
 
 
     return (
-        <div className='flex'>
+        <div className='flex selectionNone'>
          {
             user && 
             <MetaEditor

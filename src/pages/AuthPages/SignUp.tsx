@@ -138,7 +138,7 @@ const SignUp: React.FC = () => {
     const { showMenu }: any = useStore()
 
     return (
-        <div className='w-full h-[100dvh] p-3 items-center flex justify-center'>
+        <div className='w-full h-[100dvh] p-3 items-center flex justify-center selectionNone'>
             <MetaEditor
                 title="Orgamix | Sign Up"
                 description="Join Orgamix to start organizing your life with tools for projects, deadlines, and goal setting. Get started today!"

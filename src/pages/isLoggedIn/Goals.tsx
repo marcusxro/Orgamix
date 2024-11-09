@@ -319,7 +319,7 @@ const Goals: React.FC = () => {
 
 
     return (
-        <div>
+        <div className='selectionNone'>
             {
                 user &&
                 <MetaEditor

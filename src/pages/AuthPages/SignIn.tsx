@@ -121,7 +121,7 @@ const SignIn: React.FC = () => {
     const [isSee, setIsSee] = useState<boolean>(false)
     const { showMenu }: any = useStore()
     return (
-        <div className='w-full h-[100dvh] p-3 items-center flex justify-center'>
+        <div className='w-full h-[100dvh] p-3 items-center flex justify-center selectionNone'>
             <MetaEditor
                 title="Orgamix | Sign In"
                 description="Access your Orgamix dashboard to manage and track your tasks, projects, and personal goals with ease."

@@ -10,10 +10,10 @@ const Header: React.FC = () => {
     const [user] = IsLoggedIn()
 
     const nav = useNavigate()
-    const {showMenu, setShowMenu}: any = useStore()
+    const { showMenu, setShowMenu }: any = useStore()
 
     return (
-        <header className='flex gap-3 mx-auto px-3 justify-between items-center py-4 border-b-[1px] border-b-[#414141]'>
+        <header className='flex gap-3 sticky top-0 bg-[#242424] z-[200000000] mx-auto px-5 justify-between items-center py-4 border-b-[1px] border-b-[#414141]'>
             <div className='flex gap-3 justify-between items-center mx-auto w-full max-w-[1200px] '>
 
                 <div className='w-[20px] h-[20px] cursor-pointer flex gap-2 items-center'>
@@ -23,13 +23,13 @@ const Header: React.FC = () => {
                     </div>
 
                     <div className='hidden text-[13px] gap-3 ml-[2rem] md:flex'>
-                        <div       onClick={() => { nav('/') }}>
+                        <div onClick={() => { nav('/') }}>
                             Home
                         </div>
                         <div>
                             Documentation
                         </div>
-                        <div>
+                        <div onClick={() => { nav('/about') }}>
                             About
                         </div>
                         <div>
@@ -61,9 +61,9 @@ const Header: React.FC = () => {
                                     Sign   up</div>
                             </div>
                     }
-                    <div 
-                        onClick={() => {setShowMenu(!showMenu)}}
-                    className='block md:hidden h-full  p-[13px] rounded-full bg-[#1f1f1f] hover:bg-[#414141] mt-1 242424] px-4 border-[1px] border-[#414141]'>
+                    <div
+                        onClick={() => { setShowMenu(!showMenu) }}
+                        className='block md:hidden h-full  p-[13px] rounded-full bg-[#1f1f1f] hover:bg-[#414141] mt-1 242424] px-4 border-[1px] border-[#414141]'>
                         <HiOutlineMenuAlt4 />
                     </div>
                 </div>

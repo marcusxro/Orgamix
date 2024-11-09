@@ -46,7 +46,7 @@ const ForgotPassword:React.FC = () => {
 
 
     return (
-        <div className='w-full h-[100dvh] p-3 items-center flex justify-center'>
+        <div className='w-full h-[100dvh] p-3 items-center flex justify-center selectionNone' >
             <MetaEditor
                 title="Orgamix | Forgot Password"
                 description="Need help logging in? Reset your Orgamix password here and get back to staying organized."
