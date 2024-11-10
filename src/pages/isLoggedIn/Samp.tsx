@@ -51,6 +51,7 @@ import InviteToProjects from '../../comps/System/Projects/InviteToProjects';
 import ProjectSettings from '../../comps/System/Projects/ProjectSettings';
 import Chat from '../../comps/System/Projects/Chat';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
+import Draw from '../../comps/System/Projects/Draw';
 
 
 interface invitedEmails {
@@ -135,7 +136,7 @@ export default function Samp() {
     const [colorVal, setColorVal] = useState<string>("")
     const [user] = IsLoggedIn()
     const { loading, setLoading }: any = useStore()
-    const { settingsTask, settingsBoard, viewNotifs }: any = useStore()
+    const { settingsTask, settingsBoard, viewNotifs, showDrawer }: any = useStore()
     const { inviteToProject, setInviteToProject }: any = useStore()
     const { openKanbanSettings }: any = useStore()
     const { openKanbanChat }: any = useStore()
@@ -844,6 +845,10 @@ export default function Samp() {
                     description='Projects to manage your workflow with ease.'
                     keywords='Projects, Manage, Workflow, Orgamix'
                 />
+            }
+            {
+                showDrawer &&
+                <Draw />
             }
             {
                 //closes the modal if its in private, and not included in shareable invited_emails

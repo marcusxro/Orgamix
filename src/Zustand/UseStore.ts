@@ -80,6 +80,10 @@ interface AppState {
     showActivity: boolean | null;
     setShowActivity: (params: boolean) => void;
 
+
+    showDrawer: boolean | null;
+    setShowDrawer: (params: boolean) => void;
+
 }
 
 const useStore = create<AppState>((set) => ({
@@ -144,6 +148,9 @@ const useStore = create<AppState>((set) => ({
     showActivity: null,
     setShowActivity: (task) => set({ showActivity: task }),
 
+
+    showDrawer: null,
+    setShowDrawer: (task) => set({ showDrawer: task }),
 
 }));
 

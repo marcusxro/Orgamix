@@ -8,6 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useStore from '../../../Zustand/UseStore';
 import { supabase } from '../../../supabase/supabaseClient';
 import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import { FaFlipboard } from "react-icons/fa";
 
 interface KanBanType {
     location: string;
@@ -25,7 +26,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
     const nav = useNavigate()
 
     const { setOpenKanbanSettings }: any = useStore()
-    const {openKanbanChat, setOpenKanbanChat }: any = useStore()
+    const { openKanbanChat, setOpenKanbanChat, setShowDrawer }: any = useStore()
     const params = useParams()
     const [chatArray, setChatArray] = useState<MessageType[] | null>(null)
     const [user] = IsLoggedIn()
@@ -122,13 +123,19 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
                     <div
                         onClick={() => { setOpenKanbanChat(true) }}
                         className={` w-auto md:w-full  flex items-center gap-2 md:text-md px-3 py-1 text-left rounded-lg cursor-pointer`}>
-                        <CiChat1 /> Chats 
+                        <CiChat1 /> Chats
                         {chatArray && user && chatArray.length > 0 && (
                             <div className='text-[10px] bg-[#111] border-[1px] border-[#414141] p-2 rounded-lg'>
                                 {chatArray.length >= 999 ? "999+" : chatArray.length}
                             </div>
                         )}
 
+                    </div>
+                    <div
+                    onClick={() => { setShowDrawer(true) }}
+                        className={` w-auto md:w-full  flex items-center gap-2 md:text-md px-3 py-1 text-left rounded-lg cursor-pointer`}
+                    >
+                    <FaFlipboard/>    Draw
                     </div>
                 </div>
 
