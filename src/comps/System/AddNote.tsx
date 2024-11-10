@@ -1,4 +1,4 @@
-import {  useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { supabase } from '../../supabase/supabaseClient';
@@ -6,7 +6,8 @@ import IsLoggedIn from '../../firebase/IsLoggedIn';
 import useStore from '../../Zustand/UseStore';
 import Loader from '../Loader';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { BiSolidError } from "react-icons/bi";
+import { FaCheck } from "react-icons/fa";
 
 const fontOptions = [
     'sans-serif',
@@ -49,6 +50,8 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
     const [category, setcategory] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false)
     const { editTask, setEditTask } = useStore()
+    const [error, setError] = useState<string | null>(null)
+    const [success, setSuccess] = useState<string | null>(null)
 
     const handleOutsideClick = () => {
         setIsExiting(true);
@@ -65,6 +68,7 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
 
         if (!value || !title || !category) {
             setLoading(false);
+            setError("Please fill in all fields.");
             return;
         }
 
@@ -125,16 +129,34 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
             setcategory("");
             setEditTask(!editTask);
 
+            setSuccess("Note created successfully!");
+
+            setTimeout(() => {
+                setSuccess(null);
+                setError(null);
+            }, 3000);
+
+            setError(null);
+
             if (purpose === "modal") {
                 handleOutsideClick();
             }
         } catch (err) {
+            setError("An error occurred. Please try again.");
             console.error(err);
         } finally {
+            setError("An error occurred. Please try again.");
+
             setLoading(false);
         }
     }
 
+    useEffect(() => {
+        console.log(error)
+        if(success){
+           setError(null)
+        }
+    }, [error, success])
 
     return (
         <AnimatePresence>
@@ -196,35 +218,55 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
 
 
                         </div>
-                        <div className='mt-auto flex gap-2 w-full'>
+                        <div className='mt-auto w-full'>
                             {
-                                purpose === 'modal' &&
-                                <div
-                                    onClick={() => handleOutsideClick()}
-                                    className={` bg-[#684444] w-full mt-2 flex items-center justify-center  p-2 text-sm rounded-lg text-center cursor-pointer
-                         border-[#535353] border-[1px] hover:bg-[#535353] `}>
-                                    Close
+                                error != null && success == null &&
+                                <div className='flex items-center gap-2 p-2 bg-red-500 rounded-lg text-white'>
+                                    <BiSolidError />
+                                    <span>
+                                        {error}
+                                    </span>
                                 </div>
                             }
-
-                            <div
-                                onClick={() => { createNote() }}
-                                className={`${loading && 'bg-[#535353] '} w-full bg-[#111111] mt-2 flex items-center justify-center  p-2 text-sm rounded-lg text-center cursor-pointer
-                                        border-[#535353] border-[1px] hover:bg-[#535353] `}>
+                            {
+                                success != null &&
+                                <div className='flex items-center gap-2 p-2 bg-green-500 rounded-lg text-white'>
+                                    <FaCheck />
+                                    <span>
+                                        {success}
+                                    </span>
+                                </div>
+                            }
+                            <div className='flex gap-2 w-full'>
                                 {
-                                    loading ?
-                                        <div className='w-[20px] h-[20px] m-1'>
-                                            <Loader />
-                                        </div>
-                                        :
-                                        'Add Note'
+                                    purpose === 'modal' &&
+                                    <div
+                                        onClick={() => handleOutsideClick()}
+                                        className={` bg-[#684444] w-full mt-2 flex items-center justify-center  p-2 text-sm rounded-lg text-center cursor-pointer
+                         border-[#535353] border-[1px] hover:bg-[#535353] `}>
+                                        Close
+                                    </div>
                                 }
+
+                                <div
+                                    onClick={() => { createNote() }}
+                                    className={`${loading && 'bg-[#535353] '} w-full bg-[#111111] mt-2 flex items-center justify-center  p-2 text-sm rounded-lg text-center cursor-pointer
+                                        border-[#535353] border-[1px] hover:bg-[#535353] `}>
+                                    {
+                                        loading ?
+                                            <div className='w-[20px] h-[20px] m-1'>
+                                                <Loader />
+                                            </div>
+                                            :
+                                            'Add Note'
+                                    }
+                                </div>
+
+
                             </div>
 
 
                         </div>
-
-
                     </motion.div>
                 </motion.div>
             }

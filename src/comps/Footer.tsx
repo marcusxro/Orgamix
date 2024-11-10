@@ -5,6 +5,10 @@ import { FaFacebook } from "react-icons/fa";
 import { SiGmail } from "react-icons/si";
 
 const Footer: React.FC = () => {
+    
+    const handleEmailClick = () => {
+        window.location.href = 'mailto:orgamixteam@gmail.com'; // Triggers email client with the provided email
+    };
     return (
         <div className='h-auto  flex flex-col gap-5 bg-[#1b1b1b] items-center text-white border-t-[1px] border-t-[#535353] p-5 overflow-auto'>
 
@@ -21,24 +25,33 @@ const Footer: React.FC = () => {
                 </div>
 
                 <div>
-                    Orgamix 
+                    Orgamix
                 </div>
             </div>
 
             <div className='w-full mx-auto  max-w-[1180px]  gap-5 justify-between flex items-start md:items-center mt-5 '>
                 <div className='flex gap-3'>
-                    <div className='text-[#888] cursor-pointer hover:text-[#fff]'>
+                    <div
+                        onClick={() => { window.open('https://github.com/marcusxro') }}
+
+                        className='text-[#888] cursor-pointer hover:text-[#fff]'>
                         <FaGithub />
                     </div>
-                    <div className='text-[#888] cursor-pointer hover:text-[#fff]'>
+                    <div
+
+                        onClick={() => { window.open('https://www.facebook.com/marcuss09') }}
+
+                        className='text-[#888] cursor-pointer hover:text-[#fff]'>
                         <FaFacebook />
                     </div>
-                    <div className='text-[#888] cursor-pointer hover:text-[#fff]'>
+                    <div
+                        onClick={handleEmailClick}
+                        className='text-[#888] cursor-pointer hover:text-[#fff]'>
                         <SiGmail />
                     </div>
                 </div>
                 <div className='flex gap-3 text-[#888] items-end md:items-center flex-col md:flex-row'>
-                <div className='text-sm'>Free tier ●</div>
+                    <div className='text-sm'>Free tier ●</div>
                     <div className='cursor-pointer text-sm'>Home</div>
                     <div className='cursor-pointer text-sm'>Documentation</div>
                     <div className='cursor-pointer text-sm'>About</div>

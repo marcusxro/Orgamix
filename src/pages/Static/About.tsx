@@ -11,10 +11,12 @@ import useStore from '../../Zustand/UseStore'
 
 
 
+
 const About: React.FC = () => {
 
     const nav = useNavigate()
     const { showMenu }: any = useStore()
+
     return (
         <div className='relative invertedSelection'>
             {
@@ -46,7 +48,7 @@ const About: React.FC = () => {
                         </div>
                         <div className="w-full h-0 pt-[56.25%] mt-4 bg-black rounded-lg relative">
                             <div className="absolute inset-0">
-                                sds
+                            
                             </div>
                         </div>
                     </div>
@@ -73,10 +75,10 @@ const About: React.FC = () => {
 
                         <div className="w-full h-auto pt-[50%] sm:pt-[36.25%] bg-[#111] border-l-0 md:border-l-[1px] border-l-[#535353] relative overflow-hidden">
                             <div className="absolute inset-0">
-                                <div>
+                                <div className='h-full w-full'>
                                     <Marquee autoFill>
-                                        <img src={projcetImage} alt="" className='w-full h-full object-cover' />
-                                        <img src={projcetImage} alt="" className='w-full h-full object-cover' />
+                                        <img src={projcetImage} alt="" className='w-full h-full object-cover object-center' />
+                                        <img src={projcetImage} alt="" className='w-full h-full object-cover object-center' />
                                     </Marquee>
                                 </div>
                             </div>
@@ -93,7 +95,7 @@ const About: React.FC = () => {
                     <div className='mt-[8%]'>
                         <div className="w-full h-0 pt-[56.25%] mt-4 bg-black rounded-lg relative">
                             <div className="absolute inset-0">
-                                sd
+                                
                             </div>
                         </div>
                     </div>
@@ -102,13 +104,15 @@ const About: React.FC = () => {
                     <div className="mt-[8%] flex items-center justify-center">
                         <div className='w-full max-w-[500px] flex items-center justify-center gap-4 flex-col'>
                             <div className="text-xl font-semibold">
-                                Join Orgamix
+                                Join Orgamix team
                             </div>
                             <div className="text-center text-[#888]">
                                 We’re looking for skilled developers eager to make an impact by volunteering with us.
                             </div>
 
-                            <div className='px-8 cursor-pointer border-[1px] border-[#545454]  hover:bg-[#333] hover:text-[#ececec] py-2 text-md text-[#111] rounded-lg bg-[#ececec]'>
+                            <div
+                                onClick={() => { nav('/contact') }}
+                                className='px-8 cursor-pointer border-[1px] border-[#545454]  hover:bg-[#333] hover:text-[#ececec] py-2 text-md text-[#111] rounded-lg bg-[#ececec]'>
                                 Contact
                             </div>
                         </div>
@@ -118,7 +122,7 @@ const About: React.FC = () => {
                     <div className='mt-[8%]'>
                         <div className="w-full h-0 pt-[56.25%] mt-4 bg-black rounded-lg relative">
                             <div className="absolute inset-0">
-                                sd
+
                             </div>
                         </div>
                     </div>

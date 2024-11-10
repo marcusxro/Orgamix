@@ -19,7 +19,7 @@ const Menu: React.FC = () => {
     const [user] = IsLoggedIn()
     const nav = useNavigate()
     return (
-        <div className='h-[100dvh] block md:hidden py-4 overflow-auto bg-[#111] fixed top-0 left-0 w-full z-[5066262000] p-3'>
+        <div className='h-[100dvh] block md:hidden py-4 overflow-auto bg-[#111] fixed top-0 left-0 w-full z-[5066262000] p-5'>
             <header className='flex gap-5 items-center justify-between'>
                 <div className='w-[20px] h-[20px] cursor-pointer flex gap-2 items-center'>
                     <img src={OrgamixLogo} className='w-full h-full object-cover' alt="" />
@@ -36,7 +36,7 @@ const Menu: React.FC = () => {
 
             </header>
 
-            <div className='mt-9 flex gap-2 flex-col '>
+            <div className='mt-9 flex gap-4 flex-col '>
                 {
                     user ?
                         <div

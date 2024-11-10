@@ -7,6 +7,8 @@ import IsLoggedIn from '../../../firebase/IsLoggedIn';
 import Loader from '../../Loader';
 import useStore from '../../../Zustand/UseStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BiSolidError } from "react-icons/bi";
+import { FaCheck } from "react-icons/fa";
 
 const AddProject: React.FC = () => {
     const [isExiting, setIsExiting] = useState(false);
@@ -18,7 +20,8 @@ const AddProject: React.FC = () => {
     const [privacySel, setPrivacySel] = useState("public")
     const { openNew, setOpenNew }: any = useStore()
     const { loading, setLoading }: any = useStore()
-
+    const [error, setError] = useState<string | null>(null)
+    const [success, setSuccess] = useState<string | null>(null)
     const [user] = IsLoggedIn()
 
     const handleOutsideClick = () => {
@@ -32,10 +35,12 @@ const AddProject: React.FC = () => {
         setLoading(true);
         if (loading) {
             setLoading(false);
+
             return;
         }
         if (!nameVal || !description || !category) {
             setLoading(false);
+            setError("Please fill in all required fields");
             return;
         }
 
@@ -50,6 +55,7 @@ const AddProject: React.FC = () => {
 
             if (fetchError) {
                 console.error('Error fetching data:', fetchError);
+                setError('An unexpected error occurred');
                 setLoading(false);
                 return;
             }
@@ -73,7 +79,7 @@ const AddProject: React.FC = () => {
             }
 
             // Insert the new project with the determined name
-            
+
             const { error } = await supabase.from('projects').insert({
                 name: finalName,
                 description: description,
@@ -87,17 +93,23 @@ const AddProject: React.FC = () => {
 
             if (error) {
                 console.error('Error inserting data:', error);
+                setError('An unexpected error occurred');
             } else {
                 console.log("Project created");
                 setIsExiting(true);
+                setSuccess("Project created successfully");
                 setTimeout(() => {
                     setOpenNew(!openNew);
                     setIsExiting(false);
+                    setError(null);
+                    setSuccess(null);
                 }, 300);
+
 
             }
         } catch (err) {
             console.error('Unexpected error:', err);
+            setError('An unexpected error occurred');
         } finally {
             setLoading(false);
         }
@@ -121,7 +133,7 @@ const AddProject: React.FC = () => {
                         exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
 
                         onClick={(e) => { e.stopPropagation() }}
-                        className='w-full max-w-[600px] h-full max-h-[630px] bg-[#313131] z-[5000]
+                        className='w-full max-w-[600px] h-auto bg-[#313131] z-[5000]
                         rounded-lg p-5 border-[#535353] border-[1px] flex flex-col justify-between overflow-auto'>
 
 
@@ -215,24 +227,41 @@ const AddProject: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className='w-full flex border-[#535353] border-[1px] overflow-hidden rounded-lg mt-2'>
-                            <div
-                                onClick={() => { !loading && handleOutsideClick() }}
-                                className='p-3 bg-[#111111] outline-none  text-center border-r-[#535353] border-r-[1px] cursor-pointer text-[#888] w-full hover:bg-[#222222]'>
-                                Cancel
-                            </div>
-                            <div
-                                onClick={() => { createProject() }}
-                                className={`${loading ? "bg-[#535353]" : "bg-[#111111]"} p-3 flex items-center justify-center  outline-none  text-center  cursor-pointer text-[#888] w-full hover:bg-[#222222]`}>
-                                {
-                                    loading ?
-                                        <div className='w-[20px] h-[20px]'>
-                                            <Loader />
-                                        </div>
-                                        :
+                        <div className='mt-5'>
+                            {
+                                error != null && success == null &&
+                                <div className='flex gap-2 items-center mt-2 bg-red-500 text-white p-2 rounded-lg'>
+                                    <BiSolidError />
+                                    {error}
+                                </div>
+                            }
+                            {
+                                success != null &&
+                                <div className='flex gap-2 items-center bg-green-500 text-white p-2 rounded-lg'>
+                                    <FaCheck />
+                                    {success}
+                                </div>
+                            }
+                            <div className='w-full flex mt-2 border-[#535353] border-[1px] overflow-hidden rounded-lg'>
 
-                                        "Create"
-                                }
+                                <div
+                                    onClick={() => { !loading && handleOutsideClick() }}
+                                    className='p-3 bg-[#111111] outline-none  text-center border-r-[#535353] border-r-[1px] cursor-pointer text-[#888] w-full hover:bg-[#222222]'>
+                                    Cancel
+                                </div>
+                                <div
+                                    onClick={() => { createProject() }}
+                                    className={`${loading ? "bg-[#535353]" : "bg-[#111111]"} p-3 flex items-center justify-center  outline-none  text-center  cursor-pointer text-[#888] w-full hover:bg-[#222222]`}>
+                                    {
+                                        loading ?
+                                            <div className='w-[20px] h-[20px]'>
+                                                <Loader />
+                                            </div>
+                                            :
+
+                                            "Create"
+                                    }
+                                </div>
                             </div>
                         </div>
                     </motion.div>
