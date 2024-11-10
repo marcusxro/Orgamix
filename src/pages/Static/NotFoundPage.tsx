@@ -3,11 +3,20 @@ import Header from '../../comps/Header'
 import Footer from '../../comps/Footer'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 import { useNavigate } from 'react-router-dom'
+import useStore from '../../Zustand/UseStore'
+import Menu from '../../comps/Menu'
 
 const NotFoundPage: React.FC = () => {
     const nav = useNavigate()
+
+    const { showMenu }: any = useStore()
     return (
         <div className='relative'>
+            {
+                showMenu &&
+                <Menu />
+
+            }
             <Header />
             <MetaEditor
                 title='Orgamix | 404'
@@ -20,7 +29,7 @@ const NotFoundPage: React.FC = () => {
             <div className="absolute inset-0 w-full h-full bg-gradient-to-l from-[#222] via-transparent to-transparent z-10 opacity-80"></div>
 
 
-            <div className='h-[78vh] flex items-center justify-center relative z-[500] p-5'>
+            <div className='h-[78vh] min-h-[500px] flex items-center justify-center relative z-[500] p-5'>
                 <div className='flex flex-col gap-2 items-center justify-center text-center'>
 
                     <h1 className='text-9xl text-[#888] font-bold'>404</h1>

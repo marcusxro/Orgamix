@@ -74,7 +74,7 @@ const Menu: React.FC = () => {
 
                     <div
                         onClick={() => { nav('/user/dashboard'); setShowMenu(!showMenu) }}
-                        className='flex gap-2 justify-between'>
+                        className='flex gap-2 justify-between cursor-pointer'>
                         <div>
                             Dashboard
                         </div>
@@ -86,7 +86,7 @@ const Menu: React.FC = () => {
 
                     <div
                         onClick={() => { nav('/user/tasks'); setShowMenu(!showMenu) }}
-                        className='flex gap-2 justify-between'>
+                        className='flex gap-2 justify-between cursor-pointer'>
                         <div>
                             Tasks
                         </div>
@@ -100,7 +100,7 @@ const Menu: React.FC = () => {
 
                     <div
                         onClick={() => { nav('/user/notes'); setShowMenu(!showMenu) }}
-                        className='flex gap-2 justify-between'>
+                        className='flex gap-2 justify-between cursor-pointer'>
                         <div>
                             Notes
                         </div>
@@ -112,7 +112,7 @@ const Menu: React.FC = () => {
 
                     <div
                         onClick={() => { nav('/user/goals'); setShowMenu(!showMenu) }}
-                        className='flex gap-2 justify-between'>
+                        className='flex gap-2 justify-between cursor-pointer'>
                         <div>
                             Goals
                         </div>
@@ -124,7 +124,7 @@ const Menu: React.FC = () => {
 
                     <div
                         onClick={() => { nav('/user/projects'); setShowMenu(!showMenu) }}
-                        className='flex gap-2 justify-between'>
+                        className='flex gap-2 justify-between cursor-pointer'>
                         <div>
                             Projects
                         </div>
@@ -136,7 +136,7 @@ const Menu: React.FC = () => {
 
                     <div
                         onClick={() => { nav('/user/settings'); setShowMenu(!showMenu) }}
-                        className='flex gap-2 justify-between'>
+                        className='flex gap-2 justify-between cursor-pointer'>
                         <div>
                             Settings
                         </div>
