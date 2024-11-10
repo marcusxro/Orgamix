@@ -57,15 +57,15 @@ const Footer: React.FC = () => {
                     <div
                         onClick={() => { nav('/') }}
                         className='cursor-pointer text-sm'>Home</div>
-                    <div 
+                    <div
                         onClick={() => { nav('/documentation') }}
-                    className='cursor-pointer text-sm'>Documentation</div>
+                        className='cursor-pointer text-sm'>Documentation</div>
                     <div
                         onClick={() => { nav('/about') }}
-                    className='cursor-pointer text-sm'>About</div>
+                        className='cursor-pointer text-sm'>About</div>
                     <div
                         onClick={() => { nav('/contact') }}
-                     className='cursor-pointer text-sm'>Contact</div>
+                        className='cursor-pointer text-sm'>Contact</div>
                 </div>
             </div>
         </div>

@@ -252,7 +252,7 @@ const CalendarPage: React.FC = () => {
                 <div className='h-auto w-full'>
                     <div className='text-2xl font-bold'>Deadlines</div>
                     <div className='text-sm text-[#888]'>
-                        Easily create, edit, and organize your notes in this section for a streamlined experience.
+                    Track and manage deadlines for tasks, goals, and projects.
                     </div>
                 </div>
 

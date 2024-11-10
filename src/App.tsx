@@ -28,6 +28,7 @@ import TabChangeTitle from './comps/MetaHeader/TabChangeTitle';
 import About from './pages/Static/About';
 import Contact from './pages/Static/Contact';
 import NotFoundPage from './pages/Static/NotFoundPage';
+import AdSenseAd from './comps/AdSense/AdGenerator';
 
 
 function App() {
@@ -262,6 +263,7 @@ function Main() {
   return (
     <div className="App">
       <ScrollToTop />
+ 
       <Routes>
         {/* static pages */}
         <Route path='/' element={<Homepage />} />
