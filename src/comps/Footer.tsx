@@ -3,12 +3,14 @@ import OrgamixLogo from '../assets/Orgamix.png'
 import { FaGithub } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
 import { SiGmail } from "react-icons/si";
+import { useNavigate } from 'react-router-dom';
 
 const Footer: React.FC = () => {
-    
+
     const handleEmailClick = () => {
         window.location.href = 'mailto:orgamixteam@gmail.com'; // Triggers email client with the provided email
     };
+    const nav = useNavigate()
     return (
         <div className='h-auto  flex flex-col gap-5 bg-[#1b1b1b] items-center text-white border-t-[1px] border-t-[#535353] p-5 overflow-auto'>
 
@@ -52,10 +54,18 @@ const Footer: React.FC = () => {
                 </div>
                 <div className='flex gap-3 text-[#888] items-end md:items-center flex-col md:flex-row'>
                     <div className='text-sm'>Free tier ●</div>
-                    <div className='cursor-pointer text-sm'>Home</div>
-                    <div className='cursor-pointer text-sm'>Documentation</div>
-                    <div className='cursor-pointer text-sm'>About</div>
-                    <div className='cursor-pointer text-sm'>Contact</div>
+                    <div
+                        onClick={() => { nav('/') }}
+                        className='cursor-pointer text-sm'>Home</div>
+                    <div 
+                        onClick={() => { nav('/documentation') }}
+                    className='cursor-pointer text-sm'>Documentation</div>
+                    <div
+                        onClick={() => { nav('/about') }}
+                    className='cursor-pointer text-sm'>About</div>
+                    <div
+                        onClick={() => { nav('/contact') }}
+                     className='cursor-pointer text-sm'>Contact</div>
                 </div>
             </div>
         </div>

@@ -27,6 +27,7 @@ import CongratsModal from './comps/System/NewUserModal/CongratsModal';
 import TabChangeTitle from './comps/MetaHeader/TabChangeTitle';
 import About from './pages/Static/About';
 import Contact from './pages/Static/Contact';
+import NotFoundPage from './pages/Static/NotFoundPage';
 
 
 function App() {
@@ -266,6 +267,7 @@ function Main() {
         <Route path='/' element={<Homepage />} />
         <Route path='/about' element={<About />} />
         <Route path='/contact' element={<Contact />} />
+        <Route path='*' element={<NotFoundPage />} />
 
         {/* auth pages */}
         <Route path='/sign-in' element={<SignIn />} />
