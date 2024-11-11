@@ -24,6 +24,8 @@ import {
     UniqueIdentifier,
     closestCorners,
     useSensor,
+    TouchSensor,
+    MouseSensor,
     useSensors,
 } from '@dnd-kit/core';
 import {
@@ -509,13 +511,16 @@ export default function Samp() {
         return container as boardsType
     };
 
+
+
     // DND Handlers
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        }),
-    );
+    const mouseSensor = useSensor(MouseSensor)
+    const touchSensor = useSensor(TouchSensor)
+    const keyboardSensor = useSensor(KeyboardSensor)
+
+
+       const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor)
+
 
     function handleDragStart(event: DragStartEvent) {
         const { active } = event;
@@ -620,7 +625,7 @@ export default function Samp() {
         // Copying the fetchedData's boards
         let newItems = [...fetchedData[0]?.boards];
 
-
+        console.log("is moving")
         // Handling Container (Board) Sorting
         if (
             active.id.toString().includes('container') &&
@@ -629,6 +634,7 @@ export default function Samp() {
             over &&
             active.id !== over.id
         ) {
+            console.log("is movings")
             const activeContainerIndex = newItems.findIndex(
                 (container) => container.board_uid === active.id,
             );
@@ -837,7 +843,7 @@ export default function Samp() {
 
 
     return (
-        <div className=' flex flex-col h-[100dvh] overflow-hidden md:flex-row selectionNone'>
+        <div className=' flex flex-col h-[100dvh] overflow-hidden md:flex-row'>
             {
                 user && fetchedData &&
                 <MetaEditor

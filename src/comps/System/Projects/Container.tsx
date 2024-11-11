@@ -75,7 +75,7 @@ const Container = ({
         <div className='gap-2 flex items-center'>
           <button
             data-tooltip-id={`drop-${id}`}
-            className='text-md px-3 py-[11px] touchedPage rounded-lg bg-[#222222] text-white hover:bg-[#353535]   border-[#535353] border-[1px]'
+            className='text-md px-3 py-[11px]  rounded-lg bg-[#222222] text-white hover:bg-[#353535]   border-[#535353] border-[1px]'
 
             {...listeners}
           >
