@@ -858,7 +858,7 @@ export default function Samp() {
                             (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) &&
                 showDrawer &&
-                <Draw />
+                <Draw roomId={params?.uid + "-" + params?.time} />
             }
             {
                 //closes the modal if its in private, and not included in shareable invited_emails

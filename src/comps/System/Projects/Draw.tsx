@@ -1,34 +1,130 @@
-import React, { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import useStore from '../../../Zustand/UseStore';
-import { Tldraw, DefaultColorThemePalette, useTldrawUser, TLUserPreferences } from 'tldraw'
-import 'tldraw/tldraw.css'
 import { useSyncDemo } from '@tldraw/sync'
-import { useParams } from 'react-router-dom';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
-import { supabase } from '../../../supabase/supabaseClient';
+import React, { useEffect, useState } from 'react'
+import {
+    Atom,
+    TLComponents,
+    Tldraw,
+    react,
+    useAtom,
+    useEditor,
+    useIsToolSelected,
+    useTools,
+    useValue,
+    useTldrawUser,
+    TLUserPreferences
+} from 'tldraw'
+import 'tldraw/tldraw.css'
+import { Toggle } from './toggle/Toggle'
+import { AnimatePresence, motion } from 'framer-motion'
+import useStore from '../../../Zustand/UseStore'
+import IsLoggedIn from '../../../firebase/IsLoggedIn'
+import { supabase } from '../../../supabase/supabaseClient'
 
-const Draw: React.FC = () => {
-    const [isExiting, setIsExiting] = useState(false);
+
+
+// Create context for managing private mode state
+const PrivateModeContext = React.createContext<null | Atom<boolean>>(null)
+
+const components: TLComponents = {
+    // Custom component to display in front of the canvas
+    InFrontOfTheCanvas: () => {
+        const editor = useEditor()
+        const isInSelectTool = useIsToolSelected(useTools().select)
+        const userId = useValue('userId', () => editor.user.getId(), [])
+        const myPrivateSelectedShapes = useValue(
+            'private shapes',
+            () =>
+                editor
+                    .getSelectedShapes()
+                    .filter((shape) => !!shape.meta.private && shape.meta.ownerId === userId),
+            [editor, userId]
+        )
+
+        const isPrivateMode$ = React.useContext(PrivateModeContext)!
+        const isPrivateMode = useValue(isPrivateMode$)
+
+
+        const { setIsExisting }: any = useStore();
+        const { setShowDrawer }: any = useStore()
+
+        const handleOutsideClick = () => {
+            setIsExisting(true);
+            setTimeout(() => {
+                setShowDrawer(null);
+                setIsExisting(false);
+            }, 300);
+        };
+
+        return (
+            <>
+                {isInSelectTool && myPrivateSelectedShapes.length > 0 ? (
+                    <div className="toggle-panel">
+                        <div>
+                            Make {myPrivateSelectedShapes.length} selected shape
+                            {myPrivateSelectedShapes.length > 1 ? 's' : ''} public?{' '}
+                        </div>
+                        <button
+                            onClick={() => {
+                                editor.markHistoryStoppingPoint()
+                                // Change private shapes to public
+                                const allAffectedShapes = [
+                                    ...editor.getShapeAndDescendantIds(myPrivateSelectedShapes.map((s) => s.id)),
+                                ].map((id) => editor.getShape(id)!)
+
+                                editor.updateShapes(
+                                    allAffectedShapes.map((shape) => ({
+                                        ...shape,
+                                        meta: { ...shape.meta, private: false },
+                                    }))
+                                )
+                            }}
+                        >
+                            Yes
+                        </button>
+                    </div>
+                ) : (
+                    <div className="toggle-panel pointer" onClick={() => isPrivateMode$.update((v) => !v)}>
+                        <div>Private mode</div>
+                        <Toggle isChecked={isPrivateMode} />
+                    </div>
+                )}
+
+                  {/* Custom Back Button */}
+                  <div className="custom-button-container">
+                    <button className="custom-button" onClick={handleOutsideClick}>
+                        Close
+                    </button>
+                </div>
+            </>
+        )
+    },
+}
+
+
+
+function Draw({ roomId }: { roomId: string }) {
+    const { isExiting, setIsExisting }: any = useStore();
     const { setShowDrawer }: any = useStore()
-    const params = useParams()
-    const [user] = IsLoggedIn()
 
     const handleOutsideClick = () => {
-        setIsExiting(true);
+        setIsExisting(true);
         setTimeout(() => {
             setShowDrawer(null);
-            setIsExiting(false);
-        }, 300);
+            setIsExisting(false);
+        }, 500);
     };
+    const isPrivateMode$ = React.useContext(PrivateModeContext)!
+
+
+    const [user] = IsLoggedIn()
+
     const initialPreferences = user
         ? { id: user.uid, name: user.email }
         : { id: 'defaultUid', name: 'Guest' };
 
     const [userPreferences, setUserPreferences] = useState<TLUserPreferences>(initialPreferences);
 
-
-    const store = useSyncDemo({ roomId: `${params?.time ?? 'defaultTime'}${params?.uid ?? 'defaultUid'}`, userInfo: userPreferences })
+    const store = useSyncDemo({ roomId: roomId, userInfo: userPreferences })
 
     const userName = useTldrawUser({ userPreferences, setUserPreferences })
 
@@ -42,25 +138,25 @@ const Draw: React.FC = () => {
                         .from('accounts')
                         .select('*')
                         .eq('userid', user?.uid);
-    
+
                     if (error) {
                         console.error('Error fetching data:', error);
                     } else if (data.length > 0) {
-                        setUserPreferences({ id: user.uid, name: data[0]?.username});
+                        setUserPreferences({ id: user.uid, name: data[0]?.username });
                     }
                 } catch (err) {
                     console.error('Error:', err);
                 }
             }
         };
-    
+
         fetchUserPreferences();
     }, [user]);
-    
 
-    DefaultColorThemePalette.lightMode.black.solid = 'aqua'
+
 
     return (
+
         <AnimatePresence>
             {
                 !isExiting &&
@@ -68,26 +164,52 @@ const Draw: React.FC = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 0.2 } }}
                     exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                    className='ml-auto positioners flex items-center p-1 justify-center relative w-full h-full'
+                    className='ml-auto positioners flex items-center p-3 justify-center relative w-full h-full'
                     onClick={handleOutsideClick}>
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
                         exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
-                        className={`w-full h-full bg-[#313131] z-[5000]  rounded-lg  overflow-auto border-[#535353] border-[1px]  flex flex-col justify-between`}
+                        className={`w-full h-full bg-[#313131] z-[5000] rounded-lg  overflow-auto border-[#535353] border-[1px]  flex flex-col justify-between`}
                         onClick={(e) => e.stopPropagation()}>
-                        <div className='flex gap-2 p-2'>
-                            <div
-                                onClick={handleOutsideClick}
-                                className='bg-[#111] px-5 cursor-pointer border-[#535353] border-[1px] rounded-lg'>
-                                Back
-                            </div>
-                        </div>
                         <Tldraw
-                        inferDarkMode={true}
-                        forceMobile={true}
                             user={userName}
-                            store={store} />
+                            store={store}
+                            deepLinks
+
+                            isShapeHidden={(shape, editor) => {
+                                const userId = editor.user.getId()
+                                // Hide private shapes from other users
+                                return !!shape.meta.private && shape.meta.ownerId !== userId
+                            }}
+                            onMount={(editor) => {
+                                // Add private and ownerId metadata when a shape is created
+                                editor.store.sideEffects.registerBeforeCreateHandler('shape', (shape) => {
+                                    if ('private' in shape.meta) return shape
+                                    return {
+                                        ...shape,
+                                        meta: {
+                                            ...shape.meta,
+                                            private: isPrivateMode$.get(),
+                                            ownerId: editor.user.getId(),
+                                        },
+                                    }
+                                })
+
+                                // Clean up the selection by removing any hidden shapes
+                                return react('clean up selection', () => {
+                                    const selectedShapes = editor.getSelectedShapes()
+                                    const filteredSelectedShapes = selectedShapes.filter((s) => !editor.isShapeHidden(s))
+                                    if (filteredSelectedShapes.length !== selectedShapes.length) {
+                                        editor.select(...filteredSelectedShapes)
+                                    }
+                                })
+                            }}
+                            components={{
+                                ...components,
+                  
+                            }}
+                        />
 
                     </motion.div>
                 </motion.div>
@@ -96,4 +218,25 @@ const Draw: React.FC = () => {
     )
 }
 
-export default Draw
+export default function SyncPrivateContentExample({ roomId }: { roomId: string }) {
+    return (
+        <PrivateModeContext.Provider value={useAtom('isPrivateDrawingMode', false)}>
+            <Draw roomId={roomId} />
+        </PrivateModeContext.Provider>
+    )
+}
+
+/**
+ * This example demonstrates how to create a 'private' drawing mode where any shapes created by one person cannot be seen by another.
+ * It sets up a simple ownership system where each shape created is tagged with the id of the user who created it.
+ * It also adds a boolean flag to each shape called 'private' which is set to true if the shape is created in private mode.
+ * If the user selects one or more private shapes, they will be given the option to make them public.
+ *
+ * 1. We create a context to store the atom that will hold the state of the private drawing mode. We are using signals here but you can use any state management library you like.
+ * 2. We override the `InFrontOfTheCanvas` component to add a tool panel at the top of the screen that allows the user to toggle private drawing mode on and off, and to make private shapes public.
+ * 3. We use the context to get the atom that holds the state of the private drawing mode. We then have to call 'useValue' on the atom to get the current value in a reactive way.
+ * 4. We override the `isShapeHidden` function to hide shapes that are private and not owned by the current user.
+ * 5. We register a side effect that adds the 'private' and 'ownerId' meta fields to each shape created. We set the 'private' field to the current value of the private drawing mode atom.
+ * 6. We register a side effect that cleans up the selection by removing any hidden shapes from the selection. This re-runs whenever the selection or the hidden state of a selected shape changes.
+ * 7. Child shapes (e.g inside groups and frames) do not inherit the 'private' meta property from their parent. So when making a shape public, we decide to also make all descendant shapes public since this is most likely what the user intended.
+ */

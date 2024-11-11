@@ -84,6 +84,8 @@ interface AppState {
     showDrawer: boolean | null;
     setShowDrawer: (params: boolean) => void;
 
+    isexisting: boolean | null;
+    setIsExisting: (params: boolean) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -151,6 +153,9 @@ const useStore = create<AppState>((set) => ({
 
     showDrawer: null,
     setShowDrawer: (task) => set({ showDrawer: task }),
+
+    isexisting: null,
+    setIsExisting: (task) => set({ isexisting: task }),
 
 }));
 
