@@ -36,7 +36,6 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
     useEffect(() => {
         if (user) {
             getChatArray();
-            console.log("asdas")
             const subscription = supabase
                 .channel('public:projects')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, (payload) => {
@@ -50,9 +49,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
             return () => {
                 subscription.unsubscribe();
             };
-        } else {
-            console.log("not loggedin")
-        }
+        } 
     }, [user, params, chatListener, openKanbanChat]);
 
 

@@ -20,7 +20,7 @@ import {
     DragOverlay,
     DragStartEvent,
     KeyboardSensor,
-    PointerSensor,
+    // PointerSensor,
     UniqueIdentifier,
     closestCorners,
     useSensor,
@@ -31,7 +31,7 @@ import {
 import {
     SortableContext,
     arrayMove,
-    sortableKeyboardCoordinates,
+    // sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 
 
@@ -167,7 +167,6 @@ export default function Samp() {
     }, [user, openKanbanChat, openKanbanSettings, viewNotifs, settingsBoard, settingsTask, inviteToProject, loading]);
 
     const handleRealtimeEvent = (payload: any) => {
-        console.log(payload.new);
 
         // Check if the item matches the payload before switching
         const matchingItem = fetchedData?.find(item => item.id === payload.new.id);
@@ -227,14 +226,11 @@ export default function Samp() {
 
     async function getAccounts() {
         try {
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('accounts')
                 .select('*')
                 .eq('userid', user?.uid)
 
-            if (data) {
-                console.log(data)
-            }
             if (error) {
                 return console.error('Error fetching data:', error);
             }
@@ -519,7 +515,7 @@ export default function Samp() {
     const keyboardSensor = useSensor(KeyboardSensor)
 
 
-       const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor)
+    const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor)
 
 
     function handleDragStart(event: DragStartEvent) {
@@ -625,7 +621,7 @@ export default function Samp() {
         // Copying the fetchedData's boards
         let newItems = [...fetchedData[0]?.boards];
 
-        console.log("is moving")
+
         // Handling Container (Board) Sorting
         if (
             active.id.toString().includes('container') &&
@@ -634,7 +630,7 @@ export default function Samp() {
             over &&
             active.id !== over.id
         ) {
-            console.log("is movings")
+
             const activeContainerIndex = newItems.findIndex(
                 (container) => container.board_uid === active.id,
             );
@@ -853,6 +849,14 @@ export default function Samp() {
                 />
             }
             {
+                (fetchedData && fetchedData.length > 0 && (
+                    fetchedData[0]?.created_by === user?.uid ||
+                    (fetchedData[0].is_shared !== "private" && fetchedData[0].is_shared === "public") ||
+                    (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.uid) ||
+                    (fetchedData[0].is_shared === "shareable" &&
+                        ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.uid) ||
+                            (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
+                )) &&
                 showDrawer &&
                 <Draw />
             }
