@@ -19,6 +19,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import useStore from '../../../Zustand/UseStore'
 import IsLoggedIn from '../../../firebase/IsLoggedIn'
 import { supabase } from '../../../supabase/supabaseClient'
+import orgamixLogo from '../../../assets/Orgamix.png'
 
 
 
@@ -89,11 +90,18 @@ const components: TLComponents = {
                     </div>
                 )}
 
-                  {/* Custom Back Button */}
-                  <div className="custom-button-container">
-                    <button className="custom-button" onClick={handleOutsideClick}>
+                {/* Custom Back Button */}
+                <div className="custom-button-container flex items-center justify-center text-center hover:bg-[#888]">
+                    <button className="custom-button " onClick={handleOutsideClick}>
                         Close
                     </button>
+                </div>
+
+
+                <div className="absolute bottom-[80px] scale-[.5] md:scale-[1] flex gap-2 font-bold text-sm md:rotate-0 md:bottom-[10px] rotate-90 px-5 justify-center items-center border-[1px] border-[#535353] right-[-60px] md:right-[5px] bg-[#222] text-white p-1 rounded-lg">
+                  <span className='w-[20px] h-[20px] overflow-hidden'>
+                    <img className='w-full h-full object-cover' src={orgamixLogo} alt="" />
+                    </span>  ORGAMIX
                 </div>
             </>
         )
@@ -118,9 +126,9 @@ function Draw({ roomId }: { roomId: string }) {
 
     const [user] = IsLoggedIn()
 
-    const initialPreferences = user
-        ? { id: user.uid, name: user.email }
-        : { id: 'defaultUid', name: 'Guest' };
+    const initialPreferences: any = user
+        ? { id: user.uid, name: user.email, colorScheme: 'dark'}
+        : { id: 'defaultUid', name: 'Guest', colorScheme: 'dark'};
 
     const [userPreferences, setUserPreferences] = useState<TLUserPreferences>(initialPreferences);
 
@@ -128,7 +136,7 @@ function Draw({ roomId }: { roomId: string }) {
 
     const userName = useTldrawUser({ userPreferences, setUserPreferences })
 
-
+    
 
     useEffect(() => {
         const fetchUserPreferences = async () => {
@@ -142,7 +150,7 @@ function Draw({ roomId }: { roomId: string }) {
                     if (error) {
                         console.error('Error fetching data:', error);
                     } else if (data.length > 0) {
-                        setUserPreferences({ id: user.uid, name: data[0]?.username });
+                        setUserPreferences({ id: user.uid, name: data[0]?.username, colorScheme: 'dark',});
                     }
                 } catch (err) {
                     console.error('Error:', err);
@@ -164,7 +172,7 @@ function Draw({ roomId }: { roomId: string }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 0.2 } }}
                     exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                    className='ml-auto positioners flex items-center p-3 justify-center relative w-full h-full'
+                    className='ml-auto positioners flex items-center p-1 justify-center relative w-full h-full'
                     onClick={handleOutsideClick}>
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
@@ -207,7 +215,7 @@ function Draw({ roomId }: { roomId: string }) {
                             }}
                             components={{
                                 ...components,
-                  
+
                             }}
                         />
 

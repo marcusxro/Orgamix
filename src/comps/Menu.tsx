@@ -47,17 +47,19 @@ const Menu: React.FC = () => {
                         <div className='flex gap-2'>
                             <div
                                 onClick={() => { nav('/sign-in'); setShowMenu(!showMenu) }}
-                                className='w-full bg-white p-3 rounded-lg text-black font-bold text-center'>
+                                className='w-full bg-white cursor-pointer hover:bg-[#d3d3d3] p-3 rounded-lg text-black font-bold text-center'>
                                 Sign in
                             </div>
                             <div
                                 onClick={() => { nav('/sign-up'); setShowMenu(!showMenu) }}
-                                className='w-full bg-white p-3 rounded-lg text-black font-bold text-center'>
+                                className='w-full bg-white p-3 cursor-pointer hover:bg-[#d3d3d3] rounded-lg text-black font-bold text-center'>
                                 Sign up
                             </div>
                         </div>
                 }
-                <div className='w-full mt-2 bg-[#1f1f1f]  border-[1px] border-[#414141] text-white p-3 rounded-lg  font-bold text-center'>
+                <div 
+                onClick={() => {nav('/contact'); ; setShowMenu(!showMenu) }}
+                className='w-full mt-2 bg-[#1f1f1f]  border-[1px] hover:bg-[#333] cursor-pointer border-[#414141] text-white p-3 rounded-lg  font-bold text-center'>
                     Contact
                 </div>
             </div>

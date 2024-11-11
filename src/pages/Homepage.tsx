@@ -18,7 +18,6 @@ import { useNavigate } from 'react-router-dom';
 import useStore from '../Zustand/UseStore';
 import Menu from '../comps/Menu';
 import MetaEditor from '../comps/MetaHeader/MetaEditor';
-import AdSenseAd from '../comps/AdSense/AdGenerator';
 
 const Homepage: React.FC = () => {
   const [user] = IsLoggedIn()
@@ -39,7 +38,6 @@ const Homepage: React.FC = () => {
         
       }
       <div className='px-5'>
-      <AdSenseAd  />
         <div className='w-full max-w-[1200px]   mx-auto mt-8  overflow-hidden '>
           <div className="videoBg  rounded-md p-5 text-center gap-3 min-h-[400px] md:min-h-[500px] flex items-center flex-col justify-center bg-[#11]  relative overflow-hidden">
 

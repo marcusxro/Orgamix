@@ -28,7 +28,7 @@ import TabChangeTitle from './comps/MetaHeader/TabChangeTitle';
 import About from './pages/Static/About';
 import Contact from './pages/Static/Contact';
 import NotFoundPage from './pages/Static/NotFoundPage';
-import TestPage from './pages/TestPage';
+
 
 function App() {
   return (
@@ -269,8 +269,6 @@ function Main() {
         <Route path='/about' element={<About />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='*' element={<NotFoundPage />} />
-
-        <Route path='/Test' element={<TestPage />} />
         
         {/* auth pages */}
         <Route path='/sign-in' element={<SignIn />} />
