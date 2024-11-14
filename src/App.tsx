@@ -29,6 +29,7 @@ import About from './pages/Static/About';
 import Contact from './pages/Static/Contact';
 import NotFoundPage from './pages/Static/NotFoundPage';
 import TestPage from './pages/TestPage';
+import ArtificialIntelligence from './pages/isLoggedIn/ArtificialIntelligence';
 
 
 function App() {
@@ -271,7 +272,7 @@ function Main() {
         <Route path='/contact' element={<Contact />} />
         <Route path='*' element={<NotFoundPage />} />
         <Route path='/test' element={<TestPage />} />
-        
+    
         {/* auth pages */}
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
@@ -288,6 +289,7 @@ function Main() {
         <Route path='/user/projects' element={<Projects />} />
         <Route path='/user/projects/view/:uid/:time' element={<Samp />} />
         <Route path='/user/calendar' element={<CalendarPage />} />
+        <Route path='/user/ask-orgamix' element={<ArtificialIntelligence />} />
         <Route path='/user/settings' element={<Settings />} />
 
 

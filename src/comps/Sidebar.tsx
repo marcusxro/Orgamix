@@ -13,7 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import { IoIosNotifications } from "react-icons/io";
 import useStore from '../Zustand/UseStore';
 import FetchPFP from './FetchPFP';
-
+import { GiArtificialHive } from "react-icons/gi";
+import {motion} from 'framer-motion'
 
 interface dataType {
     userid: string;
@@ -354,6 +355,21 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
                     </div>
                     <span>Deadlines</span>
                 </div>
+                <div
+      onClick={() => { navigateToPages("/user/ask-orgamix") }}
+      className={`${location === "Ask" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}
+    >
+      {/* Add motion.div for the rotating icon */}
+      <motion.div
+        className="text-2xl"
+        whileHover={{ rotate: 360 }}
+        transition={{ duration: .5 }}
+      >
+        <GiArtificialHive />
+      </motion.div>
+      <span>Ask AI</span>
+    </div>
+        
 
             </div>
 

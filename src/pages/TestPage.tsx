@@ -41,7 +41,7 @@ const YourComponent:React.FC = () => {
     if(prompt === "") {
       return;
     }
-    const genAI = new GoogleGenerativeAI.GoogleGenerativeAI('AIzaSyAmcKmm6KXHwobr5uT_TxUb1u3wj6ySWL8');
+    const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     // Default prompt based on user input
@@ -86,8 +86,6 @@ const YourComponent:React.FC = () => {
   return (
     <div className="p-5 min-h-screen flex flex-col">
     <h1 className="text-xl font-semibold">Orgamix AI:</h1>
-    {import.meta.env.VITE_GEMINI_KEY}
-    
     <div className="flex flex-col gap-5 mt-2 bg-slate-300 p-4 rounded-lg overflow-auto h-full max-h-[80vh]">
       {AIresponse.map((response, index) => (
         <div className="bg-gray-500 p-2 rounded-lg mb-2" key={index}>

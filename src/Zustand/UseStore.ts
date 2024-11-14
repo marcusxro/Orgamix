@@ -86,6 +86,9 @@ interface AppState {
 
     isexisting: boolean | null;
     setIsExisting: (params: boolean) => void;
+
+    isDone: boolean | null;
+    setIsDone: (params: boolean) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -156,6 +159,10 @@ const useStore = create<AppState>((set) => ({
 
     isexisting: null,
     setIsExisting: (task) => set({ isexisting: task }),
+
+
+    isDone: false,
+    setIsDone: (task) => set({ isDone: task }),
 
 }));
 
