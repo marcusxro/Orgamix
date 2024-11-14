@@ -179,9 +179,7 @@ const ArtificialIntelligence: React.FC = () => {
                     </div>
 
                     <div className="flex flex-row gap-2 mt-5 w-full relative">
-                        {
-                            !isDone && "WAHAHAHAh"
-                        }
+          
                         <textarea
                             value={prompt}
                             readOnly={loading}
@@ -191,11 +189,11 @@ const ArtificialIntelligence: React.FC = () => {
                         />
                         <button
                             onClick={() => {isDone && startChat()}}
-                            className="bg-[#444] text-white p-2 rounded-md md:w-auto absolute top-[15px] right-3"
+                            className={`${isDone ? "bg-[#444]" : "bg-[#888]"} text-white p-2 rounded-md md:w-auto absolute top-[15px] right-3`}
                         >
                             {
                                 loading ?
-                                    <div className='w-[20px] h-[20px]'>
+                                    <div className='w-[15px] h-[15px]'>
                                         <Loader />
                                     </div>
                                     : <IoIosSend />
