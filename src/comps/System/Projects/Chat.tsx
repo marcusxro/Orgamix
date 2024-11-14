@@ -6,7 +6,6 @@ import IsLoggedIn from '../../../firebase/IsLoggedIn';
 import { supabase } from '../../../supabase/supabaseClient';
 import { IoMdClose } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
-import UserNoProfile from '../../../assets/UserNoProfile.jpg'
 import moment from 'moment';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { MdOutlineEmojiEmotions } from "react-icons/md";

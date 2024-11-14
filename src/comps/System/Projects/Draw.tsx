@@ -85,14 +85,14 @@ const components: TLComponents = {
                     </div>
                 ) : (
                     <div className="toggle-panel pointer" onClick={() => isPrivateMode$.update((v) => !v)}>
-                        <div>Private mode</div>
+                        <div className='text-white'>Private mode</div>
                         <Toggle isChecked={isPrivateMode} />
                     </div>
                 )}
 
                 {/* Custom Back Button */}
                 <div className="custom-button-container flex items-center justify-center text-center hover:bg-[#888]">
-                    <button className="custom-button " onClick={handleOutsideClick}>
+                    <button className="custom-button text-white " onClick={handleOutsideClick}>
                         Close
                     </button>
                 </div>
@@ -136,7 +136,7 @@ function Draw({ roomId }: { roomId: string }) {
 
     const userName = useTldrawUser({ userPreferences, setUserPreferences })
 
-    
+
 
     useEffect(() => {
         const fetchUserPreferences = async () => {
