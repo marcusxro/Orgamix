@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react'
-
 import * as GoogleGenerativeAI from "@google/generative-ai";
-import IsLoggedIn from '../firebase/IsLoggedIn';
-import { useLocation } from 'react-router-dom';
 
 const TypingEffect = ({ response }: any) => {
   const [displayText, setDisplayText] = useState('');
@@ -24,12 +21,12 @@ const TypingEffect = ({ response }: any) => {
 };
 
 
-const YourComponent = () => {
+const YourComponent:React.FC = () => {
   const [prompt, setPrompt] = useState("");
   const [AIresponse, setAIresponse] = useState<string[]>([]);
 
   const [greetingSent, setGreetingSent] = useState(false);
-  const location = useLocation();
+
 
   useEffect(() => {
     if (!greetingSent) {
@@ -44,7 +41,7 @@ const YourComponent = () => {
     if(prompt === "") {
       return;
     }
-    const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
+    const genAI = new GoogleGenerativeAI.GoogleGenerativeAI('AIzaSyAmcKmm6KXHwobr5uT_TxUb1u3wj6ySWL8');
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     // Default prompt based on user input
@@ -89,6 +86,7 @@ const YourComponent = () => {
   return (
     <div className="p-5 min-h-screen flex flex-col">
     <h1 className="text-xl font-semibold">Orgamix AI:</h1>
+    {import.meta.env.VITE_GEMINI_KEY}
     
     <div className="flex flex-col gap-5 mt-2 bg-slate-300 p-4 rounded-lg overflow-auto h-full max-h-[80vh]">
       {AIresponse.map((response, index) => (
