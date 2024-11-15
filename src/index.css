@@ -166,3 +166,7 @@ display: none;
     opacity: 1;
   }
 }
+
+.isCode {
+  background-color: #111;
+}
