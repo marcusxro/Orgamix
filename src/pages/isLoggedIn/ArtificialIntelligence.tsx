@@ -10,7 +10,10 @@ import { IoIosSend } from "react-icons/io";
 import useStore from '../../Zustand/UseStore';
 import { FaArrowDown } from "react-icons/fa6";
 import { motion } from 'framer-motion'
-
+import { IoCopyOutline } from "react-icons/io5";
+import { PiSpeakerHigh } from "react-icons/pi";
+import { Tooltip as ReactTooltip } from 'react-tooltip'
+import { FaCircleStop } from "react-icons/fa6";
 
 
 
@@ -22,6 +25,8 @@ const TypingEffect = ({ response, container }: any) => {
     const [isUserScrolling, setIsUserScrolling] = useState(false);
     const prevScrollTop = useRef(0); // To track previous scroll position
     const [isBottomReached, setIsBottomReached] = useState(false);
+    const [typingDone, setTypingDone] = useState<boolean>(false); // Track if typing is done for the current response
+
 
     // Function to detect user scrolling direction
     const checkScrollDirection = () => {
@@ -72,23 +77,25 @@ const TypingEffect = ({ response, container }: any) => {
 
                     if (index < response.text.length) {
 
-                
-                        if(isUserScrolling && isDone){
+
+                        if (isUserScrolling && isDone) {
                             clearInterval(typingInterval)
                             setDisplayText((prev) => prev + response.text[index]);
                             setIndex((prev) => prev + 1); // Move forward through the string for AI
-    
+
                         } else {
                             scrollToBottom()
                             setDisplayText((prev) => prev + response.text[index]);
                             setIndex((prev) => prev + 1); // Move forward through the string for AI
-    
+                            setTypingDone(true); // Set typingDone to true to trigger the copy div
+
                         }
-                 
+
                     } else {
+
                         clearInterval(typingInterval); // Stop typing when done
                         setIsDone(true); // Mark typing as done
-                      
+
                     }
                 }, 3); // Adjust typing speed (10ms per character)
 
@@ -123,10 +130,98 @@ const TypingEffect = ({ response, container }: any) => {
         };
     }, []); // Empty dependency array to run this effect once on mount
 
-
     const isCode = (text: string) => {
-        return /<.*?>/.test(text) || /\b(function|const|let|var|class|import|export)\b/.test(text);
+        // Check for common code patterns and keywords
+        const codePatterns = [
+            /<.*?>/, // HTML tags
+            /\b(function|const|let|var|class|import|export|return|if|else|for|while|switch|case|break|continue|try|catch|finally|throw|new|this|super|extends|constructor|static|get|set|async|await|yield|typeof|instanceof|void|delete|in|of)\b/, // Common JavaScript keywords
+            /=>/, // Arrow functions
+            /\/\*[\s\S]*?\*\/|\/\/.*/, // Comments
+            /['"`][^'"`]*['"`]/, // Strings
+            /\{[^}]*\}/, // Object literals or blocks
+            /\[[^\]]*\]/, // Array literals
+            /\([^)]*\)/, // Function parameters or expressions
+            /;$/, // Semicolons at the end of lines
+        ];
+
+        return codePatterns.some(pattern => pattern.test(text));
     };
+
+    const [msgId, setMsgId] = useState<string | null>(null);
+
+    function copyText(params: string) {
+        navigator.clipboard.writeText(displayText);
+        setMsgId(params);
+
+    }
+
+    const [prevCreatedAt, setPrevCreatedAt] = useState(response.created_at);
+    const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
+    const [isSpeaking, setIsSpeaking] = useState(false);
+
+
+
+
+    const getProfessionalVoice = () => {
+        const voices = window.speechSynthesis.getVoices();
+        return voices.find(voice => voice.name.includes("Google") || voice.name.includes("Microsoft")) || voices[0];
+    };
+
+    // Function to read the text aloud with a professional-sounding voice
+    const readTextAloud = (text: string) => {
+        if (window.speechSynthesis) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voice = getProfessionalVoice();
+            utterance.voice = voice;
+            utterance.lang = 'en-US'; // Set the language
+            utterance.pitch = 0.9; // Slightly lower pitch for a formal tone
+            utterance.rate = 0.9;  // Slower speaking rate
+            window.speechSynthesis.speak(utterance);
+            speechSynthesisRef.current = utterance; // Keep track of the utterance for stopping later
+        } else {
+            console.error("SpeechSynthesis is not supported in this browser.");
+        }
+    };
+
+    // Function to stop the current speech
+    const stopSpeech = () => {
+        if (speechSynthesisRef.current) {
+            window.speechSynthesis.cancel(); // Stop the current speech
+            setIsSpeaking(false);
+        }
+    };
+
+    // Trigger voice reading when typing is done and when a new response is received
+    useEffect(() => {
+        if (typingDone && !isSpeaking && !isUserScrolling) {
+            readTextAloud(displayText);
+            setIsSpeaking(true); 
+        }
+    }, [typingDone, displayText, isSpeaking, isUserScrolling]);
+    
+
+    // Listen for response updates based on created_at to handle new messages
+    useEffect(() => {
+        if (response?.created_at !== prevCreatedAt) {
+            stopSpeech(); // Stop speech if a new message arrives
+            setPrevCreatedAt(response.created_at); // Update the previous message timestamp
+            setDisplayText(''); // Clear the previous message's text (if needed)
+            setIndex(0); // Reset typing effect
+            setTypingDone(false); // Reset typing completion status
+            setIsSpeaking(false); // Reset speaking status
+        }
+    }, [response, prevCreatedAt]);
+
+    // Toggle speech on click (start/stop)
+    const toggleSpeech = (text: string) => {
+        if (isSpeaking) {
+            stopSpeech(); // Stop speech
+        } else {
+            readTextAloud(text); // Start speech
+            setIsSpeaking(true);
+        }
+    };
+    
 
 
     return (
@@ -134,11 +229,11 @@ const TypingEffect = ({ response, container }: any) => {
         <>
             {
                 response?.type === "User" ?
-                    <p className={`flex items-start gap-2 relative justify-end`}>
-                        <div className="bg-[#191919] px-3 break-all p-2 text-md rounded-lg mb-2 max-w-[700px] w-auto border-[1px] border-[#535353]">
+                    <p className={`flex items-start gap-2 relative justify-end text-sm`}>
+                        <div className="bg-[#191919] px-3 break-all p-2 rounded-lg mb-2 max-w-[700px] w-auto border-[1px] border-[#535353]">
                             {displayText}
                         </div>
-                        <div className='w-full mt-1 h-full max-h-[30px] max-w-[30px] overflow-hidden rounded-full flex items-center justify-center '>
+                        <div className='w-[30px] mt-1 h-[30px] min-h-[30px] min-w-[30px] bg-[#191919] max-w-[30px] overflow-hidden rounded-full flex items-center justify-center '>
                             {response?.type === "User" ? (
                                 <FetchPFP userUid={user?.uid} />
                             ) : (
@@ -149,25 +244,55 @@ const TypingEffect = ({ response, container }: any) => {
 
                     </p>
                     :
-                    <p className={`flex items-start gap-2`}>
+                    <p className={`flex items-start gap-2 text-sm`}>
                         <div className='w-full mt-1 h-full min-h-[30px] min-w-[30px] bg-[#191919] border-[1px] border-[#535353] max-w-[30px] overflow-hidden rounded-full flex items-center justify-center '>
                             <img className='w-[20px] h-[20px] object-contain' src={orgamixLogo} alt="Orgamix Logo" />
                         </div>
-                        <div className="bg-[#191919] p-2 text-left rounded-lg mb-2 max-w-[700px] w-auto border border-[#535353] overflow-auto">
+                        <div>
+                            <div className="bg-[#191919] p-2 changeFont text-left rounded-lg mb-2 max-w-[700px] w-auto border border-[#535353] overflow-auto">
 
-                            {
-                                // If the displayText contains code, render it as code
-                                isCode(displayText) ? (
-                                    <pre className="whitespace-pre-wrap sans isCode p-2 rounded-lg text-green-500 break-words">
-                                        <code>{displayText}</code>
-                                    </pre>
-                                ) : (
-                                    // Otherwise, render it as normal text
-                                    <pre className="whitespace-pre-wrap sans px-3">
-                                        {displayText}
-                                    </pre>
-                                )
-                            }
+                                {
+                                    // If the displayText contains code, render it as code
+                                    isCode(displayText) ? (
+                                        <pre className="whitespace-pre-wrap sans isCode p-2 rounded-lg text-green-500 break-words">
+                                            <code>{displayText}</code>
+                                        </pre>
+                                    ) : (
+                                        // Otherwise, render it as normal text
+                                        <pre className="whitespace-pre-wrap  px-3">
+                                            {displayText}
+                                        </pre>
+                                    )
+                                }
+
+                            </div>
+                            {typingDone && (
+                                <div className="flex gap-3 mt-3 ml-1">
+                                    <div
+                                        onClick={() => copyText(response.created_at)}
+                                        data-tooltip-id={`copy-${response.created_at}`}
+                                        className='cursor-pointer hover:text-[#888]'>
+                                        <IoCopyOutline />
+                                    </div>
+
+                                    <ReactTooltip
+                                        id={`copy-${response.created_at}`}
+                                        place="bottom"
+                                        variant="dark"
+                                        className='rounded-lg border-[#535353] border-[1px] text-sm z-40'
+                                        content={`${msgId === response.created_at ? "Copied!" : "Copy"}`}
+                                    />
+
+                                    <div
+                                        onClick={() => toggleSpeech(displayText)}
+                                        className='cursor-pointer hover:text-[#888]'>
+                                        {
+                                            isSpeaking ? <PiSpeakerHigh /> : <FaCircleStop />
+                                        }
+
+                                    </div>
+                                </div>
+                            )}
 
                         </div>
 
@@ -257,7 +382,11 @@ const ArtificialIntelligence: React.FC = () => {
         if (!greetingSent.current) {
             setAIresponse((prevs) => [
                 ...prevs,
-                { text: "Hello, I am Orgamix AI, built to assist you with tasks, projects, and providing useful information.", type: "AI" }
+                {
+                    text: "Hello, I am Orgamix AI, built to assist you with tasks, projects, and providing useful information.",
+                    type: "AI",
+                    created_at: Date.now()
+                }
             ]);
             greetingSent.current = true; // Mark as sent
         }
@@ -347,6 +476,7 @@ const ArtificialIntelligence: React.FC = () => {
                 {
                     text: "Error occured, please send other prompt.",
                     type: "AI",
+                    created_at: Date.now()
                 },
             ])
 
@@ -372,7 +502,7 @@ const ArtificialIntelligence: React.FC = () => {
                         className="flex flex-col gap-5 mt-2 rounded-lg overflow-auto h-full pb-[3rem] mb-[4.2rem]">
                         {AIresponse.map((response, index) => (
                             <div key={index}>
-                                <TypingEffect response={response} container={chatContainerRef} />
+                                <TypingEffect response={response} container={chatContainerRef} setAIresponse={setAIresponse} />
                             </div>
                         ))}
                         {
@@ -418,7 +548,7 @@ const ArtificialIntelligence: React.FC = () => {
                             value={prompt}
                             readOnly={loading}
                             onChange={(e) => setPrompt(e.target.value)}
-                            className={`p-2 ${loading ? "text-[#888]" : "text-white "} pr-[4rem] relative border-[1px] border-[#535353] resize-none rounded-md outline-none w-full mb-2 md:mb-0`}
+                            className={`p-2 ${loading ? "text-[#888]" : "text-white "} bg-[#111] pr-[4rem] relative border-[1px] border-[#535353] resize-none rounded-md outline-none w-full mb-2 md:mb-0`}
                             placeholder="Type your message..."
                         />
                         <button
