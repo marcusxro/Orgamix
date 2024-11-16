@@ -30,6 +30,7 @@ import Contact from './pages/Static/Contact';
 import NotFoundPage from './pages/Static/NotFoundPage';
 import TestPage from './pages/TestPage';
 import ArtificialIntelligence from './pages/isLoggedIn/ArtificialIntelligence';
+import ViewAiChat from './pages/isLoggedIn/ViewAiChat';
 
 
 function App() {
@@ -290,6 +291,7 @@ function Main() {
         <Route path='/user/projects/view/:uid/:time' element={<Samp />} />
         <Route path='/user/calendar' element={<CalendarPage />} />
         <Route path='/user/ask-orgamix' element={<ArtificialIntelligence />} />
+        <Route path='/user/ask-orgamix/:time' element={<ViewAiChat />} />
         <Route path='/user/settings' element={<Settings />} />
 
 

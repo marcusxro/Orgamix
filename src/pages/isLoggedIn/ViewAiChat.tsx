@@ -16,7 +16,7 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { FaCircleStop } from "react-icons/fa6";
 import AISidebar from '../../comps/System/AIComp/AISidebar';
 import { supabaseTwo } from '../../supabase/supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 
 
@@ -28,7 +28,7 @@ const TypingEffect = ({ response, container }: any) => {
     const [isUserScrolling, setIsUserScrolling] = useState(false);
     const prevScrollTop = useRef(0); // To track previous scroll position
     const [isBottomReached, setIsBottomReached] = useState(false);
-    const [typingDone, setTypingDone] = useState<boolean>(false); // Track if typing is done for the current response
+    const [_, setTypingDone] = useState<boolean>(false); // Track if typing is done for the current response
 
     // Function to detect user scrolling direction
     const checkScrollDirection = () => {
@@ -141,7 +141,7 @@ const TypingEffect = ({ response, container }: any) => {
 };
 
 
-const ArtificialIntelligence: React.FC = () => {
+const ViewAiChat: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [prompt, setPrompt] = useState("");
     const [AIresponse, setAIresponse] = useState<any[]>([]);
@@ -149,8 +149,39 @@ const ArtificialIntelligence: React.FC = () => {
     const [isTyping, setIsTyping] = useState(false); // State to track if AI is typing
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const [isShow, setIsShow] = useState<boolean>(false)
-    const greetingSent = useRef(false);
     const [isUserScrolling, setIsUserScrolling] = useState(false)
+    const params = useParams();
+    const [user] = IsLoggedIn()
+
+
+
+    useEffect(() => {
+        if (user) {
+            getSpecificChats()
+        }
+    }, [user])
+
+    async function getSpecificChats() {
+        try {
+            const { data, error } = await supabaseTwo
+                .from('user_chats')
+                .select('*')
+                .eq('userid', user?.uid)
+                .eq('created_at', params.time)
+
+            if (error) {
+                console.log(error)
+            } else {
+                console.log(data[0].chats)
+                setAIresponse(data[0].chats)
+            }
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+
 
     const scrollToBottom = () => {
         if (chatContainerRef.current) {
@@ -161,6 +192,12 @@ const ArtificialIntelligence: React.FC = () => {
         }
     };
 
+
+    useEffect(() => {
+       if(isNearBottom()) {
+        scrollToBottom()
+       }
+    }, [AIresponse, isDone])
 
     const scrollToBottomSmooth = () => {
         if (chatContainerRef.current && !isUserScrolling) {
@@ -210,104 +247,56 @@ const ArtificialIntelligence: React.FC = () => {
     }, [AIresponse]);
 
 
-
-
-    useEffect(() => {
-        if (!greetingSent.current) {
-            setAIresponse((prevs) => [
-                ...prevs,
-                {
-                    text: "Hello, I am Orgamix AI, built to assist you with tasks, projects, and providing useful information.",
-                    type: "AI",
-                    created_at: Date.now()
-                }
-            ]);
-            greetingSent.current = true; // Mark as sent
-        }
-    }, []);
-
-
-    const nav = useNavigate()
-    
-    async function createNewChat(text: string) {
+    async function editChats(chatData: any) {
         try {
-            // Generate the timestamp once
-            const DateNow = Date.now();
-    
-            // First, update the state with the user's prompt and the AI's response
-            setAIresponse((prevs) => [
-                ...prevs,
-                {
-                    text: prompt, // User's prompt
-                    type: "User",
-                    created_at: DateNow // Same timestamp for the state
-                },
-                {
-                    text, // AI's response
-                    type: "AI",
-                    created_at: DateNow // Same timestamp for the state
-                },
-            ]);
-    
-            // Insert both the user's prompt and AI's response into Supabase
-            const { data, error } = await supabaseTwo
+            const { error } = await supabaseTwo
                 .from('user_chats')
-                .insert([
-                    {
-                        userid: user?.uid,
-                        created_at: DateNow, // Same timestamp for both chats
-                        chats: [
-                            {
-                                text: prompt, // User's prompt
-                                type: "User",
-                                created_at: DateNow
-                            },
-                            {
-                                text, // AI's response
-                                type: "AI",
-                                created_at: DateNow
-                            }
-                        ] // Insert both user and AI responses
-                    }
-                ]);
-    
+                .update({ chats: chatData })
+                .eq('userid', user?.uid)
+                .eq('created_at', params.time);
+
             if (error) {
                 console.log(error);
             } else {
-                console.log(data);
-                
-                // After the chat is saved in the database, navigate
-                nav(`/user/ask-orgamix/${DateNow}`);
+                console.log('Success saving chat');
             }
         } catch (error) {
             console.log(error);
         }
     }
-    
-    
 
 
     const startChat = async () => {
-
         if (prompt === "") {
             setLoading(false);
             return;
         }
 
-        scrollToBottomSmooth()
+        scrollToBottomSmooth();
         setIsDone(false);
         setIsTyping(true); // Show typing indicator
         setLoading(true);
+
         if (loading) {
-            return
+            return;
         }
 
-        console.log(prompt)
-        setAIresponse((prevs) => [...prevs, {
-            text: prompt,
-            type: "User"
+        console.log(prompt);
 
-        }]);
+        // Save the user's prompt to the state and immediately to the database
+        const userChatData: any = [
+            ...AIresponse,
+            {
+                text: prompt,
+                type: "User",
+                created_at: Date.now()
+            }
+        ];
+
+        setAIresponse(userChatData); // Update state with user prompt
+
+        // Save user's prompt to the database
+        await editChats(userChatData); // Save to the database
 
         const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
@@ -315,40 +304,27 @@ const ArtificialIntelligence: React.FC = () => {
         // Default prompt based on user input
         let adjustedPrompt = prompt;
 
-        // If the prompt mentions "Orgamix" or "founder of Orgamix", include additional details about Orgamix
+        // Add logic for specific prompts like "Orgamix" or "Marcus Salopaso"
         if (prompt.toLowerCase().includes("orgamix") || prompt.toLowerCase().includes("founder of orgamix")) {
-            console.log("Orgamix is prompted");
-
-
-            adjustedPrompt = `please listen first the prompt (${prompt}) of the user and if its relevant to provide the information about orgamix provide this similar or improved context, but dont ever metion unrelated thins "Orgamix is a productivity platform that contributes to great causes by giving funds to charity. Learn more about Orgamix at this website: https://orgamix.vercel.app/about. 
-            just provide the link and dont visit it. i want the uisers to be notified that the link is informative. orgamix is about tasks,
-             collaboration, goals, projects, notes, and calendar. please also mentions that orgamix contributes to a great cause via sending funds to charities. please listen to the prompt of the user, 
-               if its relevant to provide the information about orgamix do it, if not dont.
-              and also mention the link of orgamix about at the last. Can you tell me more about Orgamix and its impact?".
-              if the user is not asking for the context, please listen to its prompt. dont just bring context about the orgamix, listen to the user pronmpt first and do what he/she says which is this (${prompt}) `
-
-
+            adjustedPrompt = `please listen first the prompt (${prompt}) of the user and if it's relevant to provide the information about orgamix provide this similar or improved context...`;
         }
 
-        // If the prompt mentions "Marcus Salopaso", the AI will generate content related to him
         if (prompt.toLowerCase().includes("marcus salopaso") || prompt.toLowerCase().includes("founder of orgamix") || prompt.toLowerCase().includes("marcus")) {
-            adjustedPrompt = `if the user prompt which is this "${prompt} doesnt contain any harmfull or bad intentions kindly make a context about marcus salopaso which is 
-            this also make this text as a response directly to the user like a message directly to them dont mention any any person or AI. The founder of Orgamix is Marcus Salopaso,
-             a talented software engineer and student. He is passionate about creating solutions that help others. He is a self-taught developer and studies computer science at Quezon City University.
-              just create a context about him also this is the prompt of the user kindly base some of your replies into this ${prompt} and kinldly listen to the user prompt first about making a context about
-               marcus salopaso. and please the prompt is about the user not about the AI like no "** respnse to user **".  dont mention any subject that is not related to the user prompt. thank you.`;
+            adjustedPrompt = `if the user prompt which is this "${prompt} doesn't contain any harmful or bad intentions, kindly make a context about Marcus Salopaso...`;
         }
 
-        // Call the API with the adjusted prompt to generate content
         try {
+            // Generate the AI's response
             const result = await model.generateContent(adjustedPrompt);
             const response = result.response;
             const text = await response.text();
 
+            // Clear input field after AI response
             if (text) {
                 setPrompt(""); // Clear input field
             }
 
+            // Check for inappropriate content
             if (text.toLowerCase().includes("harassment")) {
                 setAIresponse((prevs) => [
                     ...prevs,
@@ -356,11 +332,23 @@ const ArtificialIntelligence: React.FC = () => {
                         text: "Warning: I do not respond to inappropriate content.",
                         type: "AI",
                         created_at: Date.now()
-                    },
+                    }
                 ]);
             } else {
-               
-                createNewChat(text);
+                // Add the AI response to the state and save it to the database
+                const aiChatData = [
+                    ...userChatData,
+                    {
+                        text: text,
+                        type: "AI",
+                        created_at: Date.now()
+                    }
+                ];
+
+                setAIresponse(aiChatData); // Update state with AI response
+
+                // Save the AI's response to the database
+                await editChats(aiChatData); // Save to the database
             }
         } catch (error) {
             console.error("Error generating response:", error);
@@ -368,12 +356,11 @@ const ArtificialIntelligence: React.FC = () => {
             setAIresponse((prevs) => [
                 ...prevs,
                 {
-                    text: "Error occured, please send other prompt.",
+                    text: "Error occurred, please send another prompt.",
                     type: "AI",
                     created_at: Date.now()
-                },
-            ])
-
+                }
+            ]);
         } finally {
             setLoading(false);
             setIsTyping(false); // Stop typing indicator after response is ready
@@ -381,19 +368,6 @@ const ArtificialIntelligence: React.FC = () => {
     };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    const [user] = IsLoggedIn(); // Assuming you have an IsLoggedIn hook for fetching user info
 
     const [msgId, setMsgId] = useState<string | null>(null);
 
@@ -452,7 +426,7 @@ const ArtificialIntelligence: React.FC = () => {
                 <Sidebar location="Ask" />
             </div>
             <div className='md:ml-[84px] w-full max-w-[200px]'>
-                <AISidebar />
+                <AISidebar location={params?.time as string} />
             </div>
 
             <div className={`md:ml-[86px] p-3 flex gap-3 flex-col h-[100dvh]  mr-[0px] w-full`}>
@@ -483,7 +457,11 @@ const ArtificialIntelligence: React.FC = () => {
                                         <div>
                                             <div className="bg-[#191919] p-3 changeFont text-left mr-[30px] rounded-2xl mb-2 max-w-[700px] w-auto border border-[#535353] overflow-auto">
                                                 <div className="whitespace-pre-wrap">
-                                                    <TypingEffect response={response} container={chatContainerRef} />
+                                                    {index === AIresponse.length - 1 ? (
+                                                        <TypingEffect response={response} container={chatContainerRef} />
+                                                    ) : (
+                                                        <div className="whitespace-pre-wrap">{response.text}</div>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -566,7 +544,7 @@ const ArtificialIntelligence: React.FC = () => {
                             placeholder="Type your message..."
                         />
                         <button
-                            onClick={() => { isDone && startChat() }}
+                            onClick={() => { startChat() }}
                             className={`${isDone ? "bg-[#444]" : "bg-[#888]"} border-[1px] border-[#535353] text-white p-2 rounded-md md:w-auto absolute top-[15px] right-3`}
                         >
                             {
@@ -587,4 +565,4 @@ const ArtificialIntelligence: React.FC = () => {
     )
 }
 
-export default ArtificialIntelligence
+export default ViewAiChat
