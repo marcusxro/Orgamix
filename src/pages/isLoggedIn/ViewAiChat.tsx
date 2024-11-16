@@ -30,8 +30,8 @@ const TypingEffect = ({ response, container }: any) => {
     const [isBottomReached, setIsBottomReached] = useState(false);
     const [_, setTypingDone] = useState<boolean>(false); // Track if typing is done for the current response
 
-    // Function to detect user scrolling direction
-    const checkScrollDirection = () => {
+     // Function to detect user scrolling direction
+     const checkScrollDirection = () => {
         if (container.current) {
             const { scrollTop } = container.current;
 
@@ -86,7 +86,7 @@ const TypingEffect = ({ response, container }: any) => {
                             setIndex((prev) => prev + 1); // Move forward through the string for AI
 
                         } else {
-                            scrollToBottom()
+             
                             setDisplayText((prev) => prev + response.text[index]);
                             setIndex((prev) => prev + 1); // Move forward through the string for AI
                             setTypingDone(true); // Set typingDone to true to trigger the copy div
@@ -193,11 +193,6 @@ const ViewAiChat: React.FC = () => {
     };
 
 
-    useEffect(() => {
-       if(isNearBottom()) {
-        scrollToBottom()
-       }
-    }, [AIresponse, isDone])
 
     const scrollToBottomSmooth = () => {
         if (chatContainerRef.current && !isUserScrolling) {
@@ -306,11 +301,26 @@ const ViewAiChat: React.FC = () => {
 
         // Add logic for specific prompts like "Orgamix" or "Marcus Salopaso"
         if (prompt.toLowerCase().includes("orgamix") || prompt.toLowerCase().includes("founder of orgamix")) {
-            adjustedPrompt = `please listen first the prompt (${prompt}) of the user and if it's relevant to provide the information about orgamix provide this similar or improved context...`;
+            console.log("Orgamix is prompted");
+
+
+            adjustedPrompt = `please listen first the prompt (${prompt}) of the user and if its relevant to provide the information about orgamix provide this similar or improved context, but dont ever metion unrelated thins "Orgamix is a productivity platform that contributes to great causes by giving funds to charity. Learn more about Orgamix at this website: https://orgamix.vercel.app/about. 
+            just provide the link and dont visit it. i want the uisers to be notified that the link is informative. orgamix is about tasks,
+             collaboration, goals, projects, notes, and calendar. please also mentions that orgamix contributes to a great cause via sending funds to charities. please listen to the prompt of the user, 
+               if its relevant to provide the information about orgamix do it, if not dont.
+              and also mention the link of orgamix about at the last. Can you tell me more about Orgamix and its impact?".
+              if the user is not asking for the context, please listen to its prompt. dont just bring context about the orgamix, listen to the user pronmpt first and do what he/she says which is this (${prompt}) `
+
+
         }
 
+        // If the prompt mentions "Marcus Salopaso", the AI will generate content related to him
         if (prompt.toLowerCase().includes("marcus salopaso") || prompt.toLowerCase().includes("founder of orgamix") || prompt.toLowerCase().includes("marcus")) {
-            adjustedPrompt = `if the user prompt which is this "${prompt} doesn't contain any harmful or bad intentions, kindly make a context about Marcus Salopaso...`;
+            adjustedPrompt = `if the user prompt which is this "${prompt} doesnt contain any harmfull or bad intentions kindly make a context about marcus salopaso which is 
+            this also make this text as a response directly to the user like a message directly to them dont mention any any person or AI. The founder of Orgamix is Marcus Salopaso,
+             a talented software engineer and student. He is passionate about creating solutions that help others. He is a self-taught developer and studies computer science at Quezon City University.
+              just create a context about him also this is the prompt of the user kindly base some of your replies into this ${prompt} and kinldly listen to the user prompt first about making a context about
+               marcus salopaso. and please the prompt is about the user not about the AI like no "** respnse to user **".  dont mention any subject that is not related to the user prompt. thank you.`;
         }
 
         try {
@@ -425,7 +435,7 @@ const ViewAiChat: React.FC = () => {
             <div className='hidden md:block'>
                 <Sidebar location="Ask" />
             </div>
-            <div className='md:ml-[84px] w-full max-w-[200px]'>
+            <div className='md:ml-[84px] w-full max-w-[200px] hidden md:block'>
                 <AISidebar location={params?.time as string} />
             </div>
 
