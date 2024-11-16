@@ -7,9 +7,6 @@ const supabaseUrlTwo: string =  import.meta.env.VITE_SUPABASETWO_URL;
 const supabaseAnonKeyTwo: string = import.meta.env.VITE_SUPABASETWO_KEY;
 
 
-
-
-
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export const supabaseTwo = createClient(supabaseUrlTwo, supabaseAnonKeyTwo)
