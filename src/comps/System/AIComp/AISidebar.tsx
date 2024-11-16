@@ -103,29 +103,6 @@ const AISidebar: React.FC<AISidebarProps> = ({ location }) => {
       console.log(error)
     }
   }
-  // State to track the sidebar visibility
-  const [isHiddens, setIsHiddens] = useState(localStorage.getItem('hideSidebar') === 'true');
-  const { setIsHidden }: any = useStore();
-  // Sync state with localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('hideSidebar', isHiddens ? 'true' : 'false');
-    setIsHidden(isHiddens)
-  }, [isHiddens]);
-
-  useEffect(() => {
-    const handleStorageChange = (event: any) => {
-      if (event.key === 'hideSidebar') {
-        setIsHiddens(event.newValue === 'true');
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
 
 
   return (

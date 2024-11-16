@@ -13,10 +13,13 @@ const AIHeader: React.FC = () => {
     const { showShare, setShowShare }: any = useStore()
 
 
+    useEffect(() => { console.log(isHidden)}, [isHidden])
+
     return (
         <>
-
+ 
             {
+                
                 <AiMenuModal location={params?.time as string} />
             }
 

@@ -81,7 +81,6 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
     }
 
 
-
     async function getChats() {
 
         try {
@@ -101,14 +100,14 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
         }
     }
 
-    const { isHidden, setIsHidden } = useStore()
+    const { isHidden, setIsHidden }:any = useStore()
     const nav = useNavigate()
     const [isExisting, setIsExisting] = React.useState(false)
 
     const handleOutsideClick = () => {
         setIsExisting(true);
         setTimeout(() => {
-            setIsHidden(!isHidden);
+            setIsHidden(null);
             setIsExisting(false);
         }, 300);
     };
@@ -138,7 +137,7 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
 
         <AnimatePresence>
             {
-                !isExisting && !isHidden &&
+                !isExisting && isHidden &&
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 0.2 } }}

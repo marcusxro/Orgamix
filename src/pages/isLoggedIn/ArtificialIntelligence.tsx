@@ -480,17 +480,6 @@ const ArtificialIntelligence: React.FC = () => {
         };
     }, []);
 
-    const { isHidden }: any = useStore();
-
-    const [isHiddens, setIsHiddens] = useState(localStorage.getItem('hideSidebar') === 'true');
-
-    useEffect(() => {
-        // Update local state if Zustand store changes
-        if (isHidden !== isHiddens) {
-            setIsHiddens(isHidden);
-        }
-    }, [isHidden, isHiddens]);
-
     return (
         <div className='relative flex'>
             <div className='hidden md:block'>

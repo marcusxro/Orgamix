@@ -146,7 +146,7 @@ const TypingEffect = ({ response, container }: any) => {
 const ViewAiChat: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [prompt, setPrompt] = useState("");
-    const [AIresponse, setAIresponse] = useState<any[]>([]);
+    const [AIresponse, setAIresponse] = useState<any | any[]>(null);
     const { isDone, setIsDone }: any = useStore()
     const [isTyping, setIsTyping] = useState(false); // State to track if AI is typing
     const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -338,7 +338,7 @@ const ViewAiChat: React.FC = () => {
 
             // Check for inappropriate content
             if (text.toLowerCase().includes("harassment")) {
-                setAIresponse((prevs) => [
+                setAIresponse((prevs: any) => [
                     ...prevs,
                     {
                         text: "Warning: I do not respond to inappropriate content.",
@@ -365,7 +365,7 @@ const ViewAiChat: React.FC = () => {
         } catch (error) {
             console.error("Error generating response:", error);
 
-            setAIresponse((prevs) => [
+            setAIresponse((prevs: any) => [
                 ...prevs,
                 {
                     text: "Error occurred, please send another prompt.",
@@ -465,16 +465,6 @@ const ViewAiChat: React.FC = () => {
         };
     }, []);
 
-    const { isHidden }: any = useStore();
-
-    const [isHiddens, setIsHiddens] = useState(localStorage.getItem('hideSidebar') === 'true');
-
-    useEffect(() => {
-        // Update local state if Zustand store changes
-        if (isHidden !== isHiddens) {
-            setIsHiddens(isHidden);
-        }
-    }, [isHidden, isHiddens]);
 
     return (
 
@@ -491,7 +481,17 @@ const ViewAiChat: React.FC = () => {
                     <div
                         ref={chatContainerRef}
                         className="flex flex-col gap-5 mt-2   max-w-[1200px] w-full mx-auto rounded-lg overflow-auto h-full bg-[#333] p-3 pb-[3rem] mb-[5rem] border-[1px] border-[#535353]">
-                        {AIresponse.map((response, index) => (
+                        {
+                            AIresponse === null &&
+                            <div className='flex items-center gap-2 justify-center h-full w-full p-2'>
+                        
+                                <div className='w-[20px] h-[20px]'>
+                                    <Loader /> 
+                                </div>
+                                <div className='text-sm text-[#888]'>Fetching chats...</div>
+                            </div>
+                        }
+                        {AIresponse != null && AIresponse.map((response: any, index: number) => (
                             <div key={index}>
                                 {response?.type === "User" ? (
                                     <p className={`flex items-start gap-2 relative justify-end text-sm`}>
@@ -593,7 +593,7 @@ const ViewAiChat: React.FC = () => {
                     </div>
 
                     {
-                        user?.uid === chatInfos?.userid &&
+                        user?.uid === chatInfos?.userid && AIresponse !=   null &&
                         <div className=" w-full absolute bottom-0  left-0">
 
 
