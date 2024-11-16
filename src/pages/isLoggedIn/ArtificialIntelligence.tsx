@@ -489,8 +489,6 @@ const ArtificialIntelligence: React.FC = () => {
             <AISidebar location="" />
 
 
-
-         
             <div className={`md:ml-[286px] p-3 flex gap-3 flex-col h-[100dvh]  mr-[0px] w-full`}>
                 <div className='w-full  h-full mx-auto flex flex-col justify-between gap-2 relative'>
                     <AIHeader />
@@ -598,35 +596,35 @@ const ArtificialIntelligence: React.FC = () => {
 
                     </div>
 
-                
-                        <div className=" w-full absolute bottom-0  left-0">
+
+                    <div className=" w-full absolute bottom-0  left-0">
 
 
-                            <div className='flex flex-row gap-2  max-w-[1200px] mx-auto relative'>
-                                <textarea
-                                    value={prompt}
-                                    readOnly={loading}
-                                    onChange={(e) => setPrompt(e.target.value)}
-                                    className={`p-2 ${loading ? "text-[#888]" : "text-white "} bg-[#111] pr-[4rem] relative border-[1px] border-[#535353] resize-none rounded-md outline-none w-full mb-2 md:mb-0`}
-                                    placeholder="Type your message..."
-                                />
-                                <button
-                                    onClick={() => { startChat() }}
-                                    className={`${isDone ? "bg-[#444]" : "bg-[#888]"} border-[1px] border-[#535353] text-white p-2 rounded-md md:w-auto absolute top-[15px] right-3`}
-                                >
-                                    {
-                                        loading ?
-                                            <div className='w-[15px] h-[15px]'>
-                                                <Loader />
-                                            </div>
-                                            : <IoIosSend />
-                                    }
-                                </button>
-                            </div>
-
+                        <div className='flex flex-row gap-2  max-w-[1200px] mx-auto relative'>
+                            <textarea
+                                value={prompt}
+                                readOnly={loading}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                className={`p-2 ${loading ? "text-[#888]" : "text-white "} bg-[#111] pr-[4rem] relative border-[1px] border-[#535353] resize-none rounded-md outline-none w-full mb-2 md:mb-0`}
+                                placeholder="Type your message..."
+                            />
+                            <button
+                                onClick={() => { startChat() }}
+                                className={`${isDone ? "bg-[#444]" : "bg-[#888]"} border-[1px] border-[#535353] text-white p-2 rounded-md md:w-auto absolute top-[15px] right-3`}
+                            >
+                                {
+                                    loading ?
+                                        <div className='w-[15px] h-[15px]'>
+                                            <Loader />
+                                        </div>
+                                        : <IoIosSend />
+                                }
+                            </button>
                         </div>
 
-                    
+                    </div>
+
+
                 </div>
 
 

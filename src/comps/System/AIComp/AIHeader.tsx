@@ -19,7 +19,7 @@ const AIHeader: React.FC = () => {
         <>
  
             {
-                
+                isHidden &&
                 <AiMenuModal location={params?.time as string} />
             }
 

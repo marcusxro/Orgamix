@@ -133,6 +133,17 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
         }
     }
 
+
+
+const handleOutsideClickWithNav = () => {
+        setIsExisting(true);
+        setTimeout(() => {
+            setIsHidden(null);
+            setIsExisting(false);
+            nav(`/user/ask-orgamix`)
+        }, 300);
+    };
+
     return (
 
         <AnimatePresence>
@@ -158,7 +169,7 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
 
                             <div className='flex flex-col gap-3'>
                                 <div
-                                    onClick={() => { nav(`/user/ask-orgamix`) }}
+                                    onClick={() => { handleOutsideClickWithNav() }}
                                     className='flex gap-4 items-center bg-[#191919] p-2 px-4 cursor-pointer border-[1px] hover:bg-[#212121] border-[#535353] rounded-lg text-sm'>
                                     <span className='text-[12px] flex items-center'>
                                         <FaPlus /> </span>New chat
