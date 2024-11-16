@@ -16,7 +16,8 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { FaCircleStop } from "react-icons/fa6";
 import AISidebar from '../../comps/System/AIComp/AISidebar';
 import { supabaseTwo } from '../../supabase/supabaseClient';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
+import AIHeader from '../../comps/System/AIComp/AIHeader';
 
 
 
@@ -30,8 +31,9 @@ const TypingEffect = ({ response, container }: any) => {
     const [isBottomReached, setIsBottomReached] = useState(false);
     const [_, setTypingDone] = useState<boolean>(false); // Track if typing is done for the current response
 
-     // Function to detect user scrolling direction
-     const checkScrollDirection = () => {
+
+    // Function to detect user scrolling direction
+    const checkScrollDirection = () => {
         if (container.current) {
             const { scrollTop } = container.current;
 
@@ -86,7 +88,7 @@ const TypingEffect = ({ response, container }: any) => {
                             setIndex((prev) => prev + 1); // Move forward through the string for AI
 
                         } else {
-             
+
                             setDisplayText((prev) => prev + response.text[index]);
                             setIndex((prev) => prev + 1); // Move forward through the string for AI
                             setTypingDone(true); // Set typingDone to true to trigger the copy div
@@ -153,6 +155,7 @@ const ViewAiChat: React.FC = () => {
     const params = useParams();
     const [user] = IsLoggedIn()
 
+    const [chatInfos, setChatInfos] = useState<any>([]);
 
 
     useEffect(() => {
@@ -166,13 +169,12 @@ const ViewAiChat: React.FC = () => {
             const { data, error } = await supabaseTwo
                 .from('user_chats')
                 .select('*')
-                .eq('userid', user?.uid)
                 .eq('created_at', params.time)
 
             if (error) {
                 console.log(error)
             } else {
-                console.log(data[0].chats)
+                setChatInfos(data[0])
                 setAIresponse(data[0].chats)
             }
         }
@@ -284,7 +286,7 @@ const ViewAiChat: React.FC = () => {
             {
                 text: prompt,
                 type: "User",
-                created_at: Date.now()
+                created_at: user?.uid
             }
         ];
 
@@ -397,7 +399,6 @@ const ViewAiChat: React.FC = () => {
     };
 
 
-
     const readTextAloud = (text: string) => {
         if (window.speechSynthesis) {
             const utterance = new SpeechSynthesisUtterance(text);
@@ -405,6 +406,11 @@ const ViewAiChat: React.FC = () => {
             utterance.lang = "en-US";
             utterance.rate = 1;
             utterance.pitch = 1;
+            utterance.onend = () => {
+                setIsSpeaking(false);
+                setSpeakId(null);
+                stopSpeech()
+            };
             window.speechSynthesis.speak(utterance);
             speechSynthesisRef.current = utterance;
         }
@@ -414,14 +420,15 @@ const ViewAiChat: React.FC = () => {
         if (speechSynthesisRef.current) {
             window.speechSynthesis.cancel();
             setIsSpeaking(false);
+            setSpeakId(null);
         }
     };
+
     const [speakId, setSpeakId] = useState<number | null>(null);
 
     const toggleSpeech = (text: string, msgId: number) => {
         if (isSpeaking) {
             stopSpeech();
-            setSpeakId(null);
         } else {
             readTextAloud(text);
             setIsSpeaking(true);
@@ -429,21 +436,61 @@ const ViewAiChat: React.FC = () => {
         }
     };
 
+    const location = useLocation()
+
+
+    useEffect(() => {
+        return () => {
+            console.log("Component unmounting...");
+            stopSpeech();
+        };
+    }, []);
+
+    // Stop speech on route change
+    useEffect(() => {
+        console.log("Route changed. Stopping speech...");
+        stopSpeech();
+    }, [location]);
+
+    // Stop speech on page reload
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            console.log("Page is reloading. Stopping speech...");
+            window.speechSynthesis.cancel();
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
+
+    const { isHidden }: any = useStore();
+
+    const [isHiddens, setIsHiddens] = useState(localStorage.getItem('hideSidebar') === 'true');
+
+    useEffect(() => {
+        // Update local state if Zustand store changes
+        if (isHidden !== isHiddens) {
+            setIsHiddens(isHidden);
+        }
+    }, [isHidden, isHiddens]);
 
     return (
+
         <div className='relative flex'>
             <div className='hidden md:block'>
                 <Sidebar location="Ask" />
             </div>
-            <div className='md:ml-[84px] w-full max-w-[200px] hidden md:block'>
-                <AISidebar location={params?.time as string} />
-            </div>
+            <AISidebar location={params?.time as string} />
 
-            <div className={`md:ml-[86px] p-3 flex gap-3 flex-col h-[100dvh]  mr-[0px] w-full`}>
-                <div className='w-full max-w-[1200px] h-full mx-auto flex flex-col justify-between gap-2 relative'>
+
+            <div className={`md:ml-[286px] p-3 flex gap-3 flex-col h-[100dvh]  mr-[0px] w-full`}>
+                <div className='w-full  h-full mx-auto flex flex-col justify-between gap-2 relative'>
+                    <AIHeader />
                     <div
                         ref={chatContainerRef}
-                        className="flex flex-col gap-5 mt-2 rounded-lg overflow-auto h-full pb-[3rem] mb-[4.2rem]">
+                        className="flex flex-col gap-5 mt-2   max-w-[1200px] w-full mx-auto rounded-lg overflow-auto h-full bg-[#333] p-3 pb-[3rem] mb-[5rem] border-[1px] border-[#535353]">
                         {AIresponse.map((response, index) => (
                             <div key={index}>
                                 {response?.type === "User" ? (
@@ -453,7 +500,7 @@ const ViewAiChat: React.FC = () => {
                                         </div>
                                         <div className='w-[30px] mt-1 h-[20px] min-h-[30px] min-w-[30px] bg-[#191919] max-w-[30px] overflow-hidden rounded-full flex items-center justify-center '>
                                             {response?.type === "User" ? (
-                                                <FetchPFP userUid={user?.uid} />
+                                                <FetchPFP userUid={response?.created_at} />
                                             ) : (
                                                 <img className='w-[20px] h-[20px] object-contain' src={orgamixLogo} alt="Orgamix Logo" />
                                             )}
@@ -477,7 +524,7 @@ const ViewAiChat: React.FC = () => {
 
                                             <div className="flex gap-3 mt-3 ml-1">
                                                 <div
-                                                    onClick={() => copyText(response.created_at)}
+                                                    onClick={() => copyText(response.text)}
                                                     data-tooltip-id={`copy-${response.created_at}`}
                                                     className='cursor-pointer hover:text-[#888]'>
                                                     <IoCopyOutline />
@@ -535,7 +582,7 @@ const ViewAiChat: React.FC = () => {
                                     <img className='w-[20px] h-[20px] object-contain' src={orgamixLogo} alt="Orgamix Logo" />
                                 </div>
 
-                                <div className="bg-[#191919] flex gap-2 items-center  p-2 text-lg rounded-lg mb-2 max-w-[700px] w-auto border-[1px] border-[#535353]">
+                                <div className="bg-[#191919] flex gap-2 items-center  p-2 text-lg rounded-2xl mb-2 max-w-[700px] w-auto border-[1px] border-[#535353]">
                                     <div className='w-[20px] h-[20px]'>
                                         <Loader />
                                     </div>
@@ -545,33 +592,42 @@ const ViewAiChat: React.FC = () => {
 
                     </div>
 
-                    <div className="flex flex-row gap-2 w-full absolute bottom-0 left-0">
-                        <textarea
-                            value={prompt}
-                            readOnly={loading}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            className={`p-2 ${loading ? "text-[#888]" : "text-white "} bg-[#111] pr-[4rem] relative border-[1px] border-[#535353] resize-none rounded-md outline-none w-full mb-2 md:mb-0`}
-                            placeholder="Type your message..."
-                        />
-                        <button
-                            onClick={() => { startChat() }}
-                            className={`${isDone ? "bg-[#444]" : "bg-[#888]"} border-[1px] border-[#535353] text-white p-2 rounded-md md:w-auto absolute top-[15px] right-3`}
-                        >
-                            {
-                                loading ?
-                                    <div className='w-[15px] h-[15px]'>
-                                        <Loader />
-                                    </div>
-                                    : <IoIosSend />
-                            }
-                        </button>
-                    </div>
+                    {
+                        user?.uid === chatInfos?.userid &&
+                        <div className=" w-full absolute bottom-0  left-0">
 
+
+                            <div className='flex flex-row gap-2  max-w-[1200px] mx-auto relative'>
+                                <textarea
+                                    value={prompt}
+                                    readOnly={loading}
+                                    onChange={(e) => setPrompt(e.target.value)}
+                                    className={`p-2 ${loading ? "text-[#888]" : "text-white "} bg-[#111] pr-[4rem] relative border-[1px] border-[#535353] resize-none rounded-md outline-none w-full mb-2 md:mb-0`}
+                                    placeholder="Type your message..."
+                                />
+                                <button
+                                    onClick={() => { startChat() }}
+                                    className={`${isDone ? "bg-[#444]" : "bg-[#888]"} border-[1px] border-[#535353] text-white p-2 rounded-md md:w-auto absolute top-[15px] right-3`}
+                                >
+                                    {
+                                        loading ?
+                                            <div className='w-[15px] h-[15px]'>
+                                                <Loader />
+                                            </div>
+                                            : <IoIosSend />
+                                    }
+                                </button>
+                            </div>
+
+                        </div>
+
+                    }
                 </div>
 
 
             </div>
         </div>
+
     )
 }
 

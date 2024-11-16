@@ -247,7 +247,7 @@ const CalendarPage: React.FC = () => {
 
     return (
         <div className='selectionNone'>
-            <Sidebar location='Events ' />
+            <Sidebar location='Events' />
             <div className={`ml-[86px] p-3 flex gap-3 flex-col h-[100dvh]  mr-[0px]`}>
                 <div className='h-auto w-full'>
                     <div className='text-2xl font-bold'>Deadlines</div>

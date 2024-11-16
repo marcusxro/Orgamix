@@ -89,6 +89,12 @@ interface AppState {
 
     isDone: boolean | null;
     setIsDone: (params: boolean) => void;
+
+    isHidden: boolean | null;
+    setIsHidden: (params: boolean) => void;
+
+    showShare: boolean | null;
+    setShowShare: (params: boolean) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -164,6 +170,12 @@ const useStore = create<AppState>((set) => ({
     isDone: false,
     setIsDone: (task) => set({ isDone: task }),
 
+
+    isHidden: false,
+    setIsHidden: (task) => set({ isHidden: task }),
+
+    showShare: null,
+    setShowShare: (task) => set({ showShare: task }),
 }));
 
 export default useStore;

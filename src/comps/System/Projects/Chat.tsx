@@ -285,6 +285,7 @@ const Chat:React.FC = () => {
             scrollToBottomSmooth();
         }
     }, [chatArray, user]);
+    
 
     useEffect(() => {
         if (user != null && chatContainerRef.current && openKanbanChat && chats != null) {
