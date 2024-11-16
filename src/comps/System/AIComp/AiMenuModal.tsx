@@ -134,8 +134,6 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
         }
     }
 
-    
-
     return (
 
         <AnimatePresence>
