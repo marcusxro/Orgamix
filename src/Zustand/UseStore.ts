@@ -95,6 +95,9 @@ interface AppState {
 
     showShare: boolean | null;
     setShowShare: (params: boolean) => void;
+
+    showInfo: boolean | null;
+    setShowInfo: (params: boolean) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -176,6 +179,9 @@ const useStore = create<AppState>((set) => ({
 
     showShare: null,
     setShowShare: (task) => set({ showShare: task }),
+
+    showInfo: false,
+    setShowInfo: (task) => set({ showInfo: task }),
 }));
 
 export default useStore;

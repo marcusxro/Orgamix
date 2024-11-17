@@ -24,6 +24,7 @@ import ReportGoal from '../../comps/System/ReportGoal';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '../../comps/Footer';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
+import FetchPFP from '../../comps/FetchPFP';
 
 
 interface subtaskType {
@@ -196,14 +197,14 @@ const GoalTemplates: React.FC = () => {
         <div
             onClick={() => { setViewEllip(null) }}
             className='w-full h-full selectionNone'>
-           {
-            user &&
-            <MetaEditor
-            title={`Goal Templates | ${user?.email}`}
-            description='Choose from a variety of pre-defined goal templates to help you stay organized and motivated. Easily import a template that aligns with your objectives, whether for personal development, fitness, or work projects.'
-            keywords='Orgamix, Goal Template, Templates, Goals, Projects, Tasks'
-            />
-           }
+            {
+                user &&
+                <MetaEditor
+                    title={`Goal Templates | ${user?.email}`}
+                    description='Choose from a variety of pre-defined goal templates to help you stay organized and motivated. Easily import a template that aligns with your objectives, whether for personal development, fitness, or work projects.'
+                    keywords='Orgamix, Goal Template, Templates, Goals, Projects, Tasks'
+                />
+            }
             {
                 isOpenCreate &&
                 <ChooseMethod closer={setIsOpenCreate} />
@@ -237,10 +238,8 @@ const GoalTemplates: React.FC = () => {
             <header className='p-3 flex items-center h-auto pb-2 justify-between border-b-[#535353] border-b-[1px] overflow-auto'>
                 <div className='flex items-center h-auto pb-2 justify-between w-full max-w-[1200px] mx-auto'>
                     <div className='flex gap-3 items-center'>
-                        <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
-                            <img
-                                className='w-full h-full'
-                                src={NoUserProfile} alt="" />
+                        <div className='w-[35px] bg-[#111] flex items-center justify-center border-[1px] h-[35px] rounded-full overflow-hidden'>
+                            <FetchPFP userUid={user?.uid} />
                         </div>
                         <div
                             onClick={() => { nav(-1) }}
@@ -249,10 +248,12 @@ const GoalTemplates: React.FC = () => {
                     </div>
                     <div className='flex gap-3 items-center'>
                         <div
+                            onClick={() => { nav('/user/dashboard') }}
                             className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-2 px-3 hover:bg-[#535353]'>
                             Dashboard <LuLayoutDashboard />
                         </div>
                         <div
+                            onClick={() => { nav('/user/settings') }}
                             className='flex gap-1 items-center bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg p-3 md:p-2 px-3 hover:bg-[#535353]'>
                             <span className='hidden md:block'>Settings</span> <IoSettingsOutline />
                         </div>
@@ -434,6 +435,7 @@ const GoalTemplates: React.FC = () => {
                                                             <BiCategory />{itm?.category}
                                                         </div>
                                                         <div className='text-[#888] text-sm flex gap-1 items-center'>
+                                                            
                                                             <GetAuthor authorUid={itm?.authorUid} />
                                                         </div>
                                                         <div className='text-[#888] text-sm flex gap-1 items-center'>
@@ -457,7 +459,11 @@ const GoalTemplates: React.FC = () => {
                                                 </div>
 
                                                 <div className='flex justify-between items-center p-3 text-[#888] gap-2'>
-                                                    <div>
+                                                    
+                                                    <div className='flex items-center gap-2'>
+                                                    <div className='w-[20px] bg-[#111] flex items-center justify-center border-[1px] h-[20px] rounded-full overflow-hidden'>
+                                                                <FetchPFP userUid={itm?.authorUid} />
+                                                            </div>
                                                         {itm?.sub_tasks.filter((itmz) => itmz.is_done).length}
                                                         /
                                                         {itm?.sub_tasks.length}

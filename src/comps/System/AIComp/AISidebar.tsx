@@ -137,15 +137,22 @@ const AISidebar: React.FC<AISidebarProps> = ({ location }) => {
             {
               fetchedData?.map((chat, index) => {
                 return (
-                  <div
+                  <motion.div
+                  key={`${chat.id}-${index}`} // Using both id and index for uniqueness
+                  initial={{ y: 20, opacity: 0 }} // Initial position and opacity
+                  animate={{ y: 0, opacity: 1 }} // End position and opacity
+                  transition={{
+                      duration: 0.2,
+                      delay: index * 0.1 // Staggered animation for notifications
+                  }}
                     onClick={() => { nav(`/user/ask-orgamix/${chat?.created_at}`), window.location.reload() }}
-                    key={index} className={`${location === chat?.created_at ? "bg-[#191919]" : "bg-[#363636] "}  flex gap-4 items-center p-2 px-4 cursor-pointer border-[1px] hover:bg-[#212121] border-[#535353] rounded-lg text-sm`}>
+                  className={`${location === chat?.created_at ? "bg-[#191919]" : "bg-[#363636] "}  flex gap-4 items-center p-2 px-4 cursor-pointer border-[1px] hover:bg-[#212121] border-[#535353] rounded-lg text-sm`}>
                   <RiMessage3Fill/>
                     <span className='text-[12px] flex items-center overflow-hidden'>
                       {chat?.chats[0]?.text.length > 20 ? chat?.chats[0]?.text.substring(0, 20) + '...' : chat?.chats[0]?.text}
 
                     </span>
-                  </div>
+                  </motion.div>
                 )
               })
 

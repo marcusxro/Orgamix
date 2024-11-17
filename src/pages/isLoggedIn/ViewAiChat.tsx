@@ -15,9 +15,10 @@ import { PiSpeakerHigh } from "react-icons/pi";
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { FaCircleStop } from "react-icons/fa6";
 import AISidebar from '../../comps/System/AIComp/AISidebar';
-import { supabaseTwo } from '../../supabase/supabaseClient';
+import { supabase, supabaseTwo } from '../../supabase/supabaseClient';
 import { useLocation, useParams } from 'react-router-dom';
 import AIHeader from '../../comps/System/AIComp/AIHeader';
+import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 
 
@@ -263,6 +264,412 @@ const ViewAiChat: React.FC = () => {
     }
 
 
+
+    const [myTasks, setMyTasks] = useState<any | null>(null);
+    const [myGoals, setMyGoals] = useState<any | null>(null);
+    const [myProjects, setMyProjects] = useState<any | null>(null);
+
+    function runAnalyticsForTasks() {
+        setIsDone(false);
+        setIsTyping(true); // Show typing indicator
+        setLoading(true);
+        scrollToBottomSmooth();
+
+        if (loading) {
+            return
+        }
+
+        const userChatData: any = [
+            ...AIresponse,
+            {
+                text: "Can you provide me with some analytics on my tasks?",
+                type: "User",
+                created_at: user?.uid
+            }
+        ];
+
+        setAIresponse(userChatData); // Update state with user prompt
+
+        const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+        // Default prompt based on user input
+        let adjustedPrompt = "Can you provide me with some very comprehensive analytics on my tasks? and also provide recommendations or etc" + JSON.stringify(myTasks);
+
+        model.generateContent(adjustedPrompt).then(result => {
+            const response = result.response;
+            const text = response.text();
+
+            const aiChatData = [
+                ...userChatData,
+                {
+                    text: text,
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ];
+            setIsTyping(false); // Show typing indicator
+            setLoading(false);
+
+            setAIresponse(aiChatData); // Update state with AI response
+            editChats(aiChatData); // Save to the database
+        }).catch(error => {
+            console.error("Error generating response:", error);
+            setIsTyping(false); // Show typing indicator
+            setAIresponse((prevs: any) => [
+                ...prevs,
+                {
+                    text: "Error occurred, please send another prompt.",
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ]);
+        });
+    }
+
+    function runAnalyticsForGoals() {
+        setIsDone(false);
+        setIsTyping(true); // Show typing indicator
+        setLoading(true);
+        scrollToBottomSmooth();
+
+        if (loading) {
+            return
+        }
+
+
+        const userChatData: any = [
+            ...AIresponse,
+            {
+                text: "Can you provide me with some analytics on my goals?",
+                type: "User",
+                created_at: user?.uid
+            }
+        ];
+
+        setAIresponse(userChatData); // Update state with user prompt
+
+        const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+        // Default prompt based on user input
+        let adjustedPrompt = "Can you provide me with some very comprehensive analytics on my goals? and also provide recommendations or etc" + JSON.stringify(myGoals);
+
+        model.generateContent(adjustedPrompt).then(result => {
+            const response = result.response;
+            const text = response.text();
+
+            const aiChatData = [
+                ...userChatData,
+                {
+                    text: text,
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ];
+            setIsTyping(false); // Show typing indicator
+            setLoading(false);
+
+            setAIresponse(aiChatData); // Update state with AI response
+            editChats(aiChatData); // Save to the database
+        }).catch(error => {
+            console.error("Error generating response:", error);
+            setIsTyping(false); // Show typing indicator
+            setAIresponse((prevs: any) => [
+                ...prevs,
+                {
+                    text: "Error occurred, please send another prompt.",
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ]);
+        });
+    }
+
+    function runAnalyticsForProjects() {
+        setIsDone(false);
+        setIsTyping(true); // Show typing indicator
+        setLoading(true);
+        scrollToBottomSmooth();
+
+        if (loading) {
+            return
+        }
+
+
+        const userChatData: any = [
+            ...AIresponse,
+            {
+                text: "Can you provide me with some analytics on my projects?",
+                type: "User",
+                created_at: user?.uid
+            }
+        ];
+
+        setAIresponse(userChatData); // Update state with user prompt
+
+        const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+        // Default prompt based on user input
+        let adjustedPrompt = "Can you provide me with some very comprehensive analytics on my projects data? and also provide recommendations or etc. and dont provide information that can affect the user, like userid or password." + JSON.stringify(myProjects);
+
+        model.generateContent(adjustedPrompt).then(result => {
+            const response = result.response;
+            const text = response.text();
+
+            const aiChatData = [
+                ...userChatData,
+                {
+                    text: text,
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ];
+            setIsTyping(false); // Show typing indicator
+            setLoading(false);
+
+            setAIresponse(aiChatData); // Update state with AI response
+            editChats(aiChatData); // Save to the database
+        }).catch(error => {
+            console.error("Error generating response:", error);
+            setIsTyping(false); // Show typing indicator
+            setAIresponse((prevs: any) => [
+                ...prevs,
+                {
+                    text: "Error occurred, please send another prompt.",
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ]);
+        });
+    }
+    function generateProjects(params: string) {
+        setIsDone(false);
+        setIsTyping(true); // Show typing indicator
+        setLoading(true);
+        scrollToBottomSmooth();
+
+        if (loading) {
+            return
+        }
+
+
+        const userChatData: any = [
+            ...AIresponse,
+            {
+                text: `can you generate me some ${params} idea?`,
+                type: "User",
+                created_at: user?.uid
+            }
+        ];
+
+        setAIresponse(userChatData); // Update state with user prompt
+
+        const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+        // Default prompt based on user input
+        let adjustedPrompt = `can you generate me some ${params} data?. id like to add to ${params} is title, description, and category and lastly kanban boards.`;
+
+        model.generateContent(adjustedPrompt).then(result => {
+            const response = result.response;
+            const text = response.text();
+
+            const aiChatData = [
+                ...userChatData,
+                {
+                    text: text,
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ];
+            setIsTyping(false); // Show typing indicator
+            setLoading(false);
+
+            setAIresponse(aiChatData); // Update state with AI response
+            editChats(aiChatData); // Save to the database
+        }).catch(error => {
+            console.error("Error generating response:", error);
+            setIsTyping(false); // Show typing indicator
+            setAIresponse((prevs: any) => [
+                ...prevs,
+                {
+                    text: "Error occurred, please send another prompt.",
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ]);
+        });
+    }
+
+    function generateTasks(params: string) {
+        setIsDone(false);
+        setIsTyping(true); // Show typing indicator
+        setLoading(true);
+        scrollToBottomSmooth();
+
+        if (loading) {
+            return
+        }
+
+
+        const userChatData: any = [
+            ...AIresponse,
+            {
+                text: `can you generate me some ${params} idea?`,
+                type: "User",
+                created_at: user?.uid
+            }
+        ];
+
+        setAIresponse(userChatData); // Update state with user prompt
+
+        const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+        // Default prompt based on user input
+        let adjustedPrompt = `can you generate me some ${params} data?. id like to add to ${params} is title, description, category, repeat or recurring.`;
+
+        model.generateContent(adjustedPrompt).then(result => {
+            const response = result.response;
+            const text = response.text();
+
+            const aiChatData = [
+                ...userChatData,
+                {
+                    text: text,
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ];
+            setIsTyping(false); // Show typing indicator
+            setLoading(false);
+
+            setAIresponse(aiChatData); // Update state with AI response
+            editChats(aiChatData); // Save to the database
+        }).catch(error => {
+            console.error("Error generating response:", error);
+            setIsTyping(false); // Show typing indicator
+            setAIresponse((prevs: any) => [
+                ...prevs,
+                {
+                    text: "Error occurred, please send another prompt.",
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ]);
+        });
+    }
+
+    function generateGoals(params: string) {
+        setIsDone(false);
+        setIsTyping(true); // Show typing indicator
+        setLoading(true);
+        scrollToBottomSmooth();
+
+        if (loading) {
+            return
+        }
+
+
+        const userChatData: any = [
+            ...AIresponse,
+            {
+                text: `can you generate me some ${params} idea?`,
+                type: "User",
+                created_at: user?.uid
+            }
+        ];
+
+        setAIresponse(userChatData); // Update state with user prompt
+
+        const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+        // Default prompt based on user input
+        let adjustedPrompt = `can you generate me some ${params} data?. id like to add to ${params} is title, description, category, tasks, and habits, in habits and repetition.`;
+
+        model.generateContent(adjustedPrompt).then(result => {
+            const response = result.response;
+            const text = response.text();
+
+            const aiChatData = [
+                ...userChatData,
+                {
+                    text: text,
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ];
+            setIsTyping(false); // Show typing indicator
+            setLoading(false);
+
+            setAIresponse(aiChatData); // Update state with AI response
+            editChats(aiChatData); // Save to the database
+        }).catch(error => {
+            console.error("Error generating response:", error);
+            setIsTyping(false); // Show typing indicator
+            setAIresponse((prevs: any) => [
+                ...prevs,
+                {
+                    text: "Error occurred, please send another prompt.",
+                    type: "AI",
+                    created_at: Date.now()
+                }
+            ]);
+        });
+    }
+
+    useEffect(() => {
+        if (user) {
+            fetchUserTasks().then((data) => {
+                setMyTasks(data);
+            });
+
+            fetchUserGoals().then((data) => {
+                setMyGoals(data);
+            });
+
+            fetchUserProjects().then((data) => {
+                setMyProjects(data);
+            });
+        }
+    }, [user]);
+
+    async function fetchUserTasks() {
+        if (!user) return null;
+        const { data, error } = await supabase
+            .from('tasks')
+            .select('*')
+            .eq('userid', user.uid);
+        if (error) console.error('Error fetching tasks:', error);
+        return data;
+    }
+
+
+    async function fetchUserGoals() {
+        if (!user) return null;
+        const { data, error } = await supabase
+            .from('goals')
+            .select('*')
+            .eq('userid', user.uid);
+        if (error) console.error('Error fetching goals:', error);
+        return data;
+    }
+
+    async function fetchUserProjects() {
+        if (!user) return null;
+        const { data, error } = await supabase
+            .from('projects')
+            .select('*')
+            .eq('created_by', user.uid);
+        if (error) console.error('Error fetching projects:', error);
+        return data;
+    }
+
+
+
     const startChat = async () => {
         if (prompt === "") {
             setLoading(false);
@@ -466,27 +873,33 @@ const ViewAiChat: React.FC = () => {
     }, []);
 
 
+
+
     return (
 
         <div className='relative flex'>
             <div className='hidden md:block'>
                 <Sidebar location="Ask" />
             </div>
-            <AISidebar location={params?.time as string} />
+            <MetaEditor
+                title='Orgamix | Ask AI'
+                description='Chat with Orgamix AI to get answers to your questions.'
+            />
 
+            <AISidebar location={params?.time as string} />
 
             <div className={`md:ml-[286px] p-3 flex gap-3 flex-col h-[100dvh]  mr-[0px] w-full`}>
                 <div className='w-full  h-full mx-auto flex flex-col justify-between gap-2 relative'>
                     <AIHeader />
                     <div
                         ref={chatContainerRef}
-                        className="flex flex-col gap-5 mt-2   max-w-[1200px] w-full mx-auto rounded-lg overflow-auto h-full bg-[#333] p-3 pb-[3rem] mb-[5rem] border-[1px] border-[#535353]">
+                        className={`flex flex-col gap-5 mt-2 max-h-full max-w-[1200px] w-full mx-auto rounded-lg overflow-auto h-full bg-[#333] p-3 ${user?.uid === chatInfos?.userid && AIresponse != null && "pb-[3rem] mb-[5rem]"}  border-[1px] border-[#535353]`}>
                         {
                             AIresponse === null &&
                             <div className='flex items-center gap-2 justify-center h-full w-full p-2'>
-                        
+
                                 <div className='w-[20px] h-[20px]'>
-                                    <Loader /> 
+                                    <Loader />
                                 </div>
                                 <div className='text-sm text-[#888]'>Fetching chats...</div>
                             </div>
@@ -513,7 +926,7 @@ const ViewAiChat: React.FC = () => {
                                         </div>
                                         <div>
                                             <div className="bg-[#191919] p-3 changeFont text-left mr-[30px] rounded-2xl mb-2 max-w-[700px] w-auto border border-[#535353] overflow-auto">
-                                                <div className="whitespace-pre-wrap">
+                                                <div className="whitespace-pre-wrap break-words break-all">
                                                     {index === AIresponse.length - 1 ? (
                                                         <TypingEffect response={response} container={chatContainerRef} />
                                                     ) : (
@@ -536,8 +949,6 @@ const ViewAiChat: React.FC = () => {
                                                     className='rounded-lg border-[#535353] border-[1px] text-sm z-40'
                                                     content={`${msgId === response.created_at ? "Copied!" : "Copy"}`}
                                                 />
-
-
                                                 <div
                                                     onClick={() => toggleSpeech(response.text, index)}
                                                     className='cursor-pointer hover:text-[#888]'>
@@ -590,12 +1001,43 @@ const ViewAiChat: React.FC = () => {
                             </p>
                         }
 
+                        <div className='flex gap-2 flex-wrap mt-auto'>
+                            <div
+                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                onClick={runAnalyticsForTasks}>
+                                Analytics for my tasks
+                            </div>
+                            <div
+                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                onClick={runAnalyticsForGoals}>
+                                Analytics for my goals
+                            </div>
+                            <div
+                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                onClick={runAnalyticsForProjects}>
+                                Analytics for my projects
+                            </div>
+                            <div
+                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                onClick={() => { generateProjects("projects") }}>
+                                Generate projects idea
+                            </div>
+                            <div
+                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                onClick={() => { generateTasks("tasks") }}>
+                                Generate tasks idea
+                            </div>
+                            <div
+                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                onClick={() => { generateGoals("goals") }}>
+                                Generate goals idea
+                            </div>
+                        </div>
                     </div>
 
                     {
-                        user?.uid === chatInfos?.userid && AIresponse !=   null &&
+                        user?.uid === chatInfos?.userid && AIresponse != null &&
                         <div className=" w-full absolute bottom-0  left-0">
-
 
                             <div className='flex flex-row gap-2  max-w-[1200px] mx-auto relative'>
                                 <textarea
@@ -605,6 +1047,7 @@ const ViewAiChat: React.FC = () => {
                                     className={`p-2 ${loading ? "text-[#888]" : "text-white "} bg-[#111] pr-[4rem] relative border-[1px] border-[#535353] resize-none rounded-md outline-none w-full mb-2 md:mb-0`}
                                     placeholder="Type your message..."
                                 />
+
                                 <button
                                     onClick={() => { startChat() }}
                                     className={`${isDone ? "bg-[#444]" : "bg-[#888]"} border-[1px] border-[#535353] text-white p-2 rounded-md md:w-auto absolute top-[15px] right-3`}

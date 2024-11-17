@@ -100,7 +100,7 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
         }
     }
 
-    const { isHidden, setIsHidden }:any = useStore()
+    const { isHidden, setIsHidden }: any = useStore()
     const nav = useNavigate()
     const [isExisting, setIsExisting] = React.useState(false)
 
@@ -135,12 +135,12 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
 
 
 
-const handleOutsideClickWithNav = () => {
+    const handleOutsideClickWithNav = (params:string) => {
         setIsExisting(true);
         setTimeout(() => {
             setIsHidden(null);
             setIsExisting(false);
-            nav(`/user/ask-orgamix`)
+            nav(params)
         }, 300);
     };
 
@@ -156,7 +156,6 @@ const handleOutsideClickWithNav = () => {
                     transition={{ duration: 0.5, ease: 'easeInOut' }}
                     onClick={handleOutsideClick}
                     className='h-full w-full positioners z-[500] md:hidden'
-
                 >
                     <motion.div
                         initial={{ x: -50, scale: 0.95, opacity: 0 }} // Starts off-screen to the left
@@ -166,18 +165,15 @@ const handleOutsideClickWithNav = () => {
                         className='w-full max-w-[250px] bg-[#292929]  h-full border-r-[1px] border-r-[#535353] p-4 overflow-auto  '>
 
                         <div className='flex flex-col gap-3 text-sm justify-between h-full'>
-
                             <div className='flex flex-col gap-3'>
                                 <div
-                                    onClick={() => { handleOutsideClickWithNav() }}
+                                    onClick={() => { handleOutsideClickWithNav(`/user/ask-orgamix`) }}
                                     className='flex gap-4 items-center bg-[#191919] p-2 px-4 cursor-pointer border-[1px] hover:bg-[#212121] border-[#535353] rounded-lg text-sm'>
                                     <span className='text-[12px] flex items-center'>
                                         <FaPlus /> </span>New chat
                                 </div>
 
-
-
-                                <div className='flex flex-col items-start gap-3 h-full max-h-[400px] pb-8 '>
+                                <div className='flex flex-col items-start gap-3 h-full  pb-8 overflow-auto '>
                                     Recent
                                     {
                                         fetchedData?.length === 0 && <div className='text-[12px] text-[#888]'>No recent chats</div>
@@ -191,15 +187,22 @@ const handleOutsideClickWithNav = () => {
                                     {
                                         fetchedData?.map((chat, index) => {
                                             return (
-                                                <div
+                                                <motion.div
+                                                    key={`${chat.id}-${index}`} // Using both id and index for uniqueness
+                                                    initial={{ y: 20, opacity: 0 }} // Initial position and opacity
+                                                    animate={{ y: 0, opacity: 1 }} // End position and opacity
+                                                    transition={{
+                                                        duration: 0.2,
+                                                        delay: index * 0.1 // Staggered animation for notifications
+                                                    }}
                                                     onClick={() => { nav(`/user/ask-orgamix/${chat?.created_at}`), window.location.reload() }}
-                                                    key={index} className={`${location === chat?.created_at ? "bg-[#191919]" : "bg-[#363636] "}  flex gap-4 items-center p-2 px-4 cursor-pointer border-[1px] hover:bg-[#212121] border-[#535353] rounded-lg text-sm`}>
+                                                     className={`${location === chat?.created_at ? "bg-[#191919]" : "bg-[#363636] "}  flex gap-4 items-center p-2 px-4 cursor-pointer border-[1px] hover:bg-[#212121] border-[#535353] rounded-lg text-sm`}>
                                                     <RiMessage3Fill />
                                                     <span className='text-[12px] flex items-center overflow-hidden'>
                                                         {chat?.chats[0]?.text.length > 20 ? chat?.chats[0]?.text.substring(0, 20) + '...' : chat?.chats[0]?.text}
 
                                                     </span>
-                                                </div>
+                                                </motion.div>
                                             )
                                         })
 
@@ -210,23 +213,23 @@ const handleOutsideClickWithNav = () => {
 
                                 </div>
                             </div>
-                            <div 
-                            onClick={() => {nav('/user/dashboard')}}
-                            className='flex flex-col gap-3 border-t-[1px] border-t-[#535353] pt-5'>
+                            <div
+                                onClick={() => { handleOutsideClickWithNav('/user/dashboard') }}
+                                className='flex flex-col gap-3 border-t-[1px] border-t-[#535353] pt-5'>
                                 <div className='px-4 bg-[#191919] flex items-center gap-4 cursor-pointer hover:bg-[#222] p-2 rounded-md border-[1px] border-[#535353]'>
-                                    <LuLayoutDashboard/> Dashboard
+                                    <LuLayoutDashboard /> Dashboard
                                 </div>
 
-                                <div className='flex gap-2 mt-2'>
+                                <div className='flex gap-2 mt-2 mb-2'>
                                     <div className='w-[30px] h-[30px] border-[1px] overflow-hidden rounded-full'>
                                         <FetchPFP userUid={user?.uid} />
                                     </div>
                                     <div>
                                         <div className='font-bold reducedHeight'>
-                                            {accountData?.length === 0 
-                                                ? "No account" 
-                                                : accountData?.[0]?.username.length > 20 
-                                                    ? accountData?.[0]?.username.substring(0, 20) + '...' 
+                                            {accountData?.length === 0
+                                                ? "No account"
+                                                : accountData?.[0]?.username.length > 20
+                                                    ? accountData?.[0]?.username.substring(0, 20) + '...'
                                                     : accountData?.[0]?.username}
                                         </div>
                                         <div className='text-[10px] text-[#888]'>
@@ -235,7 +238,9 @@ const handleOutsideClickWithNav = () => {
                                     </div>
                                 </div>
                             </div>
+
                         </div>
+
                     </motion.div>
                 </motion.div>
             }
