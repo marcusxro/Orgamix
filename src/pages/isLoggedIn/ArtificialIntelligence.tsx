@@ -77,33 +77,22 @@ const TypingEffect = ({ response, container }: any) => {
                 setDisplayText(response.text);
             } else {
                 const typingInterval = setInterval(() => {
-
                     if (index < response.text.length) {
-
-
                         if (isUserScrolling && isDone) {
                             clearInterval(typingInterval)
                             setDisplayText((prev) => prev + response.text[index]);
                             setIndex((prev) => prev + 1); // Move forward through the string for AI
-
                         } else {
                             scrollToBottom()
                             setDisplayText((prev) => prev + response.text[index]);
                             setIndex((prev) => prev + 1); // Move forward through the string for AI
                             setTypingDone(true); // Set typingDone to true to trigger the copy div
-
                         }
-
                     } else {
-
                         clearInterval(typingInterval); // Stop typing when done
                         setIsDone(true); // Mark typing as done
-
                     }
                 }, 3); // Adjust typing speed (10ms per character)
-
-
-
 
                 if (!isUserScrolling && !isDone) {
                     scrollToBottom();
@@ -112,7 +101,9 @@ const TypingEffect = ({ response, container }: any) => {
                 return () => clearInterval(typingInterval); // Cleanup interval
             }
         }
-    }, [index, response?.text, isDone, isUserScrolling]); // Trigger effect based on typing index and response text
+    }, [index, response?.text, isDone, isUserScrolling]); 
+
+
 
     // Listen for scroll events to detect user scrolling
     useEffect(() => {

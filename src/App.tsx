@@ -31,6 +31,7 @@ import NotFoundPage from './pages/Static/NotFoundPage';
 import TestPage from './pages/TestPage';
 import ArtificialIntelligence from './pages/isLoggedIn/ArtificialIntelligence';
 import ViewAiChat from './pages/isLoggedIn/ViewAiChat';
+import Pomodoro from './pages/isLoggedIn/Pomodoro';
 
 
 function App() {
@@ -292,6 +293,7 @@ function Main() {
         <Route path='/user/calendar' element={<CalendarPage />} />
         <Route path='/user/ask-orgamix' element={<ArtificialIntelligence />} />
         <Route path='/user/ask-orgamix/:time' element={<ViewAiChat />} />
+        <Route path='/user/pomodoro' element={<Pomodoro />} />
         <Route path='/user/settings' element={<Settings />} />
 
 

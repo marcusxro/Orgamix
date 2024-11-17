@@ -258,7 +258,7 @@ const Goals: React.FC = () => {
         if (daysDiff === 0) {
             // If deadline is today
             return (
-                <div className={`${isDone === true && daysDiff > 0 ? "text-green-500" : "text-[#cc0e00]"} flex gap-1 items-center`}>
+                <div className={`${isDone ? "text-green-500" : "text-[#cc0e00]"} flex gap-1 items-center text-sm`}>
                     <MdDateRange />
                     Deadline Met
                 </div>
@@ -266,7 +266,7 @@ const Goals: React.FC = () => {
         } else if (daysDiff > 0) {
             // If the deadline is in the future
             return (
-                <div className={`${daysDiff <= 3 && !isDone && 'text-[#cc8500]'} ${isDone && 'text-green-500'} text-[#888] text-sm flex gap-1 items-center`}>
+                <div className={`${daysDiff <= 3 && !isDone ? 'text-[#cc8500]' : ''} ${isDone ? 'text-green-500' : ''} text-[#888] text-sm flex gap-1 items-center`}>
                     <MdDateRange />
                     {`${deadlineString} / ${daysDiff} ${daysDiff === 1 ? 'day' : 'days'} left`}
                 </div>
@@ -274,7 +274,7 @@ const Goals: React.FC = () => {
         } else {
             // If the deadline has passed
             return (
-                <div className={` ${isDone && daysDiff > 0 ? "text-green-500" : "text-[#cc0e00]"} flex gap-1 items-center text-[#888] `}>
+                <div className={`${isDone ? "text-green-500" : "text-[#cc0e00]"} flex gap-1 items-center text-[#888] text-sm`}>
                     <MdDateRange />
                     {`${deadlineString} / ${Math.abs(daysDiff)} ${Math.abs(daysDiff) === 1 ? 'day' : 'days'} ago`}
                 </div>
@@ -297,9 +297,9 @@ const Goals: React.FC = () => {
         if (daysDiff > 0 && !boolVal) {
             // If the deadline is in the future
             return (
-                <>                                           <MdOutlineQueryStats />In progress</>
+                <><MdOutlineQueryStats />In progress</>
             );
-        } else if (daysDiff > 0 && boolVal) {
+        } else if (boolVal) {
             return (
                 <div className='text-sm text-[#2ecc71] flex gap-1 items-center'>
                     <MdOutlineQueryStats />   Completed
@@ -323,10 +323,10 @@ const Goals: React.FC = () => {
             {
                 user &&
                 <MetaEditor
-                title={`Goals | ${user?.email}`}
-                description='Easily create, edit, and organize your notes in this section for a streamlined experience.'
-                keywords='goals, tasks, notes, projects, productivity, Coderplex'
-            />
+                    title={`Goals | ${user?.email}`}
+                    description='Easily create, edit, and organize your notes in this section for a streamlined experience.'
+                    keywords='goals, tasks, notes, projects, productivity, Coderplex'
+                />
             }
             <Sidebar location='Goals' />
 

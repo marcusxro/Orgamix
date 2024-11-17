@@ -98,6 +98,17 @@ interface AppState {
 
     showInfo: boolean | null;
     setShowInfo: (params: boolean) => void;
+
+
+    workTimer: number | null;
+    setWorkTimer: (params: number) => void;
+
+    shortTimer: number | null;
+    setShortTimer: (params: number) => void;
+
+
+    longTimer: number | null;
+    setLongTimer: (params: number) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -182,6 +193,16 @@ const useStore = create<AppState>((set) => ({
 
     showInfo: false,
     setShowInfo: (task) => set({ showInfo: task }),
+
+
+    workTimer: 0,
+    setWorkTimer: (task) => set({ workTimer: task }),
+
+    shortTimer: 0,
+    setShortTimer: (task) => set({ shortTimer: task }),
+
+    longTimer: 0,
+    setLongTimer: (task) => set({ longTimer: task }),
 }));
 
 export default useStore;

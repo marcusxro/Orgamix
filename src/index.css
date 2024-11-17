@@ -176,3 +176,19 @@ display: none;
 .isCode {
   background-color: #111;
 }
+
+.slide-down {
+  animation: slide-down 0.5s ease-in-out;
+  
+}
+
+@keyframes slide-down {
+  0% {
+      transform: translateY(-10px);
+      opacity: 0;
+  }
+  100% {
+      transform: translateY(0);
+      opacity: 1;
+  }
+}
