@@ -283,7 +283,7 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
             <div className='mb-1 px-5 pt-2 items-center justify-start  flex btnSidebar gap-3'>
 
 
-                <div className='w-[25px] h-[25px] border-[1px] border-[#535353] overflow-hidden rounded-full flex items-center justify-center'>
+                <div className='w-[25px] h-[25px] min-w-[25px] min-h-[25px] max-w-[25px] max-h-[25px] border-[1px] overflow-hidden rounded-full flex items-center justify-center'>
                     <FetchPFP userUid={user?.uid} />
                 </div>
 

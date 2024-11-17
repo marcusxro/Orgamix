@@ -1001,38 +1001,41 @@ const ViewAiChat: React.FC = () => {
                             </p>
                         }
 
-                        <div className='flex gap-2 flex-wrap mt-auto'>
-                            <div
-                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
-                                onClick={runAnalyticsForTasks}>
-                                Analytics for my tasks
+                        {
+                            user?.uid === chatInfos?.userid && AIresponse != null &&
+                            <div className='flex gap-2 flex-wrap mt-auto text-[12px]'>
+                                <div
+                                    className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                    onClick={runAnalyticsForTasks}>
+                                    Analytics for my tasks
+                                </div>
+                                <div
+                                    className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                    onClick={runAnalyticsForGoals}>
+                                    Analytics for my goals
+                                </div>
+                                <div
+                                    className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                    onClick={runAnalyticsForProjects}>
+                                    Analytics for my projects
+                                </div>
+                                <div
+                                    className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                    onClick={() => { generateProjects("projects") }}>
+                                    Generate projects idea
+                                </div>
+                                <div
+                                    className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                    onClick={() => { generateTasks("tasks") }}>
+                                    Generate tasks idea
+                                </div>
+                                <div
+                                    className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                    onClick={() => { generateGoals("goals") }}>
+                                    Generate goals idea
+                                </div>
                             </div>
-                            <div
-                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
-                                onClick={runAnalyticsForGoals}>
-                                Analytics for my goals
-                            </div>
-                            <div
-                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
-                                onClick={runAnalyticsForProjects}>
-                                Analytics for my projects
-                            </div>
-                            <div
-                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
-                                onClick={() => { generateProjects("projects") }}>
-                                Generate projects idea
-                            </div>
-                            <div
-                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
-                                onClick={() => { generateTasks("tasks") }}>
-                                Generate tasks idea
-                            </div>
-                            <div
-                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
-                                onClick={() => { generateGoals("goals") }}>
-                                Generate goals idea
-                            </div>
-                        </div>
+                        }
                     </div>
 
                     {

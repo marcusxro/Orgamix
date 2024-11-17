@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IoChevronBackOutline } from "react-icons/io5";
-import NoUserProfile from '../../assets/UserNoProfile.jpg'
 import { LuLayoutDashboard } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import Marquee from 'react-fast-marquee'

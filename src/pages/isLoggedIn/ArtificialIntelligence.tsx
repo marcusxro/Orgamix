@@ -29,7 +29,7 @@ const TypingEffect = ({ response, container }: any) => {
     const [isUserScrolling, setIsUserScrolling] = useState(false);
     const prevScrollTop = useRef(0); // To track previous scroll position
     const [isBottomReached, setIsBottomReached] = useState(false);
-    const [typingDone, setTypingDone] = useState<boolean>(false); // Track if typing is done for the current response
+    const [_, setTypingDone] = useState<boolean>(false); // Track if typing is done for the current response
 
     // Function to detect user scrolling direction
     const checkScrollDirection = () => {
@@ -1012,7 +1012,7 @@ const ArtificialIntelligence: React.FC = () => {
                         }
 
 
-                        <div className='flex items-start gap-2 max-w-[1200px] w-full mx-auto overflow-auto flex-wrap mt-auto'>
+                        <div className='flex items-start gap-2 max-w-[1200px] w-full mx-auto overflow-auto flex-wrap mt-auto text-[12px]'>
                             <div
                                 className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]' onClick={runAnalyticsForTasks}>
                                 Analytics for my tasks
