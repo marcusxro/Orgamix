@@ -109,6 +109,10 @@ interface AppState {
 
     longTimer: number | null;
     setLongTimer: (params: number) => void;
+    
+
+    timerState: { isPaused: boolean; isPlaying: boolean } | null;
+    setTimerState: (params: { isPaused: boolean; isPlaying: boolean }) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -203,6 +207,9 @@ const useStore = create<AppState>((set) => ({
 
     longTimer: 0,
     setLongTimer: (task) => set({ longTimer: task }),
+
+    timerState: null,
+    setTimerState: (task) => set({ timerState: task }),
 }));
 
 export default useStore;

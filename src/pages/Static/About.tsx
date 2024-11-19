@@ -8,6 +8,9 @@ import Marquee from 'react-fast-marquee'
 import layerImg from '../../assets/Art/LayerImg.png'
 import Menu from '../../comps/Menu'
 import useStore from '../../Zustand/UseStore'
+import ThreeDeviceImg from '../../assets/About/ThreeDevice.png'
+import ManyDeviceImg from '../../assets/About/many.png'
+import ShowcaseImg from '../../assets/About/showcase.png'
 
 
 
@@ -46,9 +49,9 @@ const About: React.FC = () => {
                         <div className='text-sm text-[#888] w-full max-w-[800px] text-center'>
                             Orgamix is a software created by a solo engineer to raise funds through ads, with the earnings directed to those in need, like storm victims and other affected communities.
                         </div>
-                        <div className="w-full h-0 pt-[56.25%] mt-4 bg-black rounded-lg relative">
-                            <div className="absolute inset-0">
-                            
+                        <div className="w-full h-0 pt-[56.25%] mt-4 bg-black rounded-lg relative overflow-hidden border-[1px]">
+                            <div className="absolute inset-0 overflow-hidden">
+                                <img src={ThreeDeviceImg} alt="" className='w-full h-full object-cover object-center' />
                             </div>
                         </div>
                     </div>
@@ -93,9 +96,9 @@ const About: React.FC = () => {
                     </div>
 
                     <div className='mt-[8%]'>
-                        <div className="w-full h-0 pt-[56.25%] mt-4 bg-black rounded-lg relative">
-                            <div className="absolute inset-0">
-                                
+                    <div className="w-full h-0 pt-[56.25%] mt-4 bg-black rounded-lg relative overflow-hidden border-[1px]">
+                    <div className="absolute inset-0">
+                                <img src={ManyDeviceImg} alt="" className='w-full h-full object-cover object-center' />
                             </div>
                         </div>
                     </div>
@@ -120,9 +123,9 @@ const About: React.FC = () => {
 
 
                     <div className='mt-[8%]'>
-                        <div className="w-full h-0 pt-[56.25%] mt-4 bg-black rounded-lg relative">
-                            <div className="absolute inset-0">
-
+                    <div className="w-full h-0 pt-[56.25%] mt-4 bg-black rounded-lg relative overflow-hidden border-[1px]">
+                    <div className="absolute inset-0">
+                                <img src={ShowcaseImg} alt="" className='w-full h-full object-cover object-center' />
                             </div>
                         </div>
                     </div>

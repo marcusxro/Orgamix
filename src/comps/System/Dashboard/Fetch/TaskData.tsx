@@ -67,7 +67,7 @@ const TaskData: React.FC = () => {
                 <h2 className='font-bold mb-2'>Tasks for Today</h2>
                 <AnimatePresence>
                     {groupedTasks.today.length > 0 ? (
-                        <div className='grid grid-cols-2 gap-2'>
+                        <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
                             {groupedTasks.today.map((task: TaskDataType, idx: number) => (
                                 <motion.div
                                     initial={{ y: 20, opacity: 0 }} // Initial position and opacity
@@ -107,7 +107,7 @@ const TaskData: React.FC = () => {
                                         {task?.priority !== '' &&
                                             <div className='flex items-center gap-1 justify-start'>
                                                 <div className='w-[10px] h-[10px] bg-yellow-500'></div>
-                                                <p className='text-[#888]'>{task?.priority} priority</p>
+                                                <p className='text-[#888]'>{task?.priority}</p>
                                             </div>
                                         }
                                     </div>
@@ -124,7 +124,7 @@ const TaskData: React.FC = () => {
             <div className='flex gap-2 flex-col border-l-[2px] border-l-[#1d559e] pl-2'>
                 <h2 className='font-bold mb-2'>Tasks for Tomorrow</h2>
                 {groupedTasks.tomorrow.length > 0 ? (
-                    <div className='grid grid-cols-2 gap-2'>
+                        <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
                         {groupedTasks.tomorrow.map((task, idx: number) => (
                          <motion.div
                          initial={{ y: 20, opacity: 0 }} // Initial position and opacity
@@ -170,7 +170,7 @@ const TaskData: React.FC = () => {
                                             <div className='w-[10px] h-[10px] bg-yellow-500'>
 
                                             </div>
-                                            <p className='text-[#888] '>{task?.priority != '' && task?.priority} priority</p>
+                                            <p className='text-[#888] '>{task?.priority != '' && task?.priority}</p>
                                         </div>
                                     }
                                 </div>

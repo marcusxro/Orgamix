@@ -137,8 +137,6 @@ const Tasks: React.FC = () => {
                         )
                         : [payload.new]
                 );
-
-
                 break;
             case 'DELETE':
                 setTasksData((prevData) =>
@@ -149,7 +147,6 @@ const Tasks: React.FC = () => {
                 break;
         }
     };
-
 
 
     useEffect(() => {
