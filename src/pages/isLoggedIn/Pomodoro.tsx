@@ -283,7 +283,7 @@ const Pomodoro: React.FC = () => {
     const handleRealtimeEvent = (payload: any) => {
         const isCurrentUserProject = payload.new?.user_id === user?.uid || payload.old?.user_id === user?.uid;
         if (!isCurrentUserProject) return;
- 
+
         switch (payload.eventType) {
             case 'INSERT':
 
@@ -314,22 +314,22 @@ const Pomodoro: React.FC = () => {
         }
     };
 
-       
+
     const updateTimerState = async (time: any, running: boolean, type: any) => {
-        if(user)
-        try {
-            await supabaseTwo
-                .from('timer')
-                .update({
-                    remaining_time: time,
-                    is_running: running,
-                    type: type,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('user_id', user?.uid);
-        } catch (error) {
-            console.error('Error updating timer state:', error);
-        }
+        if (user)
+            try {
+                await supabaseTwo
+                    .from('timer')
+                    .update({
+                        remaining_time: time,
+                        is_running: running,
+                        type: type,
+                        updated_at: new Date().toISOString(),
+                    })
+                    .eq('user_id', user?.uid);
+            } catch (error) {
+                console.error('Error updating timer state:', error);
+            }
     };
 
 
@@ -350,7 +350,7 @@ const Pomodoro: React.FC = () => {
                     setShortTimer(data[0].short_timer * 60);
                     setLongTimer(data[0].long_timer * 60);
                     setIsPaused(data[0].is_paused);
-                    setSelectedTab(data[0].type || 'Work'); 
+                    setSelectedTab(data[0].type || 'Work');
                 }
             }
         } catch (err) {
@@ -396,18 +396,18 @@ const Pomodoro: React.FC = () => {
     }
     const fetchTimerState = useCallback(async () => {
         if (!user) return;
-    
+
         try {
             const { data, error } = await supabaseTwo
                 .from('timer')
                 .select('*')
                 .eq('user_id', user?.uid);
-    
+
             if (error) {
                 console.error('Error fetching timer data:', error);
                 return;
             }
-    
+
             if (data && data.length > 0) {
                 const timerData = data[0];
                 const selectedType = timerData.type || 'Work'; // Use the type from the database
@@ -416,19 +416,19 @@ const Pomodoro: React.FC = () => {
                     : selectedType === 'Short'
                         ? (timerData.short_timer || 5) * 60
                         : (timerData.long_timer || 15) * 60;
-    
+
                 const updatedAt = timerData.updated_at ? new Date(timerData.updated_at).getTime() : null;
                 const now = Date.now();
                 const elapsedTime = updatedAt ? Math.floor((now - updatedAt) / 1000) : 0;
                 const adjustedRemainingTime = timerData.is_running
                     ? Math.max(0, (timerData.remaining_time || timerDuration) - elapsedTime)
                     : timerDuration;
-    
+
                 setPomodoroData(data);
                 setRemainingTime(adjustedRemainingTime);
                 setIsStarted(timerData.is_running || false);
                 setSelectedTab(selectedType); // Set the selected tab based on the database
-    
+
                 if (timerData.is_running) {
                     startTimer(selectedType, true);
                 }
@@ -444,45 +444,47 @@ const Pomodoro: React.FC = () => {
     useEffect(() => {
         if (user) fetchTimerState();
     }, [user, fetchTimerState]);
-    useEffect(() => {
-        const syncInterval = setInterval(() => {
-            if (isStarted) updateTimerState(remainingTime, true, selectedTab);
-        }, 5000);
-    
-        return () => clearInterval(syncInterval);
-    }, [isStarted, remainingTime, updateTimerState, selectedTab,  isPaused, isPlaying]);
 
     useEffect(() => {
         const syncInterval = setInterval(() => {
             if (isStarted) updateTimerState(remainingTime, true, selectedTab);
         }, 5000);
-    
+
         return () => clearInterval(syncInterval);
-    }, [isStarted, remainingTime, updateTimerState, selectedTab]);
-    
+    }, [isStarted, remainingTime, updateTimerState, selectedTab, isPaused, isPlaying]);
+
     useEffect(() => {
         const handleBeforeUnload = () => {
             if (isStarted) {
                 updateTimerState(remainingTime, true, selectedTab);
             }
         };
-    
+
         window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [isStarted, remainingTime, updateTimerState, selectedTab]);
-    
+
+    useEffect(() => {
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [intervalId]);
+
+
     useEffect(() => {
         const handleBeforeUnload = () => {
             if (isStarted) {
                 updateTimerState(remainingTime, true, selectedTab);
             }
         };
-    
+
         window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
@@ -491,38 +493,29 @@ const Pomodoro: React.FC = () => {
 
     const startTimer = async (type: string, boolVal: boolean) => {
         if (isStarted && boolVal) return;
-    
+
         setIsStarted(boolVal);
         setIsPlaying(boolVal);
-    
+
         const duration = type === 'Work'
             ? (pomodoroData as pomodoroDataType[])[0]?.work_timer * 60
             : type === 'Short'
                 ? (pomodoroData as pomodoroDataType[])[0]?.short_timer * 60
                 : (pomodoroData as pomodoroDataType[])[0]?.long_timer * 60;
-    
 
-        
         setRemainingTime(duration || 0);
-    
+
         // Update the timer type in the database
         await updateTimerType(type);
-    
-        const interval = setInterval(() => {
-            setRemainingTime((prev) => {
-                if (prev <= 1) {
-                    clearInterval(intervalId!);
-                    setIsStarted(false);
-                    updateTimerState(0, false, type);
-                    return 0;
-                }
-                updateTimerState(prev - 1, true, type);
-                return prev - 1;
-            });
-        }, 1000);
-        setIntervalId(interval);
+
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
+
+   
+
     };
-    
+
     const pauseTimer = async () => {
         setIsPaused(true);
         setIsStarted(false);
@@ -533,7 +526,7 @@ const Pomodoro: React.FC = () => {
         }
         await updateTimerState(remainingTime, false, selectedTab);
     };
-    
+
     const resetTimer = async (tab: string) => {
         if (intervalId) {
             clearInterval(intervalId);
@@ -550,7 +543,7 @@ const Pomodoro: React.FC = () => {
         setIsStarted(false);
         setIsPaused(false);
         setIsPlaying(false);
-    
+
         await updateTimerState(duration, false, tab);
     };
 
@@ -565,8 +558,8 @@ const Pomodoro: React.FC = () => {
         }
     };
 
-   
-  
+
+
     const resumeTimer = () => {
         setIsPaused(false);
         setIsStarted(true);
@@ -585,7 +578,7 @@ const Pomodoro: React.FC = () => {
         setIntervalId(interval);
     };
 
-  
+
 
     const handleTabChange = (tab: string) => {
         setSelectedTab(tab);
