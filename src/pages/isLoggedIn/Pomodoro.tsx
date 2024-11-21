@@ -10,6 +10,7 @@ import IsLoggedIn from '../../firebase/IsLoggedIn';
 import songList from '../../comps/System/Timer/SongList';
 import Switch from "react-switch";
 import Loader from '../../comps/Loader';
+import { set } from 'date-fns';
 
 interface worksType {
     title: string;
@@ -256,6 +257,7 @@ const Pomodoro: React.FC = () => {
     const [isPaused, setIsPaused] = useState(false);
     const [pomodoroData, setPomodoroData] = useState<pomodoroDataType[] | null>(null);
     const [remainingTime, setRemainingTime] = useState<number>(0);
+    const [timerDB, setTimerDB] = useState<number>(0);
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
     const [isStarted, setIsStarted] = useState<boolean>(false)
     const { setWorkTimer, setShortTimer, setLongTimer } = useStore();
@@ -426,6 +428,7 @@ const Pomodoro: React.FC = () => {
 
                 setPomodoroData(data);
                 setRemainingTime(adjustedRemainingTime);
+                setTimerDB(adjustedRemainingTime)
                 setIsStarted(timerData.is_running || false);
                 setSelectedTab(selectedType); // Set the selected tab based on the database
 
@@ -504,7 +507,7 @@ const Pomodoro: React.FC = () => {
                 : (pomodoroData as pomodoroDataType[])[0]?.long_timer * 60;
 
         setRemainingTime(duration || 0);
-
+        setTimerDB(duration || 0);
         // Update the timer type in the database
         await updateTimerType(type);
 
@@ -512,7 +515,21 @@ const Pomodoro: React.FC = () => {
             clearInterval(intervalId);
         }
 
-   
+        
+        const counterInterval = setInterval(() => {
+            setTimerDB((prev) => {
+                if (prev <= 1) {
+                    clearInterval(intervalId!);
+                    setIsStarted(false);
+                    updateTimerState(0, false, selectedTab);
+                    return 0;
+                }
+                updateTimerState(prev - 1, true, selectedTab);
+                return prev - 1;
+            });
+        }, 1000);
+
+   setIntervalId(counterInterval);
 
     };
 
