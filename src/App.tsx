@@ -32,6 +32,7 @@ import TestPage from './pages/TestPage';
 import ArtificialIntelligence from './pages/isLoggedIn/ArtificialIntelligence';
 import ViewAiChat from './pages/isLoggedIn/ViewAiChat';
 import Pomodoro from './pages/isLoggedIn/Pomodoro';
+import TimerModal from './comps/System/Timer/TimerModal';
 
 
 function App() {
@@ -266,7 +267,7 @@ function Main() {
   return (
     <div className="App">
       <ScrollToTop />
-
+      <TimerModal />
       <Routes>
         {/* static pages */}
         <Route path='/' element={<Homepage />} />

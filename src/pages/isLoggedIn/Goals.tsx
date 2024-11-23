@@ -221,7 +221,7 @@ const Goals: React.FC = () => {
         }
     }
 
-    function determineDate(date: string): string {
+    function determineDate(date: string, isDone: boolean) {
         const deadline = new Date(date);
         const now = new Date();
         const timeDiff = deadline.getTime() - now.getTime();
@@ -229,7 +229,9 @@ const Goals: React.FC = () => {
         // Convert milliseconds to days
         const daysUntilDeadline = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-        if (daysUntilDeadline < 0) {
+        if (isDone) {
+            return '#2ecc71'; // Medium green (goal is completed)
+        } else if (daysUntilDeadline < 0) {
             return '#cc0000'; // Medium red (deadline has passed)
         } else if (daysUntilDeadline === 0) {
             return '#cc0000'; // Medium red (today is the deadline)
@@ -239,6 +241,8 @@ const Goals: React.FC = () => {
             return '#e67e22'; // Medium orange (3 days before the deadline)
         } else if (daysUntilDeadline <= 7) {
             return '#f1c40f'; // Medium yellow (7 days before the deadline)
+        } else if (deadline < now && !isDone) {
+            return '#cc0000'; // Medium red (deadline has passed)
         } else {
             return '#2ecc71'; // Medium green (more than 7 days until the deadline)
         }
@@ -412,7 +416,7 @@ const Goals: React.FC = () => {
 
                                                 <div className='flex h-[110px] items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
                                                     <div
-                                                        style={{ backgroundColor: determineDate(itm?.deadline) }}
+                                                        style={{ backgroundColor: determineDate(itm?.deadline, itm?.is_done) }}
                                                         className={`w-[2px] h-full`}>
                                                     </div>
 

@@ -32,6 +32,9 @@ interface pomodoroDataType {
     short_timer: number;
     long_timer: number;
     id: number;
+    musicID: string;
+    autoStart: boolean;
+    autoChecked: boolean;
 }
 
 
@@ -39,8 +42,9 @@ const Pomodoro: React.FC = () => {
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [selectedTab, setSelectedTab] = useState('Work');
     const containerRef = React.useRef<HTMLDivElement>(null);
+    const [loading, setLoading] = useState(false);
     const [user] = IsLoggedIn()
-
+    const [timerLoading, setTimerLoading] = useState(false);
 
 
 
@@ -58,7 +62,7 @@ const Pomodoro: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const [timerSize, setTimerSize] = React.useState(150);
+    const [_, setTimerSize] = React.useState(150);
 
     // useEffect(() => {
     //     const handleBeforeUnload = (event: any) => {
@@ -257,11 +261,18 @@ const Pomodoro: React.FC = () => {
     const [isPaused, setIsPaused] = useState(false);
     const [pomodoroData, setPomodoroData] = useState<pomodoroDataType[] | null>(null);
     const [remainingTime, setRemainingTime] = useState<number>(0);
-    const [timerDB, setTimerDB] = useState<number>(0);
+    const [timerDB, setTimerDB] = React.useState<number>(0);
+    const [checkerTimer, setCheckerTimer] = React.useState<number>(0);
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
     const [isStarted, setIsStarted] = useState<boolean>(false)
     const { setWorkTimer, setShortTimer, setLongTimer } = useStore();
-    const [listener, setListener] = useState<boolean>(false);
+    const [selectedMusicId, setSelectedMusicId] = useState<string | null>(null)
+
+    const [workTimerDuration, setWorkTimerDuration] = useState<number>(0);
+    const [shortTimerDuration, setShortTimerDuration] = useState<number>(0);
+    const [longTimerDuration, setLongTimerDuration] = useState<number>(0);
+
+
 
     useEffect(() => {
         if (user) {
@@ -271,7 +282,6 @@ const Pomodoro: React.FC = () => {
                 .channel('public:timer')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'timer' }, (payload) => {
                     handleRealtimeEvent(payload);
-                    console.log(payload)
                 })
                 .subscribe();
 
@@ -279,10 +289,12 @@ const Pomodoro: React.FC = () => {
                 subscription.unsubscribe();
             };
         }
-    }, [user]); // Update on `sortVal` change as well
+    }, [user, timerLoading]); // Update on `sortVal` change as well
+    const [isFirstUser, setIsFirstUser] = useState(false);
 
 
     const handleRealtimeEvent = (payload: any) => {
+        if (!isFirstUser) return; // Only the first user should listen to the updates
         const isCurrentUserProject = payload.new?.user_id === user?.uid || payload.old?.user_id === user?.uid;
         if (!isCurrentUserProject) return;
 
@@ -353,6 +365,10 @@ const Pomodoro: React.FC = () => {
                     setLongTimer(data[0].long_timer * 60);
                     setIsPaused(data[0].is_paused);
                     setSelectedTab(data[0].type || 'Work');
+                    setWorkTimerDuration(data[0].work_timer);
+                    setShortTimerDuration(data[0].short_timer);
+                    setLongTimerDuration(data[0].long_timer);
+                    setIsFirstUser(true);
                 }
             }
         } catch (err) {
@@ -429,9 +445,24 @@ const Pomodoro: React.FC = () => {
                 setPomodoroData(data);
                 setRemainingTime(adjustedRemainingTime);
                 setTimerDB(adjustedRemainingTime)
+                setCheckerTimer(adjustedRemainingTime)
                 setIsStarted(timerData.is_running || false);
                 setSelectedTab(selectedType); // Set the selected tab based on the database
+                console.log(timerDB)
 
+                if (timerData.autoStart) {
+                    const nextTab = selectedType === 'Work' ? 'Short' : selectedType === 'Short' ? 'Long' : 'Work';
+                    setSelectedTab(nextTab);
+                    const nextDuration = nextTab === 'Work'
+                        ? (timerData.work_timer || 25) * 60
+                        : nextTab === 'Short'
+                            ? (timerData.short_timer || 5) * 60
+                            : (timerData.long_timer || 15) * 60;
+                    setRemainingTime(nextDuration);
+                    setIsStarted(true);
+                    setIsPlaying(true);
+                    startTimer(nextTab, true); // Automatically start the next timer
+                }
                 if (timerData.is_running) {
                     startTimer(selectedType, true);
                 }
@@ -441,7 +472,47 @@ const Pomodoro: React.FC = () => {
         } catch (err) {
             console.error('Error fetching timer state:', err);
         }
-    }, [user?.uid]);
+    }, [user?.uid, timerLoading]);
+
+
+    useEffect(() => {
+        if (user && isStarted) {
+            const intervalTimer = setInterval(() => {
+                setCheckerTimer((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(intervalTimer);
+                        setIsStarted(false);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+
+            return () => clearInterval(intervalTimer);
+        }
+    }, [isStarted, user]);
+
+   useEffect(() => {
+    if (checkerTimer === 0) {
+        console.log("Timer is done");
+
+        if (isAutoStart) {
+            const nextTab = selectedTab === 'Work' ? 'Short' : selectedTab === 'Short' ? 'Long' : 'Work';
+            console.log(nextTab);
+            setRemainingTime(0);
+            handleTabChange(nextTab);
+            startTimer(nextTab, true);
+            console.log("RAM");
+
+            setIsStarted(true);
+            setIsPlaying(true);
+        } else {
+            setIsStarted(false);
+            setIsPlaying(false);
+            resetTimer(selectedTab);
+        }
+    }
+}, [checkerTimer, selectedTab]);
 
 
     useEffect(() => {
@@ -479,23 +550,12 @@ const Pomodoro: React.FC = () => {
     }, [intervalId]);
 
 
-    useEffect(() => {
-        const handleBeforeUnload = () => {
-            if (isStarted) {
-                updateTimerState(remainingTime, true, selectedTab);
-            }
-        };
-
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        return () => {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-    }, [isStarted, remainingTime, updateTimerState, selectedTab]);
 
 
     const startTimer = async (type: string, boolVal: boolean) => {
         if (isStarted && boolVal) return;
+       
+        if (isStarted && intervalId) return; // Prevent duplicate starts
 
         setIsStarted(boolVal);
         setIsPlaying(boolVal);
@@ -506,22 +566,32 @@ const Pomodoro: React.FC = () => {
                 ? (pomodoroData as pomodoroDataType[])[0]?.short_timer * 60
                 : (pomodoroData as pomodoroDataType[])[0]?.long_timer * 60;
 
-        setRemainingTime(duration || 0);
-        setTimerDB(duration || 0);
-        // Update the timer type in the database
+        const initialRemainingTime = duration || 0;
+
+        setRemainingTime(initialRemainingTime); // Sync the initial value
+        setCheckerTimer(initialRemainingTime);
+
+        // Update the timer type and time in the database
+        await updateTimerState(initialRemainingTime, boolVal, type);
         await updateTimerType(type);
 
         if (intervalId) {
             clearInterval(intervalId);
         }
 
-        
         const counterInterval = setInterval(() => {
             setTimerDB((prev) => {
                 if (prev <= 1) {
-                    clearInterval(intervalId!);
+                    clearInterval(counterInterval);
                     setIsStarted(false);
                     updateTimerState(0, false, selectedTab);
+
+                    if (isAutoStart) {
+                        const nextTab = selectedTab === 'Work' ? 'Short' : selectedTab === 'Short' ? 'Long' : 'Work';
+                        handleTabChange(nextTab);
+                        startTimer(nextTab, true);
+                    }
+
                     return 0;
                 }
                 updateTimerState(prev - 1, true, selectedTab);
@@ -529,9 +599,45 @@ const Pomodoro: React.FC = () => {
             });
         }, 1000);
 
-   setIntervalId(counterInterval);
-
+        setLoading(false);
+        setIntervalId(counterInterval);
+        passWorksToTimer(selectedData);
     };
+
+    async function passWorksToTimer(works: worksType[] | null) {
+        if (selectedData && selectedMusicId && user != null || isAuthChecked || isAutoStart) {
+            const worksData = works != null && works.map((work: any) => {
+                return {
+                    title: work.title,
+                    category: work.category,
+                    type: work.type,
+                    isTaskDone: work.isTaskDone,
+                    workID: work.workID
+                };
+            });
+
+            const { error } = await supabaseTwo
+                .from('timer')
+                .update({
+                    works: worksData || null,
+                    musicID: selectedMusicId || null,
+                    autoStart: isAutoStart || false,
+                    autoCheck: isAuthChecked || false
+                })
+                .eq('user_id', user?.uid);
+            if (error) {
+                console.log(error)
+            } else {
+                console.log('works passed')
+                setSelectedData(null)
+                setSelectedMusicId(null)
+                setLoading(false);
+                renderSelected(selectedMusicId as string)
+            }
+        }
+
+    }
+
 
     const pauseTimer = async () => {
         setIsPaused(true);
@@ -543,6 +649,8 @@ const Pomodoro: React.FC = () => {
         }
         await updateTimerState(remainingTime, false, selectedTab);
     };
+
+
 
     const resetTimer = async (tab: string) => {
         if (intervalId) {
@@ -560,9 +668,31 @@ const Pomodoro: React.FC = () => {
         setIsStarted(false);
         setIsPaused(false);
         setIsPlaying(false);
-
+        removeWorksToTimer()
         await updateTimerState(duration, false, tab);
     };
+
+
+
+    async function removeWorksToTimer() {
+        const { error } = await supabaseTwo
+            .from('timer')
+            .update({
+                works: null,
+                musicID: null,
+                autoStart: false,
+                autoCheck: false
+            })
+            .eq('user_id', user?.uid);
+        if (error) {
+            console.log(error)
+        } else {
+            console.log('works removed')
+            setLoading(false);
+        }
+
+    }
+
 
     const updateTimerType = async (type: string) => {
         try {
@@ -605,6 +735,83 @@ const Pomodoro: React.FC = () => {
         resetTimer(tab);
     };
 
+    function renderSelected(selectedID: string) {
+        if (selectedID === selectedMusicId) {
+            setSelectedMusicId(null); // Deselect if the same ID is clicked again
+        } else {
+            setSelectedMusicId(selectedID); // Select the new ID
+        }
+    }
+
+
+
+
+
+    async function editDuration() {
+        if (timerLoading) {
+            return
+        };
+        setTimerLoading(true);
+        if (!user) {
+            setTimerLoading(false);
+            return
+        };
+
+        if (!workTimerDuration || !shortTimerDuration || !longTimerDuration) {
+            setTimerLoading(false);
+            return
+        }
+
+        try {
+            const { error } = await supabaseTwo
+                .from('timer')
+                .update({
+                    work_timer: workTimerDuration,
+                    short_timer: shortTimerDuration,
+                    long_timer: longTimerDuration
+                })
+                .eq('user_id', user.uid);
+            if (error) {
+                console.log(error)
+                setTimerLoading(false);
+            } else {
+                console.log("Timer duration updated")
+                setTimerLoading(false);
+            }
+        }
+        catch (err) {
+            console.log(err)
+            setTimerLoading(false);
+        }
+
+    }
+
+
+    const handleTimerCompletion = useCallback(() => {
+        console.log("Timer is done");
+
+        if (isAutoStart) {
+            const nextTab = selectedTab === 'Work' ? 'Short' : selectedTab === 'Short' ? 'Long' : 'Work';
+            console.log(nextTab);
+            setRemainingTime(0);
+            handleTabChange(nextTab);
+            startTimer(nextTab, true);
+            console.log("RAM");
+
+            setIsStarted(true);
+            setIsPlaying(true);
+        } 
+    }, [selectedTab, handleTabChange, startTimer, resetTimer]);
+
+    useEffect(() => {
+        if (checkerTimer === 0) {
+            if (!isStarted) return; // Prevent redundant execution
+            handleTimerCompletion();
+        }
+    }, [checkerTimer, handleTimerCompletion]);
+    
+   
+    
     return (
         <div>
             <MetaEditor
@@ -613,9 +820,7 @@ const Pomodoro: React.FC = () => {
                 keywords='Pomodoro, Timer, Focus, Task'
             />
             <Sidebar location="Pomodoro" />
-
             <div className='ml-[86px] lg:h-[100vh] p-3 flex gap-3 overflow-auto mr-[0px] flex-col lg:flex-row'>
-
                 <div className='w-full h-full bg-[#191919] rounded-lg border-[1px] border-[#535353] p-3 flex items-center justify-center flex-col'>
                     <div className='flex gap-2 w-full max-w-[500px] text-sm mx-auto bg-[#111] mb-5 p-3 rounded-[2rem] border-[1px] border-[#535353]'>
                         <div
@@ -628,12 +833,10 @@ const Pomodoro: React.FC = () => {
                             onClick={() => handleTabChange('Long')}
                             className={`w-full text-center ${selectedTab === "Long" && 'bg-[#222] border-[1px] border-[#535353]'} cursor-pointer p-2 rounded-[1.5rem]`}>Long</div>
                     </div>
-                    {selectedTab}
-                    {!isPaused ? "Playing" : "Not Playing"}
+       
                     <div
                         ref={containerRef}
                         className='w-full h-full max-w-[150px] max-h-[150px] sm:max-w-[200px] sm:max-h-[200px] md:max-w-[300px] md:max-h-[300px] lg:max-w-[400px] lg:max-h-[400px] xl:max-w-[500px] xl:max-h-[500px]'>
-                        {remainingTime}
                         {selectedTab === 'Work' && pomodoroData && (
                             <CountdownCircleTimer
                                 colors="#42b3f5"
@@ -644,7 +847,7 @@ const Pomodoro: React.FC = () => {
                                 strokeWidth={10}
                                 isPlaying={isPlaying && pomodoroData && pomodoroData[0]?.type === 'Work'}
                                 key={`timer-${selectedTab}-${pomodoroData?.[0]?.work_timer ? pomodoroData[0].work_timer * 60 : 0}`}
-                                onUpdate={(remainingTime) => {
+                                onUpdate={(_) => {
                                     const timerElement = document.getElementById('timer-text');
                                     if (timerElement) {
                                         timerElement.classList.add('slide-down');
@@ -671,7 +874,7 @@ const Pomodoro: React.FC = () => {
                                 strokeWidth={10}
                                 isPlaying={isPlaying && pomodoroData && pomodoroData[0]?.type === 'Short'}
                                 key={`timer-${selectedTab}-${pomodoroData?.[0]?.short_timer ? pomodoroData[0].short_timer * 60 : 0}`}
-                                onUpdate={(remainingTime) => {
+                                onUpdate={(_) => {
                                     const timerElement = document.getElementById('timer-text');
                                     if (timerElement) {
                                         timerElement.classList.add('slide-down');
@@ -698,7 +901,7 @@ const Pomodoro: React.FC = () => {
                                 strokeWidth={10}
                                 isPlaying={isPlaying && pomodoroData && pomodoroData[0]?.type === 'Long'}
                                 key={`timer-${selectedTab}-${pomodoroData?.[0]?.long_timer ? pomodoroData[0].long_timer * 60 : 0}`}
-                                onUpdate={(remainingTime) => {
+                                onUpdate={(_) => {
                                     const timerElement = document.getElementById('timer-text');
                                     if (timerElement) {
                                         timerElement.classList.add('slide-down');
@@ -719,33 +922,37 @@ const Pomodoro: React.FC = () => {
                     </div>
 
                     <div className='flex gap-2 mt-9'>
-                        {!isStarted && !isPaused && (
-                            <button onClick={() => startTimer(selectedTab, true)} className="bg-blue-500 text-white px-4 py-2 rounded">
-                                Start
-                            </button>
+                        {user != null && (
+                            <>
+                                {!isStarted && !isPaused && (
+                                    <button onClick={() => startTimer(selectedTab, true)} className="bg-blue-500 text-white px-4 py-2 rounded">
+                                        {loading ? (
+                                            <div className='w-[20px] h-[20px]'>
+                                                <Loader />
+                                            </div>
+                                        ) : (
+                                            'Start'
+                                        )}
+                                    </button>
+                                )}
+                                {isStarted && (
+                                    <button onClick={pauseTimer} className="bg-yellow-500 text-white px-4 py-2 rounded">
+                                        Pause
+                                    </button>
+                                )}
+                                {isPaused && (
+                                    <button onClick={resumeTimer} className="bg-green-500 text-white px-4 py-2 rounded">
+                                        Resume
+                                    </button>
+                                )}
+                                <button onClick={() => resetTimer(selectedTab)} className="bg-red-500 text-white px-4 py-2 rounded">
+                                    Reset
+                                </button>
+                            </>
                         )}
-                        {isStarted && (
-                            <button onClick={pauseTimer} className="bg-yellow-500 text-white px-4 py-2 rounded">
-                                Pause
-                            </button>
-                        )}
-                        {isPaused && (
-                            <button onClick={resumeTimer} className="bg-green-500 text-white px-4 py-2 rounded">
-                                Resume
-                            </button>
-                        )}
-                        <button onClick={() => resetTimer(selectedTab)} className="bg-red-500 text-white px-4 py-2 rounded">
-                            Reset
-                        </button>
-
 
                         <div>
 
-                            {/* <div
-
-                                className='text-sm font-bold px-5 rounded-md bg-[#191919] py-2 flex gap-2 items-center cursor-pointer border-[1px] border-[#535353]'>
-                                <IoIosSettings />Reset
-                            </div> */}
 
                         </div>
                     </div>
@@ -802,11 +1009,11 @@ const Pomodoro: React.FC = () => {
                                                         return (
                                                             <div
                                                                 onClick={() => { handleSelect(event) }}
-                                                                key={index} className={`flex gap-2 items-center border-[1px] border-[#535353] overflow-hidden cursor-pointer hover:bg-[#212121] bg-[#151515] rounded-lg ${isSelected ? 'bg-[#444]' : ''}`}>
+                                                                key={index}
+                                                                className={`flex gap-2 items-center border-[1px] border-[#535353] overflow-hidden cursor-pointer hover:bg-[#212121] bg-[#151515] rounded-lg ${isSelected ? 'bg-[#444]' : ''}`}>
                                                                 {
                                                                     isSelected && (
                                                                         <div className='bg-[#42b3f5] w-[2px] h-full'>
-
                                                                         </div>
                                                                     )
                                                                 }
@@ -838,31 +1045,31 @@ const Pomodoro: React.FC = () => {
                                             Choose music to play
                                         </div>
                                         <div className='w-full flex flex-col gap-2  h-full border-[1px] max-h-[300px] overflow-auto border-[#535353]  p-3 rounded-md min-h-[300px] bg-[#333]'>
-
                                             {
-                                                songList.map((song, index) => (
-                                                    <div key={index}
-                                                        className='flex gap-2 items-center border-[1px] p-3 border-[#535353] cursor-pointer hover:bg-[#212121] bg-[#151515] rounded-lg'>
-                                                        <div onClick={() => { playSong(song, index) }}>
-                                                            {
-                                                                playID === index ?
-                                                                    <FaPause />
-                                                                    :
-                                                                    <FaPlay />
-                                                            }
-                                                        </div>
-                                                        <div className='p-2'>
+                                                songList.map((song: any, index) => {
+                                                    const isSelected = song.songID === selectedMusicId;
+                                                    return (
+                                                        <div
+                                                            onClick={() => { renderSelected(song.songID) }}
+                                                            key={index}
+                                                            className={`flex gap-2 flex-row items-center border-[1px] cursor-pointer hover:bg-[#212121] bg-[#151515] rounded-lg ${isSelected ? 'border-green-500' : 'border-[#535353]'}`}>
+                                                            <div className='p-5 flex gap-2 items-center'>
+                                                                <div onClick={() => { playSong(song, index) }}>
+                                                                    {playID === index ? <FaPause /> : <FaPlay />}
+                                                                </div>
+                                                                <div className='p-2'>
+                                                                    <div className='text-sm text-[#888] font-bold'>
+                                                                        {song.title}
+                                                                    </div>
+                                                                    <div className='text-sm text-[#888]'>
+                                                                        {song.Date}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                                                            <div className='text-sm text-[#888] font-bold'>
-                                                                {song.title}
-                                                            </div>
-                                                            <div className='text-sm text-[#888]'>
-                                                                {song.Date}
-                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))
-                                            }
+                                                    );
+                                                })}
 
                                         </div>
                                     </div>
@@ -878,7 +1085,9 @@ const Pomodoro: React.FC = () => {
                                     <div
                                         className='w-full'>
                                         <input
-                                            value={pomodoroData && pomodoroData[0]?.work_timer || 0}
+                                            maxLength={10}
+                                            value={workTimerDuration || ''}
+                                            onChange={(e) => setWorkTimerDuration(Math.min(Number(e.target.value) || 0, 500))}
                                             className='w-full p-2 bg-[#212121] border-[1px] border-[#535353] rounded-md text-[#ecececec] outline-none'
                                             placeholder='Work timer (minutes)'
                                             type="number" />
@@ -886,7 +1095,9 @@ const Pomodoro: React.FC = () => {
                                     <div
                                         className='w-full'>
                                         <input
-                                            value={pomodoroData && pomodoroData[0]?.short_timer || 0}
+                                            maxLength={10}
+                                            value={shortTimerDuration || ''}
+                                            onChange={(e) => setShortTimerDuration(Math.min(Number(e.target.value) || 0, 500))}
                                             className='w-full p-2 bg-[#212121] border-[1px] border-[#535353] rounded-md text-[#ecececec] outline-none'
                                             placeholder='Short break timer (minutes)'
                                             type="number" />
@@ -894,15 +1105,25 @@ const Pomodoro: React.FC = () => {
                                     <div
                                         className='w-full'>
                                         <input
-                                            value={pomodoroData && pomodoroData[0]?.long_timer || 0}
+                                            maxLength={10}
+                                            value={longTimerDuration || ''}
+                                            onChange={(e) => setLongTimerDuration(Math.min(Number(e.target.value) || 0, 500))}
                                             className='w-full p-2 bg-[#212121] border-[1px] border-[#535353] rounded-md text-[#ecececec] outline-none'
                                             placeholder='Long break timer (minutes)'
                                             type="number" />
                                     </div>
 
                                     <div className='flex gap-2 w-full'>
-                                        <div className={`w-full cursor-pointer text-center hover:bg-[#aaaaaa] p-2 ${selectedTab === 'Work' ? 'bg-[#42b3f5]' : selectedTab === 'Short' ? 'bg-[#03fc88]' : 'bg-[#fc9d03]'} px-5 text-black border-[1px] border-[#535353] rounded-md outline-none`}>
-                                            Save
+                                        <div
+                                            onClick={editDuration}
+                                            className={`w-full flex items-center justify-center cursor-pointer text-center hover:bg-[#aaaaaa] p-2 ${selectedTab === 'Work' ? 'bg-[#42b3f5]' : selectedTab === 'Short' ? 'bg-[#03fc88]' : 'bg-[#fc9d03]'} px-5 text-black border-[1px] border-[#535353] rounded-md outline-none`}>
+                                            {
+                                                timerLoading ? (
+                                                    <div className='w-[20px] h-[20px]'>
+                                                        <Loader />
+                                                    </div>
+                                                ) : 'Save'
+                                            }
                                         </div>
                                         <div className={`w-full cursor-pointer text-center hover:bg-[#aaaaaa] p-2 ${selectedTab === 'Work' ? 'bg-[#42b3f5]' : selectedTab === 'Short' ? 'bg-[#03fc88]' : 'bg-[#fc9d03]'} px-5 text-black border-[1px] border-[#535353] rounded-md outline-none`}>
                                             Reset
@@ -911,12 +1132,28 @@ const Pomodoro: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className='mt-5 border-t-[1px] border-t-[#535353] pt-5 p-3'>
+                            {/* <div className='mt-5 border-t-[1px] border-t-[#535353] pt-5 p-3'>
                                 <div className='font-bold'>
                                     Automations
                                 </div>
                                 <div className='flex flex-col md:flex-row gap-2 mt-5'>
+                                    {
+                                        <>
 
+                                            {
+                                                isAuthChecked && (
+                                                    "CHECKED"
+                                                )
+
+                                            }
+                                            {
+
+                                                isAutoStart && (
+                                                    "STARTED"
+                                                )
+                                            }
+                                        </>
+                                    }
                                     <div className='flex gap-4 justify-between items-center bg-[#212121] p-3 rounded-md  border-[1px] border-[#535353] '>
                                         <span>Auto Start Breaks</span>
                                         <Switch
@@ -939,7 +1176,7 @@ const Pomodoro: React.FC = () => {
                                             checked={isAuthChecked} />
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
                         </div>
                 }

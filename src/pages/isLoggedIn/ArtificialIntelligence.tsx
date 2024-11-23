@@ -312,7 +312,7 @@ const ArtificialIntelligence: React.FC = () => {
             console.log("Orgamix is prompted");
 
 
-            adjustedPrompt = `please listen first the prompt (${prompt}) of the user and if its relevant to provide the information about orgamix provide this similar or improved context, but dont ever metion unrelated thins "Orgamix is a productivity platform that contributes to great causes by giving funds to charity. Learn more about Orgamix at this website: https://orgamix.vercel.app/about. 
+            adjustedPrompt = `please listen first the prompt (${prompt}) of the user and if its relevant to provide the information about orgamix provide this similar or improved context, but dont ever metion unrelated thins "Orgamix is a productivity platform that contributes to great causes by giving funds to charity. Learn more about Orgamix at this website: https://orgamix.tech/about. 
             just provide the link and dont visit it. i want the uisers to be notified that the link is informative. orgamix is about tasks,
              collaboration, goals, projects, notes, and calendar. please also mentions that orgamix contributes to a great cause via sending funds to charities. please listen to the prompt of the user, 
                if its relevant to provide the information about orgamix do it, if not dont.

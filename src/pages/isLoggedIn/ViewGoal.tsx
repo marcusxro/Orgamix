@@ -226,7 +226,7 @@ const ViewGoal: React.FC = () => {
 
 
 
-    function checkDeadlineMet(deadlineString: string): JSX.Element {
+    function checkDeadlineMet(deadlineString: string, isDone: boolean): JSX.Element {
         const deadline = new Date(deadlineString);
         const now = new Date();
         deadline.setHours(0, 0, 0, 0);
@@ -235,11 +235,10 @@ const ViewGoal: React.FC = () => {
         // Calculate difference in time
         const timeDiff = deadline.getTime() - now.getTime();
         const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
         if (daysDiff === 0) {
             // If deadline is today
             return (
-                <div className='text-sm text-[#cc0000] flex gap-1 items-center'>
+                <div className={`${isDone ? "text-green-500" : "text-[#cc0e00]"} flex gap-1 items-center text-sm`}>
                     <MdDateRange />
                     Deadline Met
                 </div>
@@ -247,7 +246,7 @@ const ViewGoal: React.FC = () => {
         } else if (daysDiff > 0) {
             // If the deadline is in the future
             return (
-                <div className={`${daysDiff <= 3 && 'text-[#cc0000]'} text-[#888] text-sm flex gap-1 items-center`}>
+                <div className={`${daysDiff <= 3 && !isDone ? 'text-[#cc8500]' : ''} ${isDone ? 'text-green-500' : ''} text-[#888] text-sm flex gap-1 items-center`}>
                     <MdDateRange />
                     {`${deadlineString} / ${daysDiff} ${daysDiff === 1 ? 'day' : 'days'} left`}
                 </div>
@@ -255,7 +254,7 @@ const ViewGoal: React.FC = () => {
         } else {
             // If the deadline has passed
             return (
-                <div className='text-sm text-[#cc0000] flex gap-1 items-center'>
+                <div className={`${isDone ? "text-green-500" : "text-[#cc0e00]"} flex gap-1 items-center text-[#888] text-sm`}>
                     <MdDateRange />
                     {`${deadlineString} / ${Math.abs(daysDiff)} ${Math.abs(daysDiff) === 1 ? 'day' : 'days'} ago`}
                 </div>
@@ -363,18 +362,15 @@ const ViewGoal: React.FC = () => {
         deadline.setHours(0, 0, 0, 0);
         now.setHours(0, 0, 0, 0);
 
-        // Calculate difference in time
-        const timeDiff = deadline.getTime() - now.getTime();
-        const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        // Calculate difference in days
+        const daysDiff = Math.floor((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
-        if (daysDiff > 0 && !boolVal) {
-            return "In progress"
-        } else if (daysDiff > 0 && boolVal) {
-            return "Completed"
-        }
-
-        else {
-            return "Failed"
+        if (boolVal) {
+            return "Completed";
+        } else if (daysDiff >= 0 && !boolVal) {
+            return "In progress";
+        } else {
+            return "Failed";
         }
     }
 
@@ -768,7 +764,7 @@ const ViewGoal: React.FC = () => {
                                     {fetchedData && fetchedData[0]?.description}
                                 </p>
                                 <p className='text-sm text-[#888] w-full max-w-[500px]'>
-                                    {checkDeadlineMet(fetchedData != null && fetchedData[0]?.deadline)}
+                                    {checkDeadlineMet(fetchedData != null && fetchedData[0]?.deadline, fetchedData[0]?.is_done)}
                                 </p>
 
                                 {
@@ -834,7 +830,7 @@ const ViewGoal: React.FC = () => {
                                                     :
 
                                                     <p className='text-sm text-[#888] w-full max-w-[500px]'>
-                                                        {checkDeadlineMet(fetchedData != null && fetchedData[0]?.deadline)}
+                                                        {checkDeadlineMet(fetchedData != null && fetchedData[0]?.deadline, fetchedData[0]?.is_done)}
                                                     </p>
                                             }
                                             {

@@ -124,16 +124,16 @@ const TaskData: React.FC = () => {
             <div className='flex gap-2 flex-col border-l-[2px] border-l-[#1d559e] pl-2'>
                 <h2 className='font-bold mb-2'>Tasks for Tomorrow</h2>
                 {groupedTasks.tomorrow.length > 0 ? (
-                        <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
+                    <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
                         {groupedTasks.tomorrow.map((task, idx: number) => (
-                         <motion.div
-                         initial={{ y: 20, opacity: 0 }} // Initial position and opacity
-                         animate={{ y: 0, opacity: 1 }} // End position and opacity
-                         transition={{
-                             duration: 0.4,
-                             delay: idx * 0.1 // Staggered animation
-                         }}
-                             className='bg-[#222] w-full  overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
+                            <motion.div
+                                initial={{ y: 20, opacity: 0 }} // Initial position and opacity
+                                animate={{ y: 0, opacity: 1 }} // End position and opacity
+                                transition={{
+                                    duration: 0.4,
+                                    delay: idx * 0.1 // Staggered animation
+                                }}
+                                className='bg-[#222] w-full  overflow-hidden flex items-start flex-col p-3 rounded-lg cursor-pointer border-[#535353] border-[1px] '
                                 key={idx}>
                                 <div className='font-bold'>
                                     {task?.title}

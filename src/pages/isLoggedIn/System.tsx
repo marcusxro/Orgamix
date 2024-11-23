@@ -48,7 +48,6 @@ const System: React.FC = () => {
                 console.error('Error fetching data:', error);
             } else {
                 setFetchedData(data);
-                console.log(data)
             }
         } catch (err) {
             console.log(err);
@@ -59,7 +58,7 @@ const System: React.FC = () => {
 
 
     return (
-        <div className='h-auto selectionNone'>
+        <div className='h-auto selectionNone relative'>
          {
             user && 
             <MetaEditor
