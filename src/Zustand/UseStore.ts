@@ -113,6 +113,10 @@ interface AppState {
 
     timerState: { isPaused: boolean; isPlaying: boolean } | null;
     setTimerState: (params: { isPaused: boolean; isPlaying: boolean }) => void;
+
+
+    timerDB: number | null;
+    setTimerDB: (params: number) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -210,6 +214,9 @@ const useStore = create<AppState>((set) => ({
 
     timerState: null,
     setTimerState: (task) => set({ timerState: task }),
+
+    timerDB: 0,
+    setTimerDB: (task) => set({ timerDB: task }),
 }));
 
 export default useStore;

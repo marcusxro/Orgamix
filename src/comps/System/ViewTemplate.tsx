@@ -590,7 +590,7 @@ const ViewTemplate = () => {
                                                                 type="text" />
                                                             :
                                                             <div className='font-bold'>
-                                                                {itm?.subGoal}
+                                                                {itm?.subGoal}s
                                                             </div>
                                                     }
                                                     <p className={`${itm?.is_done && 'line-through'}  text-sm text-[#888]`}>

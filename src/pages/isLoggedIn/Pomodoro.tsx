@@ -261,7 +261,7 @@ const Pomodoro: React.FC = () => {
     const [isPaused, setIsPaused] = useState(false);
     const [pomodoroData, setPomodoroData] = useState<pomodoroDataType[] | null>(null);
     const [remainingTime, setRemainingTime] = useState<number>(0);
-    const [timerDB, setTimerDB] = React.useState<number>(0);
+    const {timerDB, setTimerDB}:any = useStore();
     const [checkerTimer, setCheckerTimer] = React.useState<number>(0);
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
     const [isStarted, setIsStarted] = useState<boolean>(false)
@@ -580,7 +580,7 @@ const Pomodoro: React.FC = () => {
         }
 
         const counterInterval = setInterval(() => {
-            setTimerDB((prev) => {
+            setTimerDB((prev: number) => {
                 if (prev <= 1) {
                     clearInterval(counterInterval);
                     setIsStarted(false);

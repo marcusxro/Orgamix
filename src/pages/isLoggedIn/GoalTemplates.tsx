@@ -366,9 +366,9 @@ const GoalTemplates: React.FC = () => {
                                                     setTemplateID(itm?.created_at)
                                                 }}
                                                 key={idx}
-                                                className='w-full  bg-[#313131] border-[#535353] relative border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>
+                                                className='w-full justify-between flex flex-col  bg-[#313131] border-[#535353] relative border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>
 
-                                                <div className='flex h-auto items-start  justify-start   border-b-[#535353] border-b-[1px]  '>
+                                                <div className='flex h-auto items-start  justify-start    '>
                                                     <div
                                                         className={`w-[2px] h-full`}>
                                                     </div>
@@ -457,7 +457,7 @@ const GoalTemplates: React.FC = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className='flex justify-between items-center p-3 text-[#888] gap-2'>
+                                                <div className='flex justify-between mt-auto items-center p-3 border-t-[#535353] border-t-[1px]  text-[#888] gap-2'>
                                                     
                                                     <div className='flex items-center gap-2'>
                                                     <div className='w-[20px] bg-[#111] flex items-center justify-center border-[1px] h-[20px] rounded-full overflow-hidden'>

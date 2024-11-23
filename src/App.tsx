@@ -267,7 +267,11 @@ function Main() {
   return (
     <div className="App">
       <ScrollToTop />
-      <TimerModal />
+    
+      {
+        location.pathname.includes('/user') && location.pathname !== '/user/pomodoro' &&
+        <TimerModal />
+      }
       <Routes>
         {/* static pages */}
         <Route path='/' element={<Homepage />} />
