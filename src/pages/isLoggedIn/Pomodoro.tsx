@@ -45,7 +45,7 @@ const Pomodoro: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [user] = IsLoggedIn()
     const [timerLoading, setTimerLoading] = useState(false);
-
+    const {isPaused, setIsPaused}: any = useStore();
 
 
     React.useEffect(() => {
@@ -258,7 +258,6 @@ const Pomodoro: React.FC = () => {
     const [isAutoStart, setIsAutoStart] = useState(false);
     const [isAuthChecked, setIsAuthChecked] = useState(false);
     const [isCreatingData, setIsCreatingData] = useState(false);
-    const [isPaused, setIsPaused] = useState(false);
     const [pomodoroData, setPomodoroData] = useState<pomodoroDataType[] | null>(null);
     const [remainingTime, setRemainingTime] = useState<number>(0);
     const {timerDB, setTimerDB}:any = useStore();
@@ -448,7 +447,7 @@ const Pomodoro: React.FC = () => {
                 setCheckerTimer(adjustedRemainingTime)
                 setIsStarted(timerData.is_running || false);
                 setSelectedTab(selectedType); // Set the selected tab based on the database
-                console.log(timerDB)
+              
 
                 if (timerData.autoStart) {
                     const nextTab = selectedType === 'Work' ? 'Short' : selectedType === 'Short' ? 'Long' : 'Work';
@@ -498,11 +497,11 @@ const Pomodoro: React.FC = () => {
 
         if (isAutoStart) {
             const nextTab = selectedTab === 'Work' ? 'Short' : selectedTab === 'Short' ? 'Long' : 'Work';
-            console.log(nextTab);
+            
             setRemainingTime(0);
             handleTabChange(nextTab);
             startTimer(nextTab, true);
-            console.log("RAM");
+           
 
             setIsStarted(true);
             setIsPlaying(true);
@@ -605,7 +604,10 @@ const Pomodoro: React.FC = () => {
     };
 
     async function passWorksToTimer(works: worksType[] | null) {
-        if (selectedData && selectedMusicId && user != null || isAuthChecked || isAutoStart) {
+        console.log(works)
+
+        if (selectedData || selectedMusicId && user != null || isAuthChecked || isAutoStart) {
+
             const worksData = works != null && works.map((work: any) => {
                 return {
                     title: work.title,
@@ -615,7 +617,7 @@ const Pomodoro: React.FC = () => {
                     workID: work.workID
                 };
             });
-
+         console.log("s")
             const { error } = await supabaseTwo
                 .from('timer')
                 .update({
@@ -792,11 +794,11 @@ const Pomodoro: React.FC = () => {
 
         if (isAutoStart) {
             const nextTab = selectedTab === 'Work' ? 'Short' : selectedTab === 'Short' ? 'Long' : 'Work';
-            console.log(nextTab);
+          
             setRemainingTime(0);
             handleTabChange(nextTab);
             startTimer(nextTab, true);
-            console.log("RAM");
+            
 
             setIsStarted(true);
             setIsPlaying(true);

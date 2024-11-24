@@ -43,7 +43,6 @@ const GoalSorter: React.FC<closerType> = ({ closer }) => {
             if(selectedSort === "Category") {
                 if(CaterSelect === "") return
                 const newVal = `Category (${CaterSelect})`
-                console.log(newVal)
                 localStorage.setItem('sortMethodGoals', newVal);
                 closer(false);
                 window.location.reload()

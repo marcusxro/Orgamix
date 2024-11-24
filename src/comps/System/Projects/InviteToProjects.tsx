@@ -292,10 +292,6 @@ const InviteToProjects: React.FC = () => {
 
                     const removedEmails = previousInvitedEmails.filter(email => !emailAdded.includes(email));
 
-                    console.log(previousInvitedEmails)
-                    console.log(removedEmails)
-                    console.log(emailAdded)
-
                     for (const email of newlyAddedEmails) {
                         // Fetch the user account using the email to get the `userid`, if not already in `emailAdded`
                         const { data: userAccount, error: userError } = await supabase
@@ -370,7 +366,7 @@ const InviteToProjects: React.FC = () => {
 
         }
         catch (err) {
-            console.log(err)
+            
             setLoading(false)
         }
     }

@@ -57,7 +57,6 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
             const subscription = supabase
                 .channel('public:notification')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'notification' }, (payload) => {
-                    console.log('Realtime event:', payload);
                     handleRealtimeEvent(payload);
                 })
                 .subscribe();

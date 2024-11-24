@@ -685,7 +685,7 @@ const ViewAiChat: React.FC = () => {
             return;
         }
 
-        console.log(prompt);
+  
 
         // Save the user's prompt to the state and immediately to the database
         const userChatData: any = [

@@ -253,7 +253,6 @@ const EditTaskProject: React.FC<isAllowedType> = ({ isAllowed }) => {
 
     useEffect(() => {
         if (!defaultData) return
-        console.log(defaultData[0]?.invited_emails)
     }, [defaultData])
 
     async function editTask() {

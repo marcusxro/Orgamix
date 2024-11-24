@@ -101,9 +101,7 @@ const ProjectSidebar: React.FC<propsType> = ({ isUid }) => {
     useEffect(() => {
         if (isMobile) {
             setSidebarLoc("Home")
-        } else {
-            console.log("nyawnyaw");
-        }
+        } 
     }, [isMobile]);
 
 
@@ -122,7 +120,7 @@ const ProjectSidebar: React.FC<propsType> = ({ isUid }) => {
             const subscription = supabase
                 .channel('public:projects')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, (payload) => {
-                    console.log('Realtime event:', payload);
+            
                     handleRealtimeEvent(payload);
                 })
                 .subscribe();

@@ -317,9 +317,6 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
     }
 
 
-    useEffect(() => {
-        console.log(habits)
-    }, [habits])
 
     return (
         <AnimatePresence>

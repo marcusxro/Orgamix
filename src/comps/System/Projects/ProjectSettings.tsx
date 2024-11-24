@@ -187,7 +187,7 @@ const ProjectSettings:React.FC = () => {
             // After both queries are done, update fetched data if projectData is available
             if (projectData) {
                 setFetchedData(projectData);
-                console.log(projectData);  // Logging the fetched project data
+            
             }
 
         } catch (err) {
@@ -314,7 +314,7 @@ const ProjectSettings:React.FC = () => {
             return console.error('Error fetching data:', error);
         } else {
             handleOutsideClick()
-            console.log("dne")
+          
             setLoading(false)
             setIsEdit(false)
             nav('/user/projects')

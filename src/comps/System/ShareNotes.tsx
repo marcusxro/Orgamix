@@ -120,7 +120,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
                 console.error('Error fetching data:', error);
             } else {
                 setPrevData(data)
-                console.log(data)
+            
             }
         } catch (err) {
             console.log('Error:', err);
@@ -139,7 +139,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
-                console.log(data)
+            
                 setFetchedData(data);
             }
         } catch (err) {
@@ -157,7 +157,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
-                console.log(data)
+            
                 setMyAccount(data);
             }
         } catch (err) {
@@ -254,9 +254,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
 
                     const removedEmails = previousInvitedEmails.filter((email: any) => !emailAdded.includes(email));
 
-                    console.log(previousInvitedEmails)
-                    console.log(removedEmails)
-                    console.log(emailAdded)
+
 
                     for (const email of newlyAddedEmails) {
                         // Fetch the user account using the email to get the `userid`, if not already in `emailAdded`

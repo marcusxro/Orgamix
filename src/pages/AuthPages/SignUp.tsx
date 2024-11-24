@@ -133,7 +133,7 @@ const SignUp: React.FC = () => {
     function changeValueOfCheck() {
 
         setSeePass(prevs => !prevs)
-        console.log(seePass)
+
     }
     const { showMenu }: any = useStore()
 

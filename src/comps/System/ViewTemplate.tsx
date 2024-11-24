@@ -137,7 +137,6 @@ const ViewTemplate = () => {
             // Optionally reset the edit state or any other UI-related state
             setSubTaskIdx(null); // Reset the task index or close the modal
 
-            console.log('Sub-task renamed locally:', updatedSubTasks);
         } else {
             console.error('No fetched data available to update.');
         }
@@ -186,7 +185,6 @@ const ViewTemplate = () => {
             // Optionally reset the edit state or any other UI-related state
             setIsOpenHabit(null); // Close the habit edit modal or reset its state
 
-            console.log('Habit renamed locally:', updatedHabits);
         } else {
             console.error('No fetched data available to update.');
         }
@@ -221,7 +219,6 @@ const ViewTemplate = () => {
             // Optionally reset the deletion state or any other UI-related state
             setIsDeleteTask(null); // Reset sub-task index if needed
 
-            console.log('Task deleted locally:', updatedSubTasks);
         } else {
             console.error('No fetched data available to delete from.');
         }
@@ -253,15 +250,13 @@ const ViewTemplate = () => {
             // Optionally reset the deletion state or any other UI-related state
             setIsHabitDel(null); // Reset sub-task index if needed
 
-            console.log('Habit deleted locally:', updatedHabits);
         } else {
             console.error('No fetched data available to delete from.');
         }
     }
 
     const addNewSubTask = (params: string) => {
-        console.log("Parameters received:", params); // Log params
-
+   
         const newSubTaskObj = {
             is_done: false,
             startedAt: new Date().toISOString(),
@@ -273,7 +268,6 @@ const ViewTemplate = () => {
             habit: newHabit,
         };
 
-        console.log(newHabitObject);
 
         if (fetchedData != null && fetchedData.length > 0 && params !== '') {
             const goalId = fetchedData[0]?.id; // Get the goal ID
@@ -290,15 +284,12 @@ const ViewTemplate = () => {
                 );
 
                 setFetchedData(updatedData);
-                console.log("Sub-task added locally:", updatedSubTasks);
                 setNewSubTask(''); // Reset new sub-task input
             }
 
             // Check if you're adding a habit
             else if (params === "habit") {
-                if (!repHabit || !newHabit) return;
-
-                console.log("I AM AT HABIT");
+                if (!repHabit || !newHabit) return
                 // Add a new habit
                 const updatedHabits = [...fetchedData[0]?.habits, newHabitObject];
 
@@ -308,7 +299,7 @@ const ViewTemplate = () => {
                 );
 
                 setFetchedData(updatedData);
-                console.log("Habit added locally:", updatedHabits);
+              
                 setRepHabit(''); // Reset repeat habit input
                 setNewHabit(''); // Reset new habit input
             }
@@ -329,7 +320,7 @@ const ViewTemplate = () => {
             const subscription = supabase
                 .channel('public:templates')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'templates' }, (payload) => {
-                    console.log('Realtime event:', payload);
+              
                     handleRealtimeEvent(payload);
                 })
                 .subscribe();
@@ -427,9 +418,6 @@ const ViewTemplate = () => {
                 const index = existingGoals.length + 1;
                 newTitle = `${title} (${index})`; // Append the index to the title
             }
-
-            console.log(newTitle)
-
             const { data: updateData, error: updateError } = await supabase
                 .from('templates')
                 .update({
@@ -442,7 +430,7 @@ const ViewTemplate = () => {
                 setLoadings(false)
                 return; // Exit if update fails
             } else {
-                console.log("Updated download count:", updateData);
+             
                 setLoadings(false)
             }
 
@@ -464,7 +452,7 @@ const ViewTemplate = () => {
                 setLoadings(false)
                 console.error('Error inserting new goal:', insertError);
             } else {
-                console.log('Inserted new goal:', insertData);
+              
                 setLoadings(false)
                 handleOutsideClick()
             }
@@ -475,11 +463,6 @@ const ViewTemplate = () => {
         }
     }
 
-
-
-    useEffect(() => {
-        console.log(title)
-    }, [title])
 
     return (
         <AnimatePresence>
@@ -590,7 +573,7 @@ const ViewTemplate = () => {
                                                                 type="text" />
                                                             :
                                                             <div className='font-bold'>
-                                                                {itm?.subGoal}s
+                                                                {itm?.subGoal}
                                                             </div>
                                                     }
                                                     <p className={`${itm?.is_done && 'line-through'}  text-sm text-[#888]`}>

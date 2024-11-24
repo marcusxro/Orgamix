@@ -173,7 +173,7 @@ export default function Samp() {
         if (matchingItem) {
             // Place any specific logic you want to handle with `created_by` here
             if (matchingItem.created_by !== payload.new.created_by) {
-                console.log(`created_by changed from ${matchingItem.created_by} to ${payload.new.created_by}`);
+                console.log(`created_by changed `);
             }
         }
 

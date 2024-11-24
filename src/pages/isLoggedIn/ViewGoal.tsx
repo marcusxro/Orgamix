@@ -340,7 +340,7 @@ const ViewGoal: React.FC = () => {
                 if (updateError) {
                     console.error('Update error:', updateError.message || updateError);
                 } else {
-                    console.log('Updated task data:', updatedTask);
+                   
                 }
 
                 return updatedTask;
@@ -443,7 +443,7 @@ const ViewGoal: React.FC = () => {
                 if (updateError) {
                     console.error('Update error:', updateError.message || updateError);
                 } else {
-                    console.log('Updated task data:', updatedTask);
+                   
                     setSubTaskIdx(null)
                 }
 
@@ -497,7 +497,7 @@ const ViewGoal: React.FC = () => {
                 if (updateError) {
                     console.error('Update error:', updateError.message || updateError);
                 } else {
-                    console.log('Updated task data:', updatedTask);
+                 
                     setIsOpenHabit(null);
                 }
 
@@ -551,7 +551,7 @@ const ViewGoal: React.FC = () => {
                 if (updateError) {
                     console.error('Update error:', updateError.message || updateError);
                 } else {
-                    console.log('Updated task data:', updatedTask);
+                  
                     setIsDeleteTask(null); // Reset sub-task index if needed
                 }
 
@@ -603,7 +603,7 @@ const ViewGoal: React.FC = () => {
                 if (updateError) {
                     console.error('Update error:', updateError.message || updateError);
                 } else {
-                    console.log('Updated task data:', updatedTask);
+                  
                     setIsHabitDel(null); // Reset sub-task index if needed
                 }
 

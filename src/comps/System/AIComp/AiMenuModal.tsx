@@ -39,7 +39,7 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
             const subscription = supabaseTwo
                 .channel('public:notification')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'notification' }, (payload) => {
-                    console.log('Realtime event:', payload);
+                   
                     handleRealtiveForAccounts(payload);
                 })
                 .subscribe();
@@ -52,7 +52,7 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
     }, [user]);
 
     const handleRealtiveForAccounts = (payload: any) => {
-        console.log('Received payload:', payload); // Check the payload structure
+      
 
         switch (payload.eventType) {
             case 'INSERT':
@@ -124,7 +124,7 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
             if (error) {
                 console.log(error)
             } else {
-                console.log(data)
+              
                 setGetAccountData(data)
             }
         }

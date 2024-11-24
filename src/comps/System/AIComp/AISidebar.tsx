@@ -40,7 +40,7 @@ const AISidebar: React.FC<AISidebarProps> = ({ location }) => {
       const subscription = supabaseTwo
         .channel('public:notification')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'notification' }, (payload) => {
-          console.log('Realtime event:', payload);
+          
           handleRealtiveForAccounts(payload);
         })
         .subscribe();

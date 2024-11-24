@@ -48,7 +48,7 @@ const SendDetails: React.FC = () => {
                 console.error('Error fetching data:', error);
             } else {
                 setFetchedData(data);
-                console.log(data)
+
                 setUserName(data?.[0]?.username || "")
                 if (data.length === 0) {
                     console.log("----------NO DATA----------")
@@ -79,7 +79,7 @@ const SendDetails: React.FC = () => {
                 setFile(null);
                 return;
             }
-            console.log(selectedFile)
+          
             setFile(selectedFile);
             setChangedImg(URL.createObjectURL(selectedFile)); // Set image preview URL
         }
@@ -132,7 +132,7 @@ const SendDetails: React.FC = () => {
                 console.error('Error uploading file:', error.message);
                 setLoading(false)
             } else {
-                console.log('File uploaded successfully:', data);
+              
                 // Fetch the new image URL after uploading
                 setLoading(true)
                 setFile(null)

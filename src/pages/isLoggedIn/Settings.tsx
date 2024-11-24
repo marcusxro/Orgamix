@@ -80,7 +80,7 @@ const Settings: React.FC = () => {
                 setIsAllowed(false)
                 return;
             }
-            console.log(selectedFile)
+         
             setIsAllowed(true)
             setFile(selectedFile);
             setChangedImg(URL.createObjectURL(selectedFile)); // Set image preview URL
@@ -106,7 +106,7 @@ const Settings: React.FC = () => {
                 setFileAttachment(null);
                 return;
             }
-            console.log(selectedFile)
+            
             setIsAllowed(true)
             setFileAttachment(selectedFile);
         }
@@ -223,7 +223,7 @@ const Settings: React.FC = () => {
 
                 return false; // Return false if upload failed
             } else {
-                console.log('File uploaded successfully:', data);
+               
                 setFileAttachment(null);
                 setIsErrorAttach(null)
                 if (fileInputRefAttachment.current) {

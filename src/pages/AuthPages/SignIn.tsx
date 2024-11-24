@@ -32,7 +32,7 @@ const SignIn: React.FC = () => {
         try {
             const result = await signInWithPopup(firebaseAuthKey, provider);
             const user = result.user;
-            console.log("User signed in:", user);
+          
             // Additional actions, like saving user info, can be done here
     
         } catch (err: any) {
@@ -95,7 +95,7 @@ const SignIn: React.FC = () => {
                     errorNotif("Please verify your email first!")
                 } else {
                     window.location.reload()
-                    console.log("User signed in!!!", user)
+                   
                     setLoading(false)
                     nav('/user/dashboard')
                 }

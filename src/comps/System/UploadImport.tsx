@@ -69,7 +69,7 @@ const UploadImport = () => {
             const subscription = supabase
                 .channel('public:goals')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, (payload) => {
-                    console.log('Realtime event:', payload);
+                    
                     handleRealtimeEvent(payload);
                 })
                 .subscribe();
@@ -344,7 +344,7 @@ const UploadImport = () => {
             habit: newHabit,
         };
 
-        console.log(newHabitObject);
+
 
         if (fetchedData != null && fetchedData.length > 0 && params !== '') {
             const goalId = fetchedData[0]?.id; // Get the goal ID

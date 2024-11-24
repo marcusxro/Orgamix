@@ -56,9 +56,7 @@ const ReportGoal: React.FC<propsType> = ({ closer, contentObj }) => {
     const [user] = IsLoggedIn()
     const [isExiting, setIsExiting] = useState(false);
 
-    useEffect(() => {
-        console.log(contentObj)
-    }, [contentObj])
+
 
     const handleOutsideClick = () => {
         setIsExiting(true);

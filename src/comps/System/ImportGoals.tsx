@@ -68,7 +68,7 @@ const ImportGoals: React.FC = () => {
     useEffect(() => {
         if (user) {
             getGoalByIds()
-            console.log(showCreate)
+          
         }
     }, [user])
 
@@ -82,7 +82,7 @@ const ImportGoals: React.FC = () => {
             if (error) {
                 console.log(error)
             } else {
-                console.log(data)
+
                 setFetchedData(data)
                 setoriginalData(data)
             }

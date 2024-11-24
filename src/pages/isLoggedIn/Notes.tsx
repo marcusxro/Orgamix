@@ -43,7 +43,7 @@ const Notes = () => {
 
 
     useEffect(() => {
-        console.log(sortMethod)
+       
 
         if (user && sortMethod && !sortMethodLoaded) {
             setSortVal(sortMethod);
@@ -57,7 +57,7 @@ const Notes = () => {
         const filteredArray = fetchedData?.filter((itm: fetchedDataType) => {
             return itm?.title.toLowerCase().includes(searchVal.toLowerCase())
         })
-        console.log(filteredArray)
+        
 
         setFilteredData(filteredArray)
 
@@ -69,7 +69,7 @@ const Notes = () => {
             const subscription = supabase
                 .channel('public:notes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'notes' }, (payload) => {
-                    console.log('Realtime event:', payload);
+            
                     handleRealtimeEvent(payload);
                     getNotes()
                 })
@@ -138,7 +138,7 @@ const Notes = () => {
                 console.error(error)
             } else {
                 const sortedData = sortVal === 'Creation Date' ? data.reverse() : data;
-                console.log(data)
+               
                 setFetchedData(sortedData)
                 setFilteredData(sortedData)
             }

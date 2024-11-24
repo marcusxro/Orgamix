@@ -140,9 +140,7 @@ const Chat:React.FC = () => {
                 .eq('created_at', params?.time)
                 .single(); // Ensures we get a single result (not an array)
 
-            if (data) {
-                console.log(data?.chats)
-            }
+          
             if (!data?.chats) {
                 createSchemaIfChatsNull()
             } else {
@@ -215,7 +213,6 @@ const Chat:React.FC = () => {
                 return;
             } else {
                 if (data?.chatarr) {
-                    console.log(chatArray)
                     setChatArray(data.chatarr);
                 }
             }
@@ -252,7 +249,6 @@ const Chat:React.FC = () => {
                 const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
                 const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
 
-                console.log(scrollPercentage);
 
                 if (scrollPercentage <= 0.9) {
                     setIsShow(true)
@@ -379,7 +375,6 @@ const Chat:React.FC = () => {
             
             if (data && data.length > 0) {
                 setMyAccount(data[0]);  // Set the first item in the array
-                console.log(data[0]);
             }
     
             if (error) {

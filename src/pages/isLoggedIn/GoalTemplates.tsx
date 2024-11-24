@@ -74,7 +74,7 @@ const GoalTemplates: React.FC = () => {
             const subscription = supabase
                 .channel('public:templates')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'templates' }, (payload) => {
-                    console.log('Realtime event:', payload);
+             
                     handleRealtimeEvent(payload);
                 })
                 .subscribe();
@@ -185,11 +185,7 @@ const GoalTemplates: React.FC = () => {
     }
 
 
-    useEffect(() => {
-        console.log(isDelete)
-    }, [isDelete])
-
-
+    
 
 
     return (

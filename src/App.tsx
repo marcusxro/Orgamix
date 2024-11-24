@@ -85,7 +85,7 @@ function Main() {
       const subscription = supabase
         .channel('public:notification')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'notification' }, (payload) => {
-          console.log('Realtime event:', payload);
+
           handleRealtimeEvent(payload);
         })
         .subscribe();
@@ -104,7 +104,7 @@ function Main() {
       const subscription = supabase
         .channel('public:accounts')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, (payload) => {
-          console.log('Realtime event:', payload);
+
           handleRealtiveForAccounts(payload);
         })
         .subscribe();
@@ -157,11 +157,9 @@ function Main() {
   };
 
   const handleRealtimeEvent = (payload: any) => {
-    console.log('Received payload:', payload); // Check the payload structure
 
     setNotifications((prevNotifs) => {
       let updatedData = [...prevNotifs]; // Start with current notifications
-      console.log(payload)
       switch (payload.eventType) {
         case 'INSERT':
           updatedData.push(payload.new); // Add new notification

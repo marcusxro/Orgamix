@@ -54,12 +54,11 @@ const Tasks: React.FC = () => {
     const [filteredComp, setFilteredComp] = useState<taskDataType[] | null | undefined>(null)
 
     useEffect(() => {
-        console.log(sortMethod)
+ 
 
         if (user && sortMethod && !sortMethodLoaded) {
             setSortVal(sortMethod);
             setSortMethodLoaded(true); // Mark that the sort method has been loaded
-            console.log("Sort method loaded on initial render:", sortMethod);
         }
     }, [user, sortMethod, sortMethodLoaded]);
 
@@ -101,7 +100,6 @@ const Tasks: React.FC = () => {
             const subscription = supabase
                 .channel('public:tasks')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, (payload) => {
-                    console.log('Realtime event:', payload);
                     handleRealtimeEvent(payload);
                     getUserTask();
                     getUserTaskCompleted();
@@ -266,6 +264,7 @@ const Tasks: React.FC = () => {
                 .eq('id', idx)
                 .eq('userid', user?.uid)
                 .order('createdAt', { ascending: true })
+                
             if (error) {
                 console.log('Error encountered!')
             } else {

@@ -25,7 +25,7 @@ const NotifShow: React.FC = () => {
             const subscription = supabase
                 .channel('public:notification')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'notification' }, (payload) => {
-                    console.log('Realtime event:', payload);
+          
                     handleRealtimeEvent(payload);
                 })
                 .subscribe();
@@ -38,7 +38,6 @@ const NotifShow: React.FC = () => {
     }, [user]);
 
     const handleRealtimeEvent = (payload: any) => {
-        console.log('Received payload:', payload); // Check the payload structure
         if (!notification) return
         switch (payload.eventType) {
             case 'INSERT':

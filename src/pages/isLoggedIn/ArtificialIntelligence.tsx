@@ -266,7 +266,7 @@ const ArtificialIntelligence: React.FC = () => {
             if (error) {
                 console.log(error);
             } else {
-                console.log(data);
+            
 
                 // After the chat is saved in the database, navigate
                 nav(`/user/ask-orgamix/${DateNow}`);
@@ -294,7 +294,7 @@ const ArtificialIntelligence: React.FC = () => {
             return
         }
 
-        console.log(prompt)
+
         setAIresponse((prevs) => [...prevs, {
             text: prompt,
             type: "User",

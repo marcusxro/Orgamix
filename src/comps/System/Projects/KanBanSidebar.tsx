@@ -40,7 +40,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
                 .channel('public:projects')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, (payload) => {
                     handleRealtimeEvent(payload);
-                    console.log(payload)
+          
                     getChatArray();
                 })
                 .subscribe();
