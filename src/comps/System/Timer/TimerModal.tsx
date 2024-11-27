@@ -38,7 +38,7 @@ interface PomodoroDataType {
 
 const TimerModal = () => {
     const location = useLocation();
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
     const [pomodoroData, setPomodoroData] = useState<PomodoroDataType[] | null>(null);
     const [isRunning, setIsRunning] = useState(false);
     const [remainingTime, setRemainingTime] = useState(0);
@@ -56,7 +56,7 @@ const TimerModal = () => {
             const { data, error } = await supabaseTwo
                 .from('timer')
                 .select('*')
-                .eq('user_id', user?.uid);
+                .eq('user_id', user?.id);
 
             if (error) {
                 console.error('Error fetching timer data:', error);
@@ -96,7 +96,7 @@ const TimerModal = () => {
     // Handle real-time updates
     const handleRealtimeEvent = (payload: any) => {
         if (!isFirstUser) return; // Only the first user should listen to the updates
-        const isCurrentUserProject = payload.new?.user_id === user?.uid || payload.old?.user_id === user?.uid;
+        const isCurrentUserProject = payload.new?.user_id === user?.id || payload.old?.user_id === user?.id;
         if (!isCurrentUserProject) return;
 
         switch (payload.eventType) {
@@ -152,7 +152,7 @@ const TimerModal = () => {
                     type: type,
                     updated_at: new Date().toISOString(),
                 })
-                .eq('user_id', user.uid);
+                .eq('user_id', user.id);
         } catch (error) {
             console.error('Error updating timer state:', error);
         }
@@ -250,7 +250,7 @@ const TimerModal = () => {
             const { data, error } = await supabaseTwo
                 .from('timer')
                 .select('works')
-                .eq('user_id', user.uid);
+                .eq('user_id', user.id);
 
             if (error) {
                 console.error('Error fetching works:', error);
@@ -265,7 +265,7 @@ const TimerModal = () => {
                 await supabaseTwo
                     .from('timer')
                     .update({ works: updatedWorks })
-                    .eq('user_id', user.uid);
+                    .eq('user_id', user.id);
             }
         } catch (error) {
             console.error('Error updating work state:', error);

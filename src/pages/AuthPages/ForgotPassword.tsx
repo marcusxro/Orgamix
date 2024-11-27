@@ -1,8 +1,6 @@
 import React, { FormEvent, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { firebaseAuthKey } from '../../firebase/FirebaseKey';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion'
 import Menu from '../../comps/Menu';
@@ -10,19 +8,38 @@ import Header from '../../comps/Header';
 import useStore from '../../Zustand/UseStore';
 import Loader from '../../comps/Loader';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
+import { supabase } from '../../supabase/supabaseClient';
 
 const ForgotPassword:React.FC = () => {
     const [email, setEmail] = useState<string>("")
     const [loading, setLoading] = useState(false)
 
-    const resetPassword = (e: FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-        if (loading) {
-            return
-        }
-        sendPasswordResetEmail(firebaseAuthKey, email)
-            .then(() => {
+
+    
+    const resetPassword = async (e: FormEvent) => {
+        e.preventDefault();
+        if (loading) return;
+
+        setLoading(true);
+
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/reset-password`, // Customize the redirect URL
+            });
+
+            if (error) {
+                console.error(error);
+                toast.error("Error sending reset email. Please try again.", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "dark",
+                });
+            } else {
                 toast.success("Verification sent!", {
                     position: "top-right",
                     autoClose: 5000,
@@ -33,13 +50,24 @@ const ForgotPassword:React.FC = () => {
                     progress: undefined,
                     theme: "dark",
                 });
-                setLoading(false)
-                setEmail('')
-            }).catch((err) => {
-                console.log(err)
-                setLoading(false)
-            })
-    }
+                setEmail('');
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("An unexpected error occurred.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const nav = useNavigate()
     const { showMenu }: any = useStore()

@@ -13,7 +13,7 @@ interface userUid {
 }
 
 const FetchPFP: React.FC<userUid> = ({ userUid }) => {
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
     const [imageUrl, setImageUrl] = useState<pubsType | null>(null);
     const [loading, setLoading] = useState(true);
 

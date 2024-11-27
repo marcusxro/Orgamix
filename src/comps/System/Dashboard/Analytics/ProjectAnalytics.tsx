@@ -63,7 +63,7 @@ interface dataType {
 
 const ProjectAnalytics: React.FC = () => {
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
 
     useEffect(() => {
         if (user) {
@@ -78,13 +78,13 @@ const ProjectAnalytics: React.FC = () => {
             const { data, error } = await supabase
                 .from('projects')
                 .select('*')
-                .eq('created_by', user?.uid);
+                .eq('created_by', user?.id);
 
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
                 if (data) {
-                    const filteredData = data.filter(itm => itm.created_by === user?.uid);
+                    const filteredData = data.filter(itm => itm.created_by === user?.id);
                     setFetchedData(filteredData);
                 }
             }

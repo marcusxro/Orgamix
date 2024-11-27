@@ -42,7 +42,7 @@ const ViewTemplate = () => {
     const [title, setTitle] = useState<string>('');
     const [description, setDesc] = useState<string>('');
     const [category, setCat] = useState<string>('');
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [deadlineVal, setDeadlineVal] = useState<string>('')
     const [subTaskEdit, setSubTaskEdit] = useState<string>('')
     const [subTaskIdx, setSubTaskIdx] = useState<number | null>(null)
@@ -401,7 +401,7 @@ const ViewTemplate = () => {
             const { data: existingGoals, error: fetchError } = await supabase
                 .from('goals')
                 .select('title')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .like('title', `${title}%`);
 
             if (fetchError) {
@@ -441,7 +441,7 @@ const ViewTemplate = () => {
                     category: category,
                     is_done: false,
                     created_at: Date.now(),
-                    userid: user?.uid,
+                    userid: user?.id,
                     deadline: deadlineVal,
                     description: description,
                     sub_tasks: fetchedData[0]?.sub_tasks,

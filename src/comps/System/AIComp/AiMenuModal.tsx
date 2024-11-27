@@ -30,7 +30,7 @@ interface AISidebarProps {
 }
 const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
     const [fetchedData, setFetchedData] = React.useState<ChatType[] | null>(null)
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
     useEffect(() => {
         if (user) {
@@ -87,7 +87,7 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
             const { data, error } = await supabaseTwo
                 .from('user_chats')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .order('created_at', { ascending: false })
             if (error) {
                 console.log(error)
@@ -120,7 +120,7 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
             const { data, error } = await supabase
                 .from('accounts')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
             if (error) {
                 console.log(error)
             } else {
@@ -222,7 +222,7 @@ const AiMenuModal: React.FC<AISidebarProps> = ({ location }) => {
 
                                 <div className='flex gap-2 mt-2 mb-2'>
                                     <div className='w-[30px] h-[30px] border-[1px] overflow-hidden rounded-full'>
-                                        <FetchPFP userUid={user?.uid} />
+                                        <FetchPFP userUid={user?.id} />
                                     </div>
                                     <div>
                                         <div className='font-bold reducedHeight'>

@@ -20,7 +20,7 @@ interface CategoryData {
 }
 
 const NotesAnalytics: React.FC = () => {
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
     const [fetchedData, setFetchedData] = useState<FetchedDataType[] | null>(null);
     const [categorizedData, setCategorizedData] = useState<CategoryData[]>([]);
 
@@ -35,7 +35,7 @@ const NotesAnalytics: React.FC = () => {
             const { data, error } = await supabase
                 .from("notes")
                 .select("*")
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
 
             if (error) {
                 console.error(error);

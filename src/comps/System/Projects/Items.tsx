@@ -112,7 +112,7 @@ const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to,
   const params = useParams()
   const [_, setFetchedData] = useState<boardsType[] | null>(null);
   const [defaulData, setDefaultData] = useState<dataType[] | null>(null);
-  const [user] = IsLoggedIn()
+  const [user]:any = IsLoggedIn()
 
 
   useEffect(() => {
@@ -195,9 +195,9 @@ const Items = ({ id, title, start_work, deadline, type, isAssigned, assigned_to,
           <div className='flex gap-3 '>
             {
 
-              (isAssigned && (defaulData && defaulData[0]?.is_shared != "public" || "private") || defaulData && defaulData[0]?.created_by === user?.uid) &&
+              (isAssigned && (defaulData && defaulData[0]?.is_shared != "public" || "private") || defaulData && defaulData[0]?.created_by === user?.id) &&
               // (defaulData && defaulData[0]?.is_shared === "public") ||
-              // (defaulData && defaulData[0]?.is_shared === "private" && defaulData[0]?.created_by === user?.uid)  &&
+              // (defaulData && defaulData[0]?.is_shared === "private" && defaulData[0]?.created_by === user?.id)  &&
 
 
               <button

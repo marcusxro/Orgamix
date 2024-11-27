@@ -232,7 +232,7 @@ const ArtificialIntelligence: React.FC = () => {
                 {
                     text: userPrompt, // User's prompt
                     type: "User",
-                    created_at: user?.uid
+                    created_at: user?.id
                 },
                 {
                     text, // AI's response
@@ -246,13 +246,13 @@ const ArtificialIntelligence: React.FC = () => {
                 .from('user_chats')
                 .insert([
                     {
-                        userid: user?.uid,
+                        userid: user?.id,
                         created_at: DateNow, // Same timestamp for both chats
                         chats: [
                             {
                                 text: userPrompt, // User's prompt
                                 type: "User",
-                                created_at: user?.uid
+                                created_at: user?.id
                             },
                             {
                                 text, // AI's response
@@ -298,7 +298,7 @@ const ArtificialIntelligence: React.FC = () => {
         setAIresponse((prevs) => [...prevs, {
             text: prompt,
             type: "User",
-            created_at: user?.uid
+            created_at: user?.id
         }]);
 
         const genAI = new GoogleGenerativeAI.GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
@@ -385,7 +385,7 @@ const ArtificialIntelligence: React.FC = () => {
 
 
 
-    const [user] = IsLoggedIn(); // Assuming you have an IsLoggedIn hook for fetching user info
+    const [user]:any = IsLoggedIn(); // Assuming you have an IsLoggedIn hook for fetching user info
 
     const [msgId, setMsgId] = useState<string | null>(null);
 
@@ -495,7 +495,7 @@ const ArtificialIntelligence: React.FC = () => {
             {
                 text: "Can you provide me with some analytics on my tasks?",
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -554,7 +554,7 @@ const ArtificialIntelligence: React.FC = () => {
             {
                 text: "Can you provide me with some analytics on my goals?",
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -613,7 +613,7 @@ const ArtificialIntelligence: React.FC = () => {
             {
                 text: "Can you provide me with some analytics on my projects?",
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -671,7 +671,7 @@ const ArtificialIntelligence: React.FC = () => {
             {
                 text: `can you generate me some ${params} idea?`,
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -730,7 +730,7 @@ const ArtificialIntelligence: React.FC = () => {
             {
                 text: `can you generate me some ${params} idea?`,
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -789,7 +789,7 @@ const ArtificialIntelligence: React.FC = () => {
             {
                 text: `can you generate me some ${params} idea?`,
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -853,7 +853,7 @@ const ArtificialIntelligence: React.FC = () => {
         const { data, error } = await supabase
             .from('tasks')
             .select('*')
-            .eq('userid', user.uid);
+            .eq('userid', user.id);
         if (error) console.error('Error fetching tasks:', error);
         return data;
     }
@@ -864,7 +864,7 @@ const ArtificialIntelligence: React.FC = () => {
         const { data, error } = await supabase
             .from('goals')
             .select('*')
-            .eq('userid', user.uid);
+            .eq('userid', user.id);
         if (error) console.error('Error fetching goals:', error);
         return data;
     }
@@ -874,7 +874,7 @@ const ArtificialIntelligence: React.FC = () => {
         const { data, error } = await supabase
             .from('projects')
             .select('*')
-            .eq('created_by', user.uid);
+            .eq('created_by', user.id);
         if (error) console.error('Error fetching projects:', error);
         return data;
     }

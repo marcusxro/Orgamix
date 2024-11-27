@@ -7,6 +7,7 @@ import { supabase } from '../../supabase/supabaseClient';
 import IsLoggedIn from '../../firebase/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
+import FetchPFP from '../FetchPFP';
 
 interface dataType {
   id: number;
@@ -23,7 +24,7 @@ const Notification: React.FC = () => {
   const [groupedData, setGroupedData] = useState<{ [key: string]: dataType[] }>({});
   const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
-  const [user] = IsLoggedIn();
+  const [user]:any = IsLoggedIn();
   const nav = useNavigate();
 
   const handleOutsideClick = () => {
@@ -81,7 +82,7 @@ const Notification: React.FC = () => {
       const { data, error } = await supabase
         .from('notification')
         .select('*')
-        .eq('uid', user?.uid)
+        .eq('uid', user?.id)
         .order('created_at', { ascending: false });
 
       if (data) {
@@ -175,8 +176,8 @@ const Notification: React.FC = () => {
             <div className='h-auto flex gap-2 justify-between p-3 border-b-[#535353] border-b-[1px]'>
               <div className='flex gap-2 justify-between w-full'>
                 <div className='flex gap-2 items-center'>
-                  <div className='w-[20px] h-[20px] overflow-hidden rounded-full'>
-                    <img className='w-full h-full object-cover' src={userNoProfile} alt="" />
+                  <div className='w-[20px] h-[20px] overflow-hidden rounded-full border'>
+                    <FetchPFP userUid={user?.id} />
                   </div>
                   <div>Notifications</div>
                 </div>

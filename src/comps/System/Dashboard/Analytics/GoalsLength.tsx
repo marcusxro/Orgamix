@@ -26,7 +26,7 @@ interface dataType {
 
 const GoalsLength:React.FC = () => {
     const [taskData, setTasksData] = useState<dataType[] | null>(null);
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
 
     useEffect(() => {
         if (user) {
@@ -44,7 +44,7 @@ const GoalsLength:React.FC = () => {
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
 
             if (data) {
                 setTasksData(data);

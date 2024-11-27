@@ -30,7 +30,7 @@ interface AISidebarProps {
 }
 
 const AISidebar: React.FC<AISidebarProps> = ({ location }) => {
-  const [user] = IsLoggedIn()
+  const [user]:any = IsLoggedIn()
   const [fetchedData, setFetchedData] = React.useState<ChatType[] | null>(null)
 
 
@@ -91,7 +91,7 @@ const AISidebar: React.FC<AISidebarProps> = ({ location }) => {
       const { data, error } = await supabaseTwo
         .from('user_chats')
         .select('*')
-        .eq('userid', user?.uid)
+        .eq('userid', user?.id)
         .order('created_at', { ascending: false })
       if (error) {
         console.log(error)

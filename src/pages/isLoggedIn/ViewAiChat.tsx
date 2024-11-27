@@ -154,7 +154,7 @@ const ViewAiChat: React.FC = () => {
     const [isShow, setIsShow] = useState<boolean>(false)
     const [isUserScrolling, setIsUserScrolling] = useState(false)
     const params = useParams();
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
     const [chatInfos, setChatInfos] = useState<any>([]);
 
@@ -250,7 +250,7 @@ const ViewAiChat: React.FC = () => {
             const { error } = await supabaseTwo
                 .from('user_chats')
                 .update({ chats: chatData })
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .eq('created_at', params.time);
 
             if (error) {
@@ -284,7 +284,7 @@ const ViewAiChat: React.FC = () => {
             {
                 text: "Can you provide me with some analytics on my tasks?",
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -343,7 +343,7 @@ const ViewAiChat: React.FC = () => {
             {
                 text: "Can you provide me with some analytics on my goals?",
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -402,7 +402,7 @@ const ViewAiChat: React.FC = () => {
             {
                 text: "Can you provide me with some analytics on my projects?",
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -460,7 +460,7 @@ const ViewAiChat: React.FC = () => {
             {
                 text: `can you generate me some ${params} idea?`,
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -519,7 +519,7 @@ const ViewAiChat: React.FC = () => {
             {
                 text: `can you generate me some ${params} idea?`,
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -578,7 +578,7 @@ const ViewAiChat: React.FC = () => {
             {
                 text: `can you generate me some ${params} idea?`,
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -642,7 +642,7 @@ const ViewAiChat: React.FC = () => {
         const { data, error } = await supabase
             .from('tasks')
             .select('*')
-            .eq('userid', user.uid);
+            .eq('userid', user.id);
         if (error) console.error('Error fetching tasks:', error);
         return data;
     }
@@ -653,7 +653,7 @@ const ViewAiChat: React.FC = () => {
         const { data, error } = await supabase
             .from('goals')
             .select('*')
-            .eq('userid', user.uid);
+            .eq('userid', user.id);
         if (error) console.error('Error fetching goals:', error);
         return data;
     }
@@ -663,7 +663,7 @@ const ViewAiChat: React.FC = () => {
         const { data, error } = await supabase
             .from('projects')
             .select('*')
-            .eq('created_by', user.uid);
+            .eq('created_by', user.id);
         if (error) console.error('Error fetching projects:', error);
         return data;
     }
@@ -693,7 +693,7 @@ const ViewAiChat: React.FC = () => {
             {
                 text: prompt,
                 type: "User",
-                created_at: user?.uid
+                created_at: user?.id
             }
         ];
 
@@ -893,7 +893,7 @@ const ViewAiChat: React.FC = () => {
                     <AIHeader />
                     <div
                         ref={chatContainerRef}
-                        className={`flex flex-col gap-5 mt-2 max-h-full max-w-[1200px] w-full mx-auto rounded-lg overflow-auto h-full bg-[#333] p-3 ${user?.uid === chatInfos?.userid && AIresponse != null && "pb-[3rem] mb-[5rem]"}  border-[1px] border-[#535353]`}>
+                        className={`flex flex-col gap-5 mt-2 max-h-full max-w-[1200px] w-full mx-auto rounded-lg overflow-auto h-full bg-[#333] p-3 ${user?.id === chatInfos?.userid && AIresponse != null && "pb-[3rem] mb-[5rem]"}  border-[1px] border-[#535353]`}>
                         {
                             AIresponse === null &&
                             <div className='flex items-center gap-2 justify-center h-full w-full p-2'>
@@ -1002,7 +1002,7 @@ const ViewAiChat: React.FC = () => {
                         }
 
                         {
-                            user?.uid === chatInfos?.userid && AIresponse != null &&
+                            user?.id === chatInfos?.userid && AIresponse != null &&
                             <div className='flex gap-2 flex-wrap mt-auto text-[12px]'>
                                 <div
                                     className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
@@ -1039,7 +1039,7 @@ const ViewAiChat: React.FC = () => {
                     </div>
 
                     {
-                        user?.uid === chatInfos?.userid && AIresponse != null &&
+                        user?.id === chatInfos?.userid && AIresponse != null &&
                         <div className=" w-full absolute bottom-0  left-0">
 
                             <div className='flex flex-row gap-2  max-w-[1200px] mx-auto relative'>

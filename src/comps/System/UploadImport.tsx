@@ -33,7 +33,7 @@ interface dataType {
 
 const UploadImport = () => {
     const { createdAt, setCreatedAt, setShowCreate } = useStore()
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [title, setTitle] = useState<string>('');
     const [description, setDesc] = useState<string>('');
@@ -113,7 +113,7 @@ const UploadImport = () => {
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .eq('created_at', createdAt)
 
             if (error) {
@@ -416,7 +416,7 @@ const UploadImport = () => {
                         created_at: Date.now(),
                         sub_tasks: updatedTasks,
                         habits: fetchedData[0]?.habits,
-                        authorUid: user?.uid,
+                        authorUid: user?.id,
                         userid: "",
                         download_count: 0,
                         deadline: ""

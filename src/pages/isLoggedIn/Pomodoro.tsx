@@ -43,7 +43,7 @@ const Pomodoro: React.FC = () => {
     const [selectedTab, setSelectedTab] = useState('Work');
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState(false);
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [timerLoading, setTimerLoading] = useState(false);
     const {isPaused, setIsPaused}: any = useStore();
 
@@ -171,7 +171,7 @@ const Pomodoro: React.FC = () => {
         const { data, error } = await supabase
             .from('tasks')
             .select('*')
-            .eq('userid', user.uid);
+            .eq('userid', user.id);
         if (error) console.error('Error fetching tasks:', error);
         return data;
     }
@@ -181,7 +181,7 @@ const Pomodoro: React.FC = () => {
         const { data, error } = await supabase
             .from('goals')
             .select('*')
-            .eq('userid', user.uid);
+            .eq('userid', user.id);
         if (error) console.error('Error fetching goals:', error);
         return data;
     }
@@ -191,7 +191,7 @@ const Pomodoro: React.FC = () => {
         const { data, error } = await supabase
             .from('notes')
             .select('*')
-            .eq('userid', user.uid);
+            .eq('userid', user.id);
         if (error) console.error('Error fetching goals:', error);
         return data;
     }
@@ -201,7 +201,7 @@ const Pomodoro: React.FC = () => {
         const { data, error } = await supabase
             .from('projects')
             .select('*')
-            .eq('created_by', user.uid);
+            .eq('created_by', user.id);
         if (error) console.error('Error fetching projects:', error);
         return data;
     }
@@ -294,7 +294,7 @@ const Pomodoro: React.FC = () => {
 
     const handleRealtimeEvent = (payload: any) => {
         if (!isFirstUser) return; // Only the first user should listen to the updates
-        const isCurrentUserProject = payload.new?.user_id === user?.uid || payload.old?.user_id === user?.uid;
+        const isCurrentUserProject = payload.new?.user_id === user?.id || payload.old?.user_id === user?.id;
         if (!isCurrentUserProject) return;
 
         switch (payload.eventType) {
@@ -339,7 +339,7 @@ const Pomodoro: React.FC = () => {
                         type: type,
                         updated_at: new Date().toISOString(),
                     })
-                    .eq('user_id', user?.uid);
+                    .eq('user_id', user?.id);
             } catch (error) {
                 console.error('Error updating timer state:', error);
             }
@@ -351,7 +351,7 @@ const Pomodoro: React.FC = () => {
             const { data, error } = await supabaseTwo
                 .from('timer')
                 .select('*')
-                .eq('user_id', user?.uid);
+                .eq('user_id', user?.id);
 
             if (error) {
                 console.error('Error fetching timer data:', error);
@@ -380,7 +380,7 @@ const Pomodoro: React.FC = () => {
             const { data: existingData, error: fetchError } = await supabaseTwo
                 .from('timer')
                 .select('*')
-                .eq('user_id', user?.uid);
+                .eq('user_id', user?.id);
 
             if (fetchError) {
                 console.error('Error fetching pomodoro data:', fetchError);
@@ -396,7 +396,7 @@ const Pomodoro: React.FC = () => {
                 .from('timer')
                 .insert([
                     {
-                        user_id: user?.uid,
+                        user_id: user?.id,
                         is_running: false,
                         created_at: Date.now(),
                         work_timer: 25,
@@ -418,7 +418,7 @@ const Pomodoro: React.FC = () => {
             const { data, error } = await supabaseTwo
                 .from('timer')
                 .select('*')
-                .eq('user_id', user?.uid);
+                .eq('user_id', user?.id);
 
             if (error) {
                 console.error('Error fetching timer data:', error);
@@ -471,7 +471,7 @@ const Pomodoro: React.FC = () => {
         } catch (err) {
             console.error('Error fetching timer state:', err);
         }
-    }, [user?.uid, timerLoading]);
+    }, [user?.id, timerLoading]);
 
 
     useEffect(() => {
@@ -626,7 +626,7 @@ const Pomodoro: React.FC = () => {
                     autoStart: isAutoStart || false,
                     autoCheck: isAuthChecked || false
                 })
-                .eq('user_id', user?.uid);
+                .eq('user_id', user?.id);
             if (error) {
                 console.log(error)
             } else {
@@ -685,7 +685,7 @@ const Pomodoro: React.FC = () => {
                 autoStart: false,
                 autoCheck: false
             })
-            .eq('user_id', user?.uid);
+            .eq('user_id', user?.id);
         if (error) {
             console.log(error)
         } else {
@@ -701,7 +701,7 @@ const Pomodoro: React.FC = () => {
             await supabaseTwo
                 .from('timer')
                 .update({ type })
-                .eq('user_id', user?.uid);
+                .eq('user_id', user?.id);
         } catch (error) {
             console.error('Error updating timer type:', error);
         }
@@ -772,7 +772,7 @@ const Pomodoro: React.FC = () => {
                     short_timer: shortTimerDuration,
                     long_timer: longTimerDuration
                 })
-                .eq('user_id', user.uid);
+                .eq('user_id', user.id);
             if (error) {
                 console.log(error)
                 setTimerLoading(false);

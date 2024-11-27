@@ -43,9 +43,8 @@ interface dataType {
 
 const ViewGoal: React.FC = () => {
     const nav = useNavigate()
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const params = useParams()
-
 
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [fetchedTasks, setFetchedTasks] = useState<subtaskType[] | null>(null);
@@ -87,10 +86,6 @@ const ViewGoal: React.FC = () => {
     const handleInputChange = (e: any) => {
         setNewSubTask(e.target.value);
     };
-
-
-
-
 
     const handleHabitInputChange = (e: any) => {
         setNewHabit(e.target.value);
@@ -207,7 +202,7 @@ const ViewGoal: React.FC = () => {
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
-                .eq('userid', params?.uid)
+                .eq('userid', params?.id)
                 .eq('created_at', params?.time)
 
             if (error) {
@@ -300,7 +295,7 @@ const ViewGoal: React.FC = () => {
                 .from('goals')  // Assuming your table is called 'goals'
                 .select('sub_tasks')
                 .eq('id', fetchedData && fetchedData[0]?.id)
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .single();
 
 
@@ -332,7 +327,7 @@ const ViewGoal: React.FC = () => {
                         is_done: allSubTasksDone // Update is_done based on sub-tasks
                     })
                     .eq('id', fetchedData && fetchedData[0]?.id)
-                    .eq('userid', user?.uid);
+                    .eq('userid', user?.id);
 
 
 
@@ -411,7 +406,7 @@ const ViewGoal: React.FC = () => {
                 .from('goals')  // Assuming your table is called 'goals'
                 .select('sub_tasks')
                 .eq('id', fetchedData && fetchedData[0]?.id)
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .single();
 
 
@@ -438,7 +433,7 @@ const ViewGoal: React.FC = () => {
                         sub_tasks: updatedSubTasks,
                     })
                     .eq('id', fetchedData && fetchedData[0]?.id)
-                    .eq('userid', user?.uid);
+                    .eq('userid', user?.id);
 
                 if (updateError) {
                     console.error('Update error:', updateError.message || updateError);
@@ -467,7 +462,7 @@ const ViewGoal: React.FC = () => {
                 .from('goals')
                 .select('habits')
                 .eq('id', fetchedData && fetchedData[0]?.id)
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .single();
 
             if (error) throw error;
@@ -492,7 +487,7 @@ const ViewGoal: React.FC = () => {
                         habits: updatedHabits, //save the changes
                     })
                     .eq('id', fetchedData && fetchedData[0]?.id)
-                    .eq('userid', user?.uid);
+                    .eq('userid', user?.id);
 
                 if (updateError) {
                     console.error('Update error:', updateError.message || updateError);
@@ -526,7 +521,7 @@ const ViewGoal: React.FC = () => {
                 .from('goals')  // Assuming your table is called 'goals'
                 .select('sub_tasks')
                 .eq('id', fetchedData && fetchedData[0]?.id)
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .single();
 
 
@@ -546,7 +541,7 @@ const ViewGoal: React.FC = () => {
                         sub_tasks: updatedSubTasks, // Update with the filtered array
                     })
                     .eq('id', fetchedData && fetchedData[0]?.id)
-                    .eq('userid', user?.uid);
+                    .eq('userid', user?.id);
 
                 if (updateError) {
                     console.error('Update error:', updateError.message || updateError);
@@ -577,7 +572,7 @@ const ViewGoal: React.FC = () => {
                 .from('goals')
                 .select('habits')
                 .eq('id', fetchedData && fetchedData[0]?.id)
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .single();
 
 
@@ -598,7 +593,7 @@ const ViewGoal: React.FC = () => {
                         habits: updatedHabits,
                     })
                     .eq('id', fetchedData && fetchedData[0]?.id)
-                    .eq('userid', user?.uid);
+                    .eq('userid', user?.id);
 
                 if (updateError) {
                     console.error('Update error:', updateError.message || updateError);
@@ -693,7 +688,7 @@ const ViewGoal: React.FC = () => {
                     description: editDescription,
                     deadline: editDate
                 })
-                .eq('userid', params?.uid)
+                .eq('userid', params?.id)
                 .eq('created_at', params?.time);
 
             if (error) {
@@ -751,9 +746,9 @@ const ViewGoal: React.FC = () => {
                     </div>
                 </div>
             </header>
-
+       
             {
-                user?.uid === params.uid && fetchedData != null ?
+                user?.id === params.id && fetchedData != null ?
                     (isFailed(fetchedData[0]?.deadline, fetchedData[0]?.is_done) === "Failed") ?
                         <div className='mt-3 mx-auto max-w-[1200px] p-3'>
                             <div className='flex flex-col gap-2'>

@@ -31,7 +31,7 @@ interface taskDataType {
 }
 
 const EditTask: React.FC<taskDataType> = ({ objPass }) => {
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
     const [title, setTitle] = useState(objPass?.title || '');
     const [Description, setDescription] = useState<string>(objPass?.description || '');
     const [deadline, setdeadline] = useState<string>(objPass?.deadline || '');
@@ -97,7 +97,7 @@ const EditTask: React.FC<taskDataType> = ({ objPass }) => {
             const { data: existingTasks, error: fetchError } = await supabase
                 .from('tasks')
                 .select('title')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .neq('id', objPass?.id);
 
             if (fetchError) {
@@ -139,7 +139,7 @@ const EditTask: React.FC<taskDataType> = ({ objPass }) => {
                     link: links // Save the entire array of links
                 })
                 .eq('id', objPass?.id)
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
 
             if (error) {
                 console.log('Error encountered, please try again later.');

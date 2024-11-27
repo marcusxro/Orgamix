@@ -53,7 +53,7 @@ const ReportGoal: React.FC<propsType> = ({ closer, contentObj }) => {
     const [description, setDescription] = useState<string>("")
     const [loading, setLoading] = useState<boolean>(false)
     const [isDoneReport, setIsDoneReport] = useState<boolean>(false)
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [isExiting, setIsExiting] = useState(false);
 
 
@@ -92,7 +92,7 @@ const ReportGoal: React.FC<propsType> = ({ closer, contentObj }) => {
                 category: selectedReason,
                 is_done: false,
                 created_at: Date.now(),
-                uid: user?.uid
+                uid: user?.id
             });
 
             if (error) {

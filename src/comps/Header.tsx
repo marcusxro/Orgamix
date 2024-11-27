@@ -7,7 +7,7 @@ import { HiOutlineMenuAlt4 } from "react-icons/hi"
 import useStore from '../Zustand/UseStore'
 
 const Header: React.FC = () => {
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const nav = useNavigate()
     const { showMenu, setShowMenu }: any = useStore()
     const [isVisible, setIsVisible] = useState(true)

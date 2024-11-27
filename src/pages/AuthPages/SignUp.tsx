@@ -79,54 +79,65 @@ const SignUp: React.FC = () => {
     }
 
 
+
     function createUserAccount(e: FormEvent) {
-        e.preventDefault()
+        e.preventDefault();
+
 
         if (!Username || !email || !password || !repPassword) {
-            return console.log("please fill up all inputs!")
+            return console.log("Please fill up all inputs!");
         }
 
         if (password !== repPassword) {
-            return console.log("Password fields are not matched!")
-        } else {
-            // 7 minimum characters
-            if (password.length <= 6 || password.length <= 6) {
-                return errorModal("Please make your password stronger!")
-            }
+            return console.log("Password fields do not match!");
+        }
+
+        if (password.length < 7) {
+            return errorModal("Please make your password stronger!");
         }
 
         if (isLoading) {
-            //prevent spam clicks
-            return
+            return; // Prevent duplicate requests
         }
-        setIsLoading(true)
-        console.log("clicked")
-        createUserWithEmailAndPassword(firebaseAuthKey, email, password)
-            .then((userCred) => {
-                sendEmailVerification(userCred.user)
-                const user = firebaseAuthKey.currentUser
-                if (user && !user.emailVerified) {
 
-                    createUser(user?.uid)
+        setIsLoading(true);
+    
 
-                }
+        // Sign up user with Supabase
+        supabase.auth
+            .signUp({
+                email: email,
+                password: password,
+            })
+            .then((response) => {
+                const user = response as any;
+                setIsLoading(false);
 
-
-            }).catch((err: any) => {
-                setIsLoading(false)
-
-                if (err === 'Email already in use') {
-                    return errorModal("Email is used!")
-                }
-
-                if (err.code === 'auth/email-already-in-use') {
-                    return errorModal("Email is used!")
-                }
-
-                if (err) {
-                    console.log(err)
+                if (user) {
+                    createUser(user.data.user.id);
+                    console.log("User signed up successfully:", user);
+                    notif("Account created! Please check your email for verification.");
                 }
             })
+            .catch((error: { message: string | string[] }) => {
+                setIsLoading(false);
+
+                if (error) {
+                    console.log(error);
+
+                    if (error.message.includes('For security purposes, you can only request')) {
+                        return errorModal("For security purposes, you can only request a new verification email every 5 minutes.");
+                    }
+                    if (error.message.includes("already registered") || error.message.includes("email already in use")) {
+                        return errorModal("Email is already in use!");
+                    }
+
+                    console.error("Signup error:", error.message);
+                    return errorModal("An error occurred. Please try again.");
+                }
+
+                errorModal("Something went wrong. Please try again later.");
+            });
     }
 
 
@@ -243,3 +254,23 @@ const SignUp: React.FC = () => {
 }
 
 export default SignUp
+function createUser(id: any) {
+    throw new Error('Function not implemented.')
+}
+
+function errorModal(arg0: string) {
+    throw new Error('Function not implemented.')
+}
+
+function setIsLoading(arg0: boolean) {
+    throw new Error('Function not implemented.')
+}
+
+function notif(arg0: string) {
+    throw new Error('Function not implemented.')
+}
+
+function setSeePass(arg0: (prevs: any) => boolean) {
+    throw new Error('Function not implemented.')
+}
+

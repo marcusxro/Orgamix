@@ -43,7 +43,7 @@ const DeleteGoal: React.FC<titleType> = ({ titleOfGoal, closer }) => {
                 .from('goals')
                 .delete()
                 .match({
-                    userid: params?.uid,
+                    userid: params?.id,
                     created_at: params?.time
                 });
 

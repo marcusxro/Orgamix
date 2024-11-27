@@ -50,7 +50,7 @@ const leftControl = <div className="text-2xl text-black"><FaArrowAltCircleLeft /
 const rightControl = <div className="text-2xl text-black"><FaArrowAltCircleRight /></div>
 
 const NotesData: React.FC = () => {
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [progress, setProgressNum] = React.useState(0);
 
     const [fetchedData, setFetchedData] = useState<fetchedDataType[] | null>(null)
@@ -65,7 +65,7 @@ const NotesData: React.FC = () => {
         try {
             const { data, error } = await supabase.from("notes")
                 .select("*")
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
 
             if (error) {
                 console.error(error)

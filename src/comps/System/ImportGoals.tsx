@@ -37,7 +37,7 @@ const ImportGoals: React.FC = () => {
     const [originalData, setoriginalData] = useState<dataType[] | null>(null);
     const [isEq, setIsEq] = useState<number | null>(null)
     const [searchVal, setSearchVal] = useState<string>("")
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
 
     function handleInput(params: string) {
@@ -77,7 +77,7 @@ const ImportGoals: React.FC = () => {
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
 
             if (error) {
                 console.log(error)

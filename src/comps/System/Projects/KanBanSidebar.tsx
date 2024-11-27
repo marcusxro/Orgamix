@@ -29,7 +29,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
     const { openKanbanChat, setOpenKanbanChat, setShowDrawer }: any = useStore()
     const params = useParams()
     const [chatArray, setChatArray] = useState<MessageType[] | null>(null)
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const { chatListener }: any = useStore()
 
 
@@ -87,25 +87,30 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
 
 
     async function getChatArray() {
+        console.log("Fetching chats for project:", params?.id);
         try {
+            // Query for the project, checking both the created_by and invited_emails
             const { data, error } = await supabase
                 .from('projects')
                 .select('chatarr')
-                .eq('created_at', params?.time)
-                .single();
-
+                .or(`created_by.eq.2280e045-fb4e-4443-b15e-738798a05f2f,invited_emails->>userid.eq.14520956-0ae2-4c52-8797-4eefbb5afc8e`)
+                .single();  // Use .single() if expecting exactly one row
+    
             if (error) {
-                console.log("Error fetching chats:", error);
+                console.error("Error fetching chats:", error);
                 return;
+            }
+    
+            if (data?.chatarr) {
+                setChatArray(data.chatarr);  // Set the chat array if data is valid
             } else {
-                if (data?.chatarr) {
-                    setChatArray(data.chatarr);
-                }
+                console.log("No chats found for this project.");
             }
         } catch (err) {
-            console.log("Error in getChatArray:", err);
+            console.error("Error in getChatArray:", err);
         }
     }
+    
 
 
 

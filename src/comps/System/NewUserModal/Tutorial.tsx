@@ -19,7 +19,7 @@ const rightControl = <div className="text-2xl text-[#888]"><FaArrowAltCircleRigh
 const Tutorial: React.FC = () => {
     const [progress, setProgressNum] = React.useState(0);
     const totalSlides = 5; // Adjust based on your carousel slides count
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [loading, setLoading] = React.useState(false);
     // Update progress based on the active slide index
     const handleSlideChange = (index: number) => {
@@ -38,7 +38,7 @@ const Tutorial: React.FC = () => {
             const { error } = await supabase
                 .from('accounts')
                 .update({ is_done: true })
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
 
             if (error) {
                 console.log(error)

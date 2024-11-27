@@ -15,7 +15,7 @@ interface dataType {
 }
 
 const NotifShow: React.FC = () => {
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
     const [notification, setNotifications] = useState<dataType[] | null>(null);
 
 
@@ -71,7 +71,7 @@ const NotifShow: React.FC = () => {
             const { data, error } = await supabase
                 .from('notification')
                 .select('*')
-                .eq('uid', user?.uid)
+                .eq('uid', user?.id)
                 .order('created_at', { ascending: false }) // Sort by latest notifications
                 .range(0, 20) // Limit to 20 notifications
 

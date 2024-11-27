@@ -20,7 +20,7 @@ interface AccType {
 }
 
 const SendDetails: React.FC = () => {
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [userName, setUserName] = useState("")
     const MAX_FILE_SIZE = 200 * 1024; // 200 KB
     const [isErrorPfp, setIsErrorPfp] = useState<string | null>(null)
@@ -43,13 +43,13 @@ const SendDetails: React.FC = () => {
         try {
             const { data, error } = await supabase.from('accounts')
                 .select('*')
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
                 setFetchedData(data);
 
-                setUserName(data?.[0]?.username || "")
+                setUserName(data?.[0]?.username || user?.user_metadata?.full_name || user?.email.split('@')[0])
                 if (data.length === 0) {
                     console.log("----------NO DATA----------")
                 }
@@ -118,7 +118,7 @@ const SendDetails: React.FC = () => {
                 maxWidthOrHeight: 300
             });
             // Use the user's UID for the path and a fixed name
-            const filePath = `images/${user.uid}/profile_picture.jpg`; // Fixed file name for the profile picture
+            const filePath = `images/${user.id}/profile_picture.jpg`; // Fixed file name for the profile picture
 
             // Remove the existing image (optional but recommended)
             await supabase.storage.from('profile').remove([filePath]);
@@ -153,6 +153,13 @@ const SendDetails: React.FC = () => {
     };
 
 
+    useEffect(() => {
+        if(user) {
+            setUserName(user?.email.split('@')[0])
+        }
+    }, [user])
+
+
     async function createUserForGoogle() {
         if (loading) return
 
@@ -166,14 +173,14 @@ const SendDetails: React.FC = () => {
             return
         }
         try {
-            if (user?.providerData[0]?.providerId !== 'google.com') {
+            if (user?.app_metadata?.provider !== 'google' || user?.app_metadata?.provider === 'discord' || user?.app_metadata?.provider === 'github') {
                 const { error } = await supabase
                     .from('accounts')
                     .update({
                         username: userName,
                         has_pfp: true,
                     })
-                    .eq('userid', user?.uid)
+                    .eq('userid', user?.id)
                 if (error) {
                     console.log(error)
                     setLoading(false)
@@ -184,13 +191,14 @@ const SendDetails: React.FC = () => {
                     setUserName("")
                 }
             } else {
-                if (user?.providerData[0]?.providerId != 'google.com') {
+                if (user?.app_metadata?.provider != 'google' || user?.app_metadata?.provider === 'discord' || user?.app_metadata?.provider === 'github') {
+          
                     setLoading(false)
-                    setIsErrorPfp("You are not signed in with Google")
+                    setIsErrorPfp("You are not signed in with provider")
                     return
                 }
                 const { error } = await supabase.from('accounts').insert({
-                    userid: user?.uid,
+                    userid: user?.id,
                     username: userName,
                     password: "GoogleProvider",
                     email: user?.email,

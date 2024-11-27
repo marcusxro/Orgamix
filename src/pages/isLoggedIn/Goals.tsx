@@ -47,7 +47,7 @@ const Goals: React.FC = () => {
     const [searchVal, setSearchVal] = useState<string>("")
     const [originalData, setOriginalData] = useState<dataType[] | null>(null); // To store unfiltered data
     const nav = useNavigate()
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
     const [isSort, setSort] = useState(false)
     const [sortVal, setSortVal] = useState<string | null>(null);
@@ -99,7 +99,7 @@ const Goals: React.FC = () => {
     }, [GoalListener, user, sortVal, localStorage, location, isSort])
 
     const handleRealtimeEvent = (payload: any) => {
-        const isCurrentUserProject = payload.new?.created_by === user?.uid || payload.old?.created_by === user?.uid;
+        const isCurrentUserProject = payload.new?.created_by === user?.id || payload.old?.created_by === user?.id;
         if (!isCurrentUserProject) return;
         switch (payload.eventType) {
             case 'INSERT':
@@ -165,7 +165,7 @@ const Goals: React.FC = () => {
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .order(columnName || "created_at", {
                     ascending: sortVal === "Completed" ? false : sortVal === "Failed" ? true : true,
                 });
@@ -409,7 +409,7 @@ const Goals: React.FC = () => {
                                                 exit={{ opacity: 0, y: 10 }}
                                                 transition={{ duration: 0.3 }}
                                                 onClick={() => {
-                                                    nav(`/user/goals/templates/${user?.uid}/${itm?.created_at}`)
+                                                    nav(`/user/goals/templates/${user?.id}/${itm?.created_at}`)
                                                 }}
                                                 key={idx}
                                                 className='w-full max-w-[300px] bg-[#313131] border-[#535353] border-[1px] cursor-pointer rounded-lg overflow-hidden hover:bg-[#222222]'>

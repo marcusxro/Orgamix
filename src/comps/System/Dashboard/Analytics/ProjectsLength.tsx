@@ -63,7 +63,7 @@ interface dataType {
 
 const ProjectsLength = () => {
     const [taskData, setTasksData] = useState<dataType[] | null>(null);
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
 
     useEffect(() => {
         if (user) {
@@ -82,7 +82,7 @@ const ProjectsLength = () => {
             const { data, error } = await supabase
                 .from('projects')
                 .select('*')
-                .eq('created_by', user?.uid)
+                .eq('created_by', user?.id)
 
             if (data) {
                 setTasksData(data);

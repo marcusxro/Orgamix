@@ -30,7 +30,7 @@ interface dataType {
 
 const System: React.FC = () => {
     const location = useLocation()
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const { showActivity, setShowActivity }: any = useStore();
 
@@ -43,7 +43,7 @@ const System: React.FC = () => {
         try {
             const { data, error } = await supabase.from('accounts')
                 .select('*')
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
             if (error) {
                 console.error('Error fetching data:', error);
             } else {

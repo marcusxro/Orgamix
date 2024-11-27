@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Menu: React.FC = () => {
     const { showMenu, setShowMenu }: any = useStore()
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const nav = useNavigate()
     return (
         <div className='h-[100dvh] block md:hidden py-4 overflow-auto bg-[#111] fixed top-0 left-0 w-full z-[5066262000] p-5'>
@@ -70,7 +70,7 @@ const Menu: React.FC = () => {
                     <div className='flex gap-5 justify-between'>
                         <div className='text-lg'>{user?.email}</div>
                         <div className='w-[30px] h-[30px] rounded-full overflow-hidden'>
-                            <FetchPFP userUid={user?.uid} />
+                            <FetchPFP userUid={user?.id} />
                         </div>
                     </div>
 

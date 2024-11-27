@@ -104,15 +104,12 @@ function Main() {
       const subscription = supabase
         .channel('public:accounts')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'accounts' }, (payload) => {
-
           handleRealtiveForAccounts(payload);
         })
         .subscribe();
-
       return () => {
         subscription.unsubscribe();
       };
-
     }
 
   }, [user, location.pathname, imageUrl]);
@@ -121,8 +118,6 @@ function Main() {
 
 
   const handleRealtiveForAccounts = (payload: any) => {
-    console.log('Received payload:', payload); // Check the payload structure
-
     switch (payload.eventType) {
       case 'INSERT':
         setFetchedData((prevData) =>
@@ -149,15 +144,11 @@ function Main() {
     }
   }
 
-
-
-
   const handleClick = (tetx: string, link: string) => {
     notifyUser(tetx, link);
   };
 
   const handleRealtimeEvent = (payload: any) => {
-
     setNotifications((prevNotifs) => {
       let updatedData = [...prevNotifs]; // Start with current notifications
       switch (payload.eventType) {
@@ -179,16 +170,17 @@ function Main() {
           console.warn('Unhandled event type:', payload.eventType);
           return prevNotifs;
       }
-
       return updatedData; // Return the updated notification list to setNotifications
     });
   };
+
+  
   async function getNotifs() {
     try {
       const { data, error } = await supabase
         .from('notification')
         .select('*')
-        .eq('uid', user?.uid)
+        .eq('uid', user?.id)
         .order('created_at', { ascending: false });
 
       if (data) {
@@ -209,7 +201,7 @@ function Main() {
     try {
       const { data, error } = await supabase.from('accounts')
         .select('*')
-        .eq('userid', user?.uid);
+        .eq('userid', user?.id);
       if (error) {
         console.error('Error fetching data:', error);
       } else {
@@ -231,7 +223,7 @@ function Main() {
       const { data: files, error: listError } = await supabase
         .storage
         .from('profile')
-        .list(`images/${user?.uid}`, { limit: 1, search: 'profile_picture.jpg' });
+        .list(`images/${user?.id}`, { limit: 1, search: 'profile_picture.jpg' });
 
       if (listError || !files || files.length === 0) {
         console.log('Profile picture not found.');
@@ -241,7 +233,7 @@ function Main() {
         const { data: publicData, error: urlError }: any = supabase
           .storage
           .from('profile')
-          .getPublicUrl(`images/${user?.uid}/profile_picture.jpg`);
+          .getPublicUrl(`images/${user?.id}/profile_picture.jpg`);
 
         if (urlError) {
           console.error('Error getting public URL:', urlError.message);
@@ -287,12 +279,12 @@ function Main() {
         <Route path='/user/dashboard' element={<System />} />
         <Route path='/user/tasks' element={<Tasks />} />
         <Route path='/user/notes' element={<Notes />} />
-        <Route path='/user/notes/:uid/:time' element={<VisitNote />} />
+        <Route path='/user/notes/:id/:time' element={<VisitNote />} />
         <Route path='/user/goals' element={<Goals />} />
         <Route path='/user/goals/templates' element={<GoalTemplates />} />
-        <Route path='/user/goals/templates/:uid/:time' element={<ViewGoal />} />
+        <Route path='/user/goals/templates/:id/:time' element={<ViewGoal />} />
         <Route path='/user/projects' element={<Projects />} />
-        <Route path='/user/projects/view/:uid/:time' element={<Samp />} />
+        <Route path='/user/projects/view/:id/:time' element={<Samp />} />
         <Route path='/user/calendar' element={<CalendarPage />} />
         <Route path='/user/ask-orgamix' element={<ArtificialIntelligence />} />
         <Route path='/user/ask-orgamix/:time' element={<ViewAiChat />} />

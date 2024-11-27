@@ -65,7 +65,7 @@ const GoalTemplates: React.FC = () => {
     const [goalToReport, setGoalToReport] = useState<any>(null);
 
 
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
     useEffect(() => {
         if (user) {
@@ -234,7 +234,7 @@ const GoalTemplates: React.FC = () => {
                 <div className='flex items-center h-auto pb-2 justify-between w-full max-w-[1200px] mx-auto'>
                     <div className='flex gap-3 items-center'>
                         <div className='w-[35px] bg-[#111] flex items-center justify-center border-[1px] h-[35px] rounded-full overflow-hidden'>
-                            <FetchPFP userUid={user?.uid} />
+                            <FetchPFP userUid={user?.id} />
                         </div>
                         <div
                             onClick={() => { nav(-1) }}
@@ -388,7 +388,7 @@ const GoalTemplates: React.FC = () => {
                                                                     }}
                                                                     className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Report</div>
 
-                                                                {itm?.authorUid === user?.uid &&
+                                                                {itm?.authorUid === user?.id &&
                                                                     <div
                                                                         onClick={() => { setIsDelete(idx) }}
                                                                         className='px-2 py-1 border-b-[#535353] border-b-[1px] hover:bg-[#222222]'>Delete</div>}
@@ -398,7 +398,7 @@ const GoalTemplates: React.FC = () => {
                                                             </div>)
                                                         }
                                                         {
-                                                            isDelete === idx && itm?.authorUid === user?.uid && viewEllip === idx &&
+                                                            isDelete === idx && itm?.authorUid === user?.id && viewEllip === idx &&
                                                             (<div
                                                                 onClick={(e) => { e.stopPropagation() }}
                                                                 className=' bg-[#111111] border-[#535353] border-[1px] flex flex-col toRight overflow-hidden rounded-md'>

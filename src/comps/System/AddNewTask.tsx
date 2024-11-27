@@ -17,7 +17,7 @@ interface propsPurpose {
 
 const AddNewTask: React.FC<propsPurpose> = ({ purpose }) => {
 
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [title, setTitle] = useState<string>('')
     const [Description, setDescription] = useState<string>('')
 
@@ -88,7 +88,7 @@ const AddNewTask: React.FC<propsPurpose> = ({ purpose }) => {
             const { data: existingTasks, error: fetchError } = await supabase
                 .from('tasks')
                 .select('title')
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
 
             if (fetchError) {
                 console.log(fetchError);
@@ -128,7 +128,7 @@ const AddNewTask: React.FC<propsPurpose> = ({ purpose }) => {
                 priority: priority,
                 category: category,
                 repeat: repeat,
-                userid: user?.uid,
+                userid: user?.id,
                 isdone: false,
                 createdAt: Date.now(),
                 link: links

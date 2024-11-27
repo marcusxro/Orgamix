@@ -93,7 +93,7 @@ const ProjectSettings:React.FC = () => {
         }
     }, [fetchedData, isEdit])
 
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
     const handleOutsideClick = () => {
         setIsExiting(true);
@@ -332,7 +332,7 @@ const ProjectSettings:React.FC = () => {
             {
                 !isExiting &&       (fetchedData && fetchedData.length > 0 && (
                     (fetchedData[0]?.is_shared !== "private") ||
-                    (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid))) &&
+                    (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.id))) &&
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1, transition: { duration: 0.2 } }}
@@ -397,8 +397,8 @@ const ProjectSettings:React.FC = () => {
 
                                                             :
                                                             <div
-                                                            onClick={() => {(!loading && fetchedData && fetchedData[0]?.created_by === user?.uid )&& setIsEdit(prevs => !prevs) }}
-                                                             className={`${isEdit && "text-green-500"} ${fetchedData && fetchedData[0]?.created_by === user?.uid && "cursor-pointer"}  cursor-not-allowed bg-[#222] border-[#535353] border-[1px]  p-2 text-2xl rounded-lg`}>
+                                                            onClick={() => {(!loading && fetchedData && fetchedData[0]?.created_by === user?.id )&& setIsEdit(prevs => !prevs) }}
+                                                             className={`${isEdit && "text-green-500"} ${fetchedData && fetchedData[0]?.created_by === user?.id && "cursor-pointer"}  cursor-not-allowed bg-[#222] border-[#535353] border-[1px]  p-2 text-2xl rounded-lg`}>
                                                                 <CiEdit />
                                                             </div>
 
@@ -434,8 +434,8 @@ const ProjectSettings:React.FC = () => {
 
                                             <div className='mt-5 text-sm text-[#888] flex items-start justify-between  gap-2'>
                                                 <div
-                                                    onClick={() => {fetchedData && fetchedData[0]?.created_by === user?.uid && setAsFav()}}
-                                                    className={`${fetchedData && fetchedData[0]?.created_by === user?.uid ? "cursor-pointer" : "cursor-not-allowed"}  flex items-center gap-2 w-auto bg-[#222] p-2 rounded-lg`}>
+                                                    onClick={() => {fetchedData && fetchedData[0]?.created_by === user?.id && setAsFav()}}
+                                                    className={`${fetchedData && fetchedData[0]?.created_by === user?.id ? "cursor-pointer" : "cursor-not-allowed"}  flex items-center gap-2 w-auto bg-[#222] p-2 rounded-lg`}>
                                                     Favorite
                                                     <div className='text-2xl'>
                                                         {
@@ -478,10 +478,10 @@ const ProjectSettings:React.FC = () => {
                                                 </div>
                                                 <input
                                                     value={isEq}
-                                                    onChange={(e) => { fetchedData && fetchedData[0]?.created_by === user?.uid &&  setIsEq(e.target.value) }}
+                                                    onChange={(e) => { fetchedData && fetchedData[0]?.created_by === user?.id &&  setIsEq(e.target.value) }}
                                                     placeholder='Confirm the text above'
                                                     type="text"
-                                                    readOnly={(!isEdit && (fetchedData && fetchedData[0]?.created_by === user?.uid)) ? false : true}
+                                                    readOnly={(!isEdit && (fetchedData && fetchedData[0]?.created_by === user?.id)) ? false : true}
                                                     className="mt-2 bg-[#111] border-[#535353] border-[1px]  outline-none p-3 rounded-lg w-full"
                                                 />
                                                 <div

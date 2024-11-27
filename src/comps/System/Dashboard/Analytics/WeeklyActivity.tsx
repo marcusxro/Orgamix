@@ -6,7 +6,7 @@ import { BarChart, Bar, Tooltip, XAxis, ResponsiveContainer } from 'recharts';
 import AnalyticsLoader from './Loader/AnalyticsLoader';
 
 const WeeklyActivity: React.FC = () => {
-  const [user] = IsLoggedIn();
+  const [user]:any = IsLoggedIn();
   const [isLoaded, setIsLoaded] = useState(false);
   interface WeeklyData {
     day: string;
@@ -80,7 +80,7 @@ const WeeklyActivity: React.FC = () => {
 
   async function fetchUserTasks() {
     if (!user) return null;
-    const { data, error } = await supabase.from('tasks').select('*').eq('userid', user.uid);
+    const { data, error } = await supabase.from('tasks').select('*').eq('userid', user.id);
     if (error) console.error('Error fetching tasks:', error);
     return data;
   }
@@ -88,21 +88,21 @@ const WeeklyActivity: React.FC = () => {
 
   async function fetchUserNotes() {
     if (!user) return null;
-    const { data, error } = await supabase.from('notes').select('*').eq('userid', user.uid);
+    const { data, error } = await supabase.from('notes').select('*').eq('userid', user.id);
     if (error) console.error('Error fetching tasks:', error);
     return data;
   }
 
   async function fetchUserGoals() {
     if (!user) return null;
-    const { data, error } = await supabase.from('goals').select('*').eq('userid', user.uid);
+    const { data, error } = await supabase.from('goals').select('*').eq('userid', user.id);
     if (error) console.error('Error fetching goals:', error);
     return data;
   }
 
   async function fetchUserProjects() {
     if (!user) return null;
-    const { data, error } = await supabase.from('projects').select('*').eq('created_by', user.uid);
+    const { data, error } = await supabase.from('projects').select('*').eq('created_by', user.id);
     if (error) console.error('Error fetching projects:', error);
     return data;
   }

@@ -1,7 +1,5 @@
 import React, { FormEvent, useEffect, useState } from 'react'
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import { firebaseAuthKey } from '../../firebase/FirebaseKey'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEye } from "react-icons/fa";
@@ -11,42 +9,22 @@ import useStore from '../../Zustand/UseStore';
 import Menu from '../../comps/Menu';
 import { motion } from 'framer-motion'
 import { FaGoogle } from "react-icons/fa";
-
-import { provider } from '../../firebase/FirebaseKey';
+import { FaDiscord } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 import Loader from '../../comps/Loader';
 import IsLoggedIn from '../../firebase/IsLoggedIn';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
+import { supabase } from '../../supabase/supabaseClient';
 
 const SignIn: React.FC = () => {
 
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
-    const [user] = IsLoggedIn()
+    const [user]: any = IsLoggedIn()
     const [loading, setLoading] = useState(false)
     const [isLoad, setIsLoad] = useState(false)
-    
-    async function handleGoogleSignIn() {
-        if (loading) return; // Prevent multiple calls if already loading
-        setIsLoad(true);
-    
-        try {
-            const result = await signInWithPopup(firebaseAuthKey, provider);
-            const user = result.user;
-          
-            // Additional actions, like saving user info, can be done here
-    
-        } catch (err: any) {
-            console.log(err);
-            if (err.code === 'auth/popup-closed-by-user') {
-                setIsLoad(false); // Reset loading state if user closes the popup
-            } else {
-                console.error("Error during sign-in:", err);
-            }
-        } finally {
-            setIsLoad(false); // Reset loading state regardless of success or error
-        }
-    }
-    
+
+
 
     const nav = useNavigate()
 
@@ -73,49 +51,105 @@ const SignIn: React.FC = () => {
     }
 
 
-    function signIn(e: FormEvent) {
+
+    const OAuthProviders = ["google", "discord", "github"]
+
+
+
+    const handleProviderSignIn = async (provider: any) => {
+        if (isLoad) return; // Prevent multiple simultaneous requests
+        setIsLoad(true); // Set loading state
+
+        if (provider) {
+            // Ensure valid provider
+            if (!OAuthProviders.includes(provider)) {
+                console.error("Invalid provider:", provider);
+                setIsLoad(false);
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: provider,
+                    options: {
+                        redirectTo: `${window.location.origin}/user/dashboard`,
+                    }
+                });
+
+
+                if (error) {
+                    console.error(`Error during ${provider} sign-in:`, error.message);
+                    setIsLoad(false);
+                    return;
+                }
+
+
+
+                console.log(`${provider} sign-in successful:`, data);
+
+                // Set loading state to false after the sign-in process completes
+                setIsLoad(false);
+
+                // Redirect to the success URL (handled by Supabase after sign-in)
+
+
+            } catch (err) {
+                console.error("Unexpected error during sign-in:", err);
+                setIsLoad(false); // Reset loading state on error
+            }
+        }
+    };
+
+
+    async function signIn(e: FormEvent) {
+        console.log("signing in")
         e.preventDefault()
+
+
         setLoading(true)
         if (loading) {
             return
         }
+
+        console.log("signing in")
         if (!email || !password) {
             setLoading(false)
             return errorNotif("Please type something!")
 
         }
 
-        signInWithEmailAndPassword(firebaseAuthKey, email, password)
-            .then((res) => {
-                const user = res.user
-                const isVerified = res.user.emailVerified
 
-                if (!isVerified) {
-                    setLoading(false)
-                    errorNotif("Please verify your email first!")
-                } else {
-                    window.location.reload()
-                   
-                    setLoading(false)
-                    nav('/user/dashboard')
-                }
+        try {
+            const { data: session, error: signInError }: any = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
 
-            }).catch((err) => {
-                console.log(err)
+            if (signInError) throw signInError;
+            const user = session?.user;
+
+            if (user?.email_confirmed_at === null) {
                 setLoading(false)
-                if (err.code === 'auth/user-not-found') {
-                    errorNotif("user not found!")
-                }
-                if (err.code === 'auth/wrong-password, please try again') {
-                    errorNotif("wrong password!")
-                }
-                if (err.code === 'auth/too-many-requests') {
-                    errorNotif("Too many requests!!")
-                }
-                if (err.code === 'auth/invalid-credential') {
-                    errorNotif("Invalid user details!")
-                }
-            })
+                return errorNotif("Please verify your email first!")
+            } else {
+
+                setLoading(false)
+                nav('/user/dashboard')
+
+            }
+
+        }
+        catch (err: any) {
+            console.log(err)
+            if (err.status === 400) {
+                errorNotif('Invalid login credentials')
+            } else if (err.status === 404) {
+                errorNotif('User not found')
+            } else {
+                errorNotif('An unexpected error occurred')
+            }
+            setLoading(false)
+        }
     }
 
     const [isSee, setIsSee] = useState<boolean>(false)
@@ -147,6 +181,10 @@ const SignIn: React.FC = () => {
                 className='w-full flex z-[12] flex-col gap-2 max-w-[400px] p-3 rounded-lg bg-[#2e2e2e] border-[1px] border-[#414141]'
                 action="submit">
                 <div className='w-full text-center'>Please sign in with Orgamix your account</div>
+
+
+
+
                 <input
                     value={email}
                     onChange={(e) => {
@@ -205,29 +243,64 @@ const SignIn: React.FC = () => {
                     </div>
                 </div>
 
-                <div
-                    onClick={() => {!isLoad && handleGoogleSignIn()}}
-                    className='bg-[#242424] py-2 rounded-md selectionNone cursor-pointer  border-[1px] border-[#414141] mt-1 hover:bg-[#414141] flex gap-2 items-center justify-center'>
 
-                    {
-                        isLoad ?
-                            <div className='w-[20px] h-[20px]'>
-                                <Loader />
-                            </div>
+                <div className='w-full flex gap-2 mt-2'>
 
-                            :
-                            <>
-                                <span className='text-md text-orange-500'>  <FaGoogle /></span> Sign in with Google
-                            </>
-                    }
+                    <div
+                        className='bg-[#242424] py-2 rounded-md selectionNone w-full cursor-pointer  border-[1px] border-[#414141] mt-1 hover:bg-[#414141] flex gap-2 items-center justify-center'
+                        onClick={() => { handleProviderSignIn("google") }}>
 
+                        {
+                            isLoad ?
+                                <div className='w-[20px] h-[20px]'>
+                                    <Loader />
+                                </div>
+
+                                :
+                                <>
+                                    <span className='text-md text-orange-500'>  <FaGoogle /></span>  Google
+                                </>
+                        }
+                    </div>
+
+                    <div
+                        className='bg-[#242424] py-2 rounded-md selectionNone w-full cursor-pointer  border-[1px] border-[#414141] mt-1 hover:bg-[#414141] flex gap-2 items-center justify-center'
+                        onClick={() => { handleProviderSignIn("discord") }}>
+
+                        {
+                            isLoad ?
+                                <div className='w-[20px] h-[20px]'>
+                                    <Loader />
+                                </div>
+
+                                :
+                                <>
+                                    <span className='text-md text-black-500'>  <FaDiscord /></span>  Discord
+                                </>
+                        }
+                    </div>
+                    <div
+                        className='bg-[#242424] py-2 rounded-md selectionNone w-full cursor-pointer  border-[1px] border-[#414141] mt-1 hover:bg-[#414141] flex gap-2 items-center justify-center'
+                        onClick={() => { handleProviderSignIn("github") }}>
+
+                        {
+                            isLoad ?
+                                <div className='w-[20px] h-[20px]'>
+                                    <Loader />
+                                </div>
+
+                                :
+                                <>
+                                    <span className='text-md text-gray-500'>  <FaGithub /></span>  GitHub
+                                </>
+                        }
+                    </div>
                 </div>
-
                 <button
                     onClick={() => {
                         nav('/sign-up')
                     }}
-                    className='bg-[#242424] py-2 rounded-md selectionNone border-[1px] border-[#414141] mt-1 hover:bg-[#414141]'>Sign up </button>
+                    className='bg-[#242424] mt-5 py-2 rounded-md selectionNone border-[1px] border-[#414141]  hover:bg-[#414141]'>Sign up </button>
             </motion.form>
         </div>
     )

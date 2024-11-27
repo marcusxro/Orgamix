@@ -42,7 +42,7 @@ interface AddNoteProps {
 
 const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
     const [isExiting, setIsExiting] = useState(false);
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
     const [value, setValue] = useState<string>('');
     const [title, setTitle] = useState<string>('');
@@ -77,7 +77,7 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
             const { data: existingNotes, error: fetchError } = await supabase
                 .from("notes")
                 .select("title")
-                .eq("userid", user?.uid)
+                .eq("userid", user?.id)
                 .like("title", `${title}%`);
 
             if (fetchError) {
@@ -113,7 +113,7 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
                 title: newTitle,
                 notes: value,
                 category: category,
-                userid: user?.uid,
+                userid: user?.id,
                 createdat: Date.now(),
             });
 

@@ -136,7 +136,7 @@ export default function Samp() {
     const params = useParams()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [colorVal, setColorVal] = useState<string>("")
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const { loading, setLoading }: any = useStore()
     const { settingsTask, settingsBoard, viewNotifs, showDrawer }: any = useStore()
     const { inviteToProject, setInviteToProject }: any = useStore()
@@ -229,7 +229,7 @@ export default function Samp() {
             const { error } = await supabase
                 .from('accounts')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
 
             if (error) {
                 return console.error('Error fetching data:', error);
@@ -266,7 +266,7 @@ export default function Samp() {
                 titleColor: colorVal,
                 created_at: Date.now(),
                 board_uid: id,
-                created_by: user?.uid,
+                created_by: user?.id,
                 tasks: []
             };
             // Fetch the existing project where boards need to be added
@@ -355,7 +355,7 @@ export default function Samp() {
             const newTask: tasksType = {
                 title: finalTitle, // Use the title with the new index
                 created_at: Date.now(),
-                created_by: user?.uid || "",
+                created_by: user?.id || "",
                 priority: priority,
                 type: workType,
                 start_work: workStart,
@@ -717,7 +717,7 @@ export default function Samp() {
             const { error } = await supabase
                 .from('projects')
                 .update({ boards: updatedContainers })
-                // .eq('created_by', user?.uid)
+                // .eq('created_by', user?.id)
                 .eq('created_at', params?.time);
 
             if (error) {
@@ -850,39 +850,39 @@ export default function Samp() {
             }
             {
                 (fetchedData && fetchedData.length > 0 && (
-                    fetchedData[0]?.created_by === user?.uid ||
+                    fetchedData[0]?.created_by === user?.id ||
                     (fetchedData[0].is_shared !== "private" && fetchedData[0].is_shared === "public") ||
-                    (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.uid) ||
+                    (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.id) ||
                     (fetchedData[0].is_shared === "shareable" &&
-                        ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.uid) ||
+                        ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.id) ||
                             (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) &&
                 showDrawer &&
-                <Draw roomId={params?.uid + "-" + params?.time} />
+                <Draw roomId={params?.id + "-" + params?.time} />
             }
             {
                 //closes the modal if its in private, and not included in shareable invited_emails
                 (fetchedData && fetchedData.length > 0 && (
-                    fetchedData[0]?.created_by === user?.uid ||
+                    fetchedData[0]?.created_by === user?.id ||
                     (fetchedData[0]?.is_shared !== "private" && fetchedData[0]?.is_shared === "public") ||
-                    (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid) ||
+                    (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.id) ||
                     (fetchedData[0]?.is_shared === "shareable" &&
-                        ((fetchedData[0]?.invited_emails === null && fetchedData[0]?.created_by === user?.uid) ||
+                        ((fetchedData[0]?.invited_emails === null && fetchedData[0]?.created_by === user?.id) ||
                             (fetchedData[0]?.invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) && settingsTask != null && settingsTask != null &&
                 <EditTaskProject isAllowed={(findTaskAssignee((settingsTask.toString())) === user?.email ? true : false) ||
                     (findTaskAssignee((settingsTask.toString())) === "Everyone" && true) ||
-                    (fetchedData && fetchedData[0]?.created_by === user?.uid ? true : false)
+                    (fetchedData && fetchedData[0]?.created_by === user?.id ? true : false)
                 } />
 
             }
             {
                 (fetchedData && fetchedData.length > 0 && (
-                    fetchedData[0]?.created_by === user?.uid ||
+                    fetchedData[0]?.created_by === user?.id ||
                     (fetchedData[0]?.is_shared !== "private" && fetchedData[0]?.is_shared === "public") ||
-                    (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid) ||
+                    (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.id) ||
                     (fetchedData[0]?.is_shared === "shareable" &&
-                        ((fetchedData[0]?.invited_emails === null && fetchedData[0]?.created_by === user?.uid) ||
+                        ((fetchedData[0]?.invited_emails === null && fetchedData[0]?.created_by === user?.id) ||
                             (fetchedData[0]?.invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) &&
 
@@ -896,11 +896,11 @@ export default function Samp() {
             }
             {
                 (fetchedData && fetchedData.length > 0 && (
-                    fetchedData[0]?.created_by === user?.uid ||
+                    fetchedData[0]?.created_by === user?.id ||
                     (fetchedData[0].is_shared !== "private" && fetchedData[0].is_shared === "public") ||
-                    (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.uid) ||
+                    (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.id) ||
                     (fetchedData[0].is_shared === "shareable" &&
-                        ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.uid) ||
+                        ((fetchedData[0].invited_emails === null && fetchedData[0].created_by === user?.id) ||
                             (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) &&
                 openKanbanSettings &&
@@ -908,12 +908,12 @@ export default function Samp() {
             }
             {
                 (fetchedData && fetchedData.length > 0 && (
-                    fetchedData[0]?.created_by === user?.uid ||
+                    fetchedData[0]?.created_by === user?.id ||
                     (fetchedData[0].is_shared !== "private" && fetchedData[0].is_shared === "public") ||
-                    (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.uid) ||
+                    (fetchedData[0].is_shared === "private" && fetchedData[0].created_by === user?.id) ||
 
                     (fetchedData[0].is_shared === "shareable" &&
-                        ((fetchedData[0].invited_emails === null && fetchedData[0]?.created_by === user?.uid) ||
+                        ((fetchedData[0].invited_emails === null && fetchedData[0]?.created_by === user?.id) ||
                             (fetchedData[0].invited_emails?.some((itm: invitedEmails) => itm.email === user?.email) || false)))
                 )) &&
                 openKanbanChat &&
@@ -928,7 +928,7 @@ export default function Samp() {
                 {
                     fetchedData && fetchedData.length > 0 && (
                         (fetchedData[0]?.is_shared !== "private") ||
-                        (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid)) &&
+                        (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.id)) &&
                     <Modal
                         purpose='modal'
                         showModal={showAddContainerModal}
@@ -974,7 +974,7 @@ export default function Samp() {
                 {
                     fetchedData && fetchedData.length > 0 && (
                         (fetchedData[0]?.is_shared !== "private") ||
-                        (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.uid)) &&
+                        (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.id)) &&
 
                     <Modal showModal={showAddItemModal} setShowModal={setShowAddItemModal} purpose='task'>
                         <div className="flex flex-col w-full items-start gap-y-4 justify-between h-full overflow-auto">
@@ -1210,7 +1210,7 @@ export default function Samp() {
                         </Button>
 
                         {
-                            fetchedData && fetchedData[0]?.created_by === user?.uid &&
+                            fetchedData && fetchedData[0]?.created_by === user?.id &&
                             <Button
                                 variant={"addBoard"}
                                 onClick={() => { { setInviteToProject(true) } }}>
@@ -1223,10 +1223,10 @@ export default function Samp() {
 
 
                 {
-                    user?.uid && fetchedData !== null
+                    user?.id && fetchedData !== null
                         ? (
                             // Check if the user has access to the project
-                            (fetchedData[0]?.created_by === user?.uid ||
+                            (fetchedData[0]?.created_by === user?.id ||
                                 fetchedData[0]?.is_shared === "public" ||
                                 (fetchedData[0]?.is_shared === "shareable" &&
                                     fetchedData[0]?.invited_emails?.some((itm) => itm?.email === user?.email)))

@@ -51,7 +51,7 @@ interface fetchedDataType {
 
 
 const VisitNote = () => {
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const params = useParams()
     const [fetchedData, setFetchedData] = useState<fetchedDataType[] | null>(null)
     const [title, setTitle] = useState<string>('');
@@ -130,7 +130,7 @@ const VisitNote = () => {
         try {
             const { data, error } = await supabase.from("notes")
                 .select("*")
-                .eq('userid', params?.uid)
+                .eq('userid', params?.id)
                 .eq('createdat', params?.time)
 
             if (error) {
@@ -167,7 +167,7 @@ const VisitNote = () => {
                 .update({
                     notes: value,
                 })
-                .eq('userid', params?.uid)
+                .eq('userid', params?.id)
                 .eq('createdat', params?.time);
 
             if (error) {
@@ -196,7 +196,7 @@ const VisitNote = () => {
             const { data: existingNotes, error: fetchError } = await supabase
                 .from("notes")
                 .select("title, createdat")
-                .eq("userid", params?.uid)
+                .eq("userid", params?.id)
                 .like("title", `${title}%`);
 
             if (fetchError) {
@@ -232,7 +232,7 @@ const VisitNote = () => {
                 .update({
                     title: newTitle,
                 })
-                .eq('userid', params?.uid)
+                .eq('userid', params?.id)
                 .eq('createdat', params?.time);
 
             if (error) {
@@ -276,9 +276,9 @@ const VisitNote = () => {
                         fetchedData[0]?.sharedEmails?.some((itm: any) => itm?.email === user?.email)) ||
 
 
-                        fetchedData[0]?.userid === user?.uid ||
+                        fetchedData[0]?.userid === user?.id ||
                         fetchedData[0]?.share === "Only me" &&
-                        fetchedData[0]?.userid === user?.uid ||
+                        fetchedData[0]?.userid === user?.id ||
                         fetchedData[0]?.share === "Everyone" ? (
                         <>
                             <div className='flex gap-2 justify-between overflow-auto'>
@@ -334,7 +334,7 @@ const VisitNote = () => {
                                 </div>
                                 {
                                     fetchedData &&
-                                    fetchedData[0]?.userid === user?.uid &&
+                                    fetchedData[0]?.userid === user?.id &&
                                     <div
                                         onClick={() => { setIsShare(true); }}
                                         className='p-3 px-4 cursor-pointer hover:bg-[#222] flex items-center justify-center rounded-lg bg-[#111111] outline-none border-[#535353] border-[1px]'>

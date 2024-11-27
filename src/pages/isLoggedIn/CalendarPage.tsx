@@ -12,7 +12,7 @@ import Confetti from 'react-confetti'
 import Loader from '../../comps/Loader';
 
 const CalendarPage: React.FC = () => {
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
     const [events, setEvents] = useState<any>([]);
     const [currentWeekStart, setCurrentWeekStart] = useState<Date>(startOfWeek(new Date()));
     const endOfWeek = addDays(currentWeekStart, 6);
@@ -95,7 +95,7 @@ const CalendarPage: React.FC = () => {
         const { data, error } = await supabase
             .from('tasks')
             .select('*')
-            .eq('userid', user.uid);
+            .eq('userid', user.id);
         if (error) console.error('Error fetching tasks:', error);
         return data;
     }
@@ -105,7 +105,7 @@ const CalendarPage: React.FC = () => {
         const { data, error } = await supabase
             .from('goals')
             .select('*')
-            .eq('userid', user.uid);
+            .eq('userid', user.id);
         if (error) console.error('Error fetching goals:', error);
         return data;
     }
@@ -115,7 +115,7 @@ const CalendarPage: React.FC = () => {
         const { data, error } = await supabase
             .from('projects')
             .select('*')
-            .eq('created_by', user.uid);
+            .eq('created_by', user.id);
         if (error) console.error('Error fetching projects:', error);
         return data;
     }

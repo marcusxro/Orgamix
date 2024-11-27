@@ -35,7 +35,7 @@ interface taskDataType {
 
 
 const Tasks: React.FC = () => {
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const { showNotif, setShowNotif } = useStoreBoolean()
     const [taskData, setTasksData] = useState<taskDataType[] | null>(null)
     const [taskDataCompleted, setTasksDataCompleted] = useState<taskDataType[] | null>(null)
@@ -114,7 +114,7 @@ const Tasks: React.FC = () => {
 
 
     const handleRealtimeEvent = (payload: any) => {
-        const isCurrentUserProject = payload.new?.created_by === user?.uid || payload.old?.created_by === user?.uid;
+        const isCurrentUserProject = payload.new?.created_by === user?.id || payload.old?.created_by === user?.id;
 
         if (!isCurrentUserProject) return;
 
@@ -184,7 +184,7 @@ const Tasks: React.FC = () => {
             const { data, error } = await supabase
                 .from('tasks')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .eq('isdone', false)
                 .order(columnName || "createdAt", { ascending: true });
 
@@ -214,7 +214,7 @@ const Tasks: React.FC = () => {
             const { data, error } = await supabase
                 .from('tasks')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .eq('isdone', true)
                 .order(columnName || "createdAt", { ascending: true });
 
@@ -237,7 +237,7 @@ const Tasks: React.FC = () => {
                 .from('tasks')
                 .delete()
                 .match({
-                    'userid': user?.uid,
+                    'userid': user?.id,
                     'id': idx
                 })
 
@@ -262,7 +262,7 @@ const Tasks: React.FC = () => {
                     isdone: true
                 })
                 .eq('id', idx)
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .order('createdAt', { ascending: true })
                 
             if (error) {
@@ -284,7 +284,7 @@ const Tasks: React.FC = () => {
                     isdone: false
                 })
                 .eq('id', idx)
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .order('createdAt', { ascending: true })
 
             if (error) {

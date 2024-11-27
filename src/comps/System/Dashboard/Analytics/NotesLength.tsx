@@ -14,7 +14,7 @@ interface fetchedDataType {
 
 const NotesLength = () => {
     const [taskData, setTasksData] = useState<fetchedDataType[] | null>(null);
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
 
     useEffect(() => {
         if (user) {
@@ -33,7 +33,7 @@ const NotesLength = () => {
             const { data, error } = await supabase
                 .from('notes')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
 
             if (data) {
                 setTasksData(data);

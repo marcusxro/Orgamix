@@ -26,7 +26,7 @@ interface fetchedDataType {
 }
 
 const Notes = () => {
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [fetchedData, setFetchedData] = useState<fetchedDataType[] | null>(null)
     const [filteredData, setFilteredData] = useState<fetchedDataType[] | null | undefined>(null)
     const [showAdd, setShowAdd] = useState<boolean>(true)
@@ -82,7 +82,7 @@ const Notes = () => {
 
 
     const handleRealtimeEvent = (payload: any) => {
-        const isCurrentUserProject = payload.new?.created_by === user?.uid || payload.old?.created_by === user?.uid;
+        const isCurrentUserProject = payload.new?.created_by === user?.id || payload.old?.created_by === user?.id;
 
         if (!isCurrentUserProject) return;
 
@@ -131,7 +131,7 @@ const Notes = () => {
             const columnName = returnSortTitle();
             const { data, error } = await supabase.from("notes")
                 .select("*")
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .order(columnName === null ? "createdat" : columnName, { ascending: true });
 
             if (error) {
@@ -162,7 +162,7 @@ const Notes = () => {
                 .from('notes')
                 .delete()
                 .match({
-                    'userid': user?.uid,
+                    'userid': user?.id,
                     'id': idx
                 })
 

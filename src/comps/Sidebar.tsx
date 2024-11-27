@@ -43,7 +43,7 @@ interface NotificationType {
 
 const Sidebar: React.FC<paramsType> = ({ location }) => {
 
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const { inviteToProject }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const { isSidebarHover, setIsSidebarHover }: any = useStore()
@@ -185,7 +185,7 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
         try {
             const { data, error } = await supabase.from('accounts')
                 .select('*')
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
@@ -256,7 +256,7 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
             const { data, error } = await supabase
                 .from('notification')
                 .select('*')
-                .eq('uid', user?.uid)
+                .eq('uid', user?.id)
                 .order('created_at', { ascending: false });
 
             if (data) {
@@ -284,7 +284,7 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
 
 
                 <div className='w-[25px] h-[25px] min-w-[25px] min-h-[25px] max-w-[25px] max-h-[25px] border-[1px] overflow-hidden rounded-full flex items-center justify-center'>
-                    <FetchPFP userUid={user?.uid} />
+                    <FetchPFP userUid={user?.id} />
                 </div>
 
                 <span className='flex flex-col'>

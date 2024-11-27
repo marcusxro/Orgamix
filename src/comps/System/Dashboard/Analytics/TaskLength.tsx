@@ -18,7 +18,7 @@ export interface TaskDataType {
 }
 
 const TaskLength = () => {
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
     const [taskData, setTasksData] = useState<TaskDataType[] | null>(null);
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const TaskLength = () => {
             const { data, error } = await supabase
                 .from('tasks')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
 
             if (data) {
                 setTasksData(data);

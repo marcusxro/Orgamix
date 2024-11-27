@@ -26,12 +26,13 @@ interface CategoryData {
 }
 
 const TasksAnalytics: React.FC = () => {
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
     const [taskData, setTasksData] = useState<TaskDataType[] | null>(null);
     const [categorizedData, setCategorizedData] = useState<CategoryData[]>([]);
 
     useEffect(() => {
         getUserTask();
+        console.log(user)
     }, [user]);
 
     useEffect(() => {
@@ -50,7 +51,7 @@ const TasksAnalytics: React.FC = () => {
             const { data, error } = await supabase
                 .from('tasks')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
 
             if (data) {
                 setTasksData(data);

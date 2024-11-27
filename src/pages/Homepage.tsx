@@ -20,7 +20,7 @@ import Menu from '../comps/Menu';
 import MetaEditor from '../comps/MetaHeader/MetaEditor';
 
 const Homepage: React.FC = () => {
-  const [user] = IsLoggedIn()
+  const [user]:any = IsLoggedIn()
   const nav = useNavigate()
   const { showMenu }: any = useStore()
 

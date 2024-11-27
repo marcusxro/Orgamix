@@ -62,7 +62,7 @@ interface DataType {
 
 const InvitedProjects: React.FC = () => {
     const [fetchedData, setFetchedData] = useState<DataType[] | null>(null);
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
 
     useEffect(() => {
         if (user) {
@@ -104,12 +104,12 @@ const InvitedProjects: React.FC = () => {
 
             if (project.boards && Array.isArray(project.boards)) {
                 project.boards.forEach((board) => {
-                    if (board.created_by === user?.uid) {
+                    if (board.created_by === user?.id) {
                         boardsCreated += 1;
 
                         if (board.tasks && Array.isArray(board.tasks)) {
                             board.tasks.forEach((task) => {
-                                if (task.created_by === user?.uid) {
+                                if (task.created_by === user?.id) {
                                     tasksCreated += 1;
                                 }
                             });

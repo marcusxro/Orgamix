@@ -28,7 +28,7 @@ interface listenerType {
 
 
 const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, location }) => {
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [loading, setLoading] = useState<boolean>(false)
     const [title, setTitle] = useState<string>("")
     const [category, setCategory] = useState<string>("")
@@ -201,7 +201,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
             const { data: existingGoals, error: fetchError } = await supabase
                 .from('goals')
                 .select('title')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .like('title', `${title}%`);
 
             if (fetchError) {
@@ -243,7 +243,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
                         category: category,
                         is_done: false,
                         created_at: Date.now(),
-                        authorUid: user?.uid,
+                        authorUid: user?.id,
                         userid: "",
                         deadline: "",
                         description: description,
@@ -286,7 +286,7 @@ const CreateGoals: React.FC<listenerType> = ({ listener, purpose, closer, locati
                         category: category,
                         is_done: false,
                         created_at: Date.now(),
-                        userid: user?.uid,
+                        userid: user?.id,
                         deadline: deadline,
                         description: description,
                         sub_tasks: subTasks,

@@ -78,7 +78,7 @@ const ProjectSidebar: React.FC<propsType> = ({ isUid }) => {
     const { openNew, setOpenNew }: any = useStore()
     const { sidebarLoc, setSidebarLoc }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [searchVal, setSearchVal] = useState("")
     const [filteredData, setFilteredData] = useState<dataType[] | null>(null);
 
@@ -171,7 +171,7 @@ const ProjectSidebar: React.FC<propsType> = ({ isUid }) => {
 
 
                 const arrayOfInvitations = fetchedProjects.filter((itm) =>
-                    itm?.invited_emails?.some((itmz: any) => itmz?.userid === user?.uid)
+                    itm?.invited_emails?.some((itmz: any) => itmz?.userid === user?.id)
                 );
 
 

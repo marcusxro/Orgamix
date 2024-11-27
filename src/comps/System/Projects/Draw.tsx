@@ -124,10 +124,10 @@ function Draw({ roomId }: { roomId: string }) {
     const isPrivateMode$ = React.useContext(PrivateModeContext)!
 
 
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
     const initialPreferences: any = user
-        ? { id: user.uid, name: user.email, colorScheme: 'dark'}
+        ? { id: user.id, name: user.email, colorScheme: 'dark'}
         : { id: 'defaultUid', name: 'Guest', colorScheme: 'dark'};
 
     const [userPreferences, setUserPreferences] = useState<TLUserPreferences>(initialPreferences);
@@ -145,12 +145,12 @@ function Draw({ roomId }: { roomId: string }) {
                     const { data, error } = await supabase
                         .from('accounts')
                         .select('*')
-                        .eq('userid', user?.uid);
+                        .eq('userid', user?.id);
 
                     if (error) {
                         console.error('Error fetching data:', error);
                     } else if (data.length > 0) {
-                        setUserPreferences({ id: user.uid, name: data[0]?.username, colorScheme: 'dark',});
+                        setUserPreferences({ id: user.id, name: data[0]?.username, colorScheme: 'dark',});
                     }
                 } catch (err) {
                     console.error('Error:', err);

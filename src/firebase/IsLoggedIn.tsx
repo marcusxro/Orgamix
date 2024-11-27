@@ -1,31 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { firebaseAuthKey } from './FirebaseKey';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { supabase } from '../supabase/supabaseClient';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const IsLoggedIn = (): [User | null, React.Dispatch<React.SetStateAction<User | null>>] => {
-    const [user, setUser] = useState<User | null>(null);
-    const nav = useNavigate()
-    const location = useLocation()
+const IsLoggedIn = (): [any | null, React.Dispatch<React.SetStateAction<any | null>>] => {
+  const [user, setUser] = useState<any | null>(null);
+  const nav = useNavigate();
+  const location = useLocation()
 
 
-    useEffect(() => {
-        const unsub = onAuthStateChanged(firebaseAuthKey, (userCred) => {
-            if (userCred?.emailVerified) {
-                setUser(userCred); // Set the user or null
-            } else {
-                setUser(null)
-                if (location.pathname.includes('/user')) {
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } }: any = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+        console.log(user)
+      } 
+      if(!user && location.pathname.includes("/user/")) {
+        nav('/sign-in')
+      }
 
-                    nav('/sign-in')
-                }
-            }
-        });
 
-        return () => unsub(); // Cleanup subscription on component unmount
-    }, [user]);
+    };
 
-    return [user, setUser];
-}
+    fetchUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        setUser(session?.user ?? null);
+      }
+      
+    });
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  return [user, setUser];
+};
 
 export default IsLoggedIn;

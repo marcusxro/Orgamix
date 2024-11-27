@@ -94,7 +94,7 @@ const EditTaskProject: React.FC<isAllowedType> = ({ isAllowed }) => {
     const [defaultData, setDefaultData] = useState<dataType[] | null>(null);
 
     const [userData, setUserData] = useState<userType[] | null>(null)
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
     const [itemName, setItemName] = useState('');
     const [assignee, setAssigne] = useState<string>(user?.email || "")

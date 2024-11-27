@@ -31,7 +31,7 @@ interface dataType {
 
 const GoalsAnalytics: React.FC = () => {
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
 
     useEffect(() => {
         if (user) {
@@ -45,7 +45,7 @@ const GoalsAnalytics: React.FC = () => {
             const { data, error } = await supabase
                 .from('goals')
                 .select('*')
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
 
             if (error) {
                 console.error('Error fetching data:', error);

@@ -43,7 +43,7 @@ interface fetchedDataTypes {
 
 
 const ShareNotes: React.FC<closerType> = ({ closer }) => {
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const params = useParams()
     const [prevData, setPrevData] = useState<fetchedDataTypes[] | null>(null)
     const [email, setEmail] = useState<string>("")
@@ -114,7 +114,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
                 .from('notes')
                 .select('*')
                 .eq('createdat', params?.time)
-                .eq('userid', params?.uid);
+                .eq('userid', params?.id);
 
             if (error) {
                 console.error('Error fetching data:', error);
@@ -152,7 +152,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
             const { data, error } = await supabase
                 .from('accounts')
                 .select('*')
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
 
             if (error) {
                 console.error('Error fetching data:', error);
@@ -173,7 +173,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
             const { data, error } = await supabase
                 .from('notes')
                 .select('*')
-                .eq('userid', params?.uid)
+                .eq('userid', params?.id)
                 .eq('createdat', params?.time);
 
             if (error) {
@@ -218,7 +218,7 @@ const ShareNotes: React.FC<closerType> = ({ closer }) => {
                     share: selectionVal,
                     sharedEmails: emailAdded
                 })
-                .eq('userid', params?.uid)
+                .eq('userid', params?.id)
                 .eq('createdat', params?.time);
 
             if (error) {

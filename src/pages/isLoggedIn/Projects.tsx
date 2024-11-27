@@ -91,7 +91,7 @@ const Projects: React.FC = () => {
     const { openNew }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [sharedProjects, setSharedProjects] = useState<dataType[] | null>(null);
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const nav = useNavigate()
     const { sidebarLoc }: any = useStore()
 
@@ -117,7 +117,7 @@ const Projects: React.FC = () => {
     // Handle real-time events
     const handleRealtimeEvent = (payload: any) => {
         // Filter out updates not related to the current user
-        const isCurrentUserProject = payload.new?.created_by === user?.uid || payload.old?.created_by === user?.uid;
+        const isCurrentUserProject = payload.new?.created_by === user?.id || payload.old?.created_by === user?.id;
 
         if (!isCurrentUserProject) return;
 
@@ -155,7 +155,7 @@ const Projects: React.FC = () => {
             const { data, error } = await supabase
                 .from('projects')
                 .select('*')
-                .eq('created_by', user?.uid)
+                .eq('created_by', user?.id)
                 .order('created_at', { ascending: false }); // Sort
 
 
@@ -164,7 +164,7 @@ const Projects: React.FC = () => {
                 console.error('Error fetching data:', error);
             } else {
                 if (data) {
-                    const filteredData = data.filter(itm => itm.created_by === user?.uid);
+                    const filteredData = data.filter(itm => itm.created_by === user?.id);
                     setFetchedData(filteredData);
                 }
             }
@@ -212,7 +212,7 @@ const Projects: React.FC = () => {
                 const fetchedProjects: dataType[] = data || []; // Fallback to empty array
 
                 const arrayOfInvitations = fetchedProjects.filter((itm) =>
-                    itm?.invited_emails?.some((itmz: any) => itmz?.userid === user?.uid)
+                    itm?.invited_emails?.some((itmz: any) => itmz?.userid === user?.id)
                 );
 
                 setSharedProjects(arrayOfInvitations)

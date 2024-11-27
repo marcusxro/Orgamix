@@ -43,7 +43,7 @@ const Chat:React.FC = () => {
     const [isExiting, setIsExiting] = useState(false);
     const { openKanbanChat, setOpenKanbanChat }: any = useStore()
     const params = useParams()
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [chats, setChats] = useState<chatType[] | null>(null)
     const [chatArray, setChatArray] = useState<MessageType[] | null>(null)
     const [chatText, setChatText] = useState<string>("")
@@ -187,7 +187,7 @@ const Chat:React.FC = () => {
                         })
                     })
                     .eq('created_at', params?.time)
-                    .eq('created_by', user?.uid);
+                    .eq('created_by', user?.id);
 
                 if (updateError) {
                     console.error("Error updating project with new chat schema:", updateError);
@@ -334,7 +334,7 @@ const Chat:React.FC = () => {
 
                 const newMessage = {
                     userEmail: myAccount && myAccount?.username, // User's email
-                    userid: user?.uid, // User's ID
+                    userid: user?.id, // User's ID
                     id: Date.now(), // Unique ID (timestamp)
                     content: chatText // The message content
                 };
@@ -370,7 +370,7 @@ const Chat:React.FC = () => {
             const { data, error } = await supabase
                 .from('accounts')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .limit(1);  // Fetch only one row
             
             if (data && data.length > 0) {
@@ -385,59 +385,6 @@ const Chat:React.FC = () => {
         }
     }
     
-
-    // async function editChatNotif() {
-    //     try {
-    //         // Update the chats object (toggle isMuted)
-    //         const { error } = await supabase
-    //             .from('projects')
-    //             .update({
-    //                 chats: { ...chats, isMuted: !chats?.isMuted } // Toggle 'isMuted'
-    //             })
-    //             .eq('created_at', params?.time);
-
-    //         if (error) {
-    //             console.log("Error updating chats:", error);
-    //         } else {
-    //             console.log("Chat notification updated successfully.");
-    //             setBooleanChanges(prevs =>!prevs)
-
-    //             // Fetch the current chatArr to append the "muted his chat" message
-    //             const { data, error: fetchError } = await supabase
-    //                 .from('projects')
-    //                 .select('chatArr')
-    //                 .eq('created_at', params?.time)
-    //                 .single(); // Get a single project entry
-
-    //             if (fetchError) {
-    //                 console.log("Error fetching chatArr:", fetchError);
-    //             } else if (data && myAccount) {
-    //                 const newMessage = {
-    //                     userEmail: myAccount?.username, // User's email
-    //                     userid: user?.uid, // User's ID
-    //                     id: "muted-" + Date.now(), // Unique ID (timestamp)
-    //                     content: !chats?.isMuted ? "muted his/her chat" : "unmuted his/her chat"
-    //                 };
-
-    //                 const updatedChatArr = [...(data.chatArr || []), newMessage];
-
-    //                 // Update the chatArr with the new message
-    //                 const { error: updateError } = await supabase
-    //                     .from('projects')
-    //                     .update({ chatArr: updatedChatArr })
-    //                     .eq('created_at', params?.time);
-
-    //                 if (updateError) {
-    //                     console.log("Error updating chatArr:", updateError);
-    //                 } else {
-    //                     console.log("Muted chat message added successfully.");
-    //                 }
-    //             }
-    //         }
-    //     } catch (err) {
-    //         console.log("Error in editChatNotif:", err);
-    //     }
-    // }
 
 
     return (
@@ -475,10 +422,11 @@ const Chat:React.FC = () => {
                             </div>
                         </div>
                         <div className='p-3 h-full flex flex-col justify-between'>
-                            <div className='h-full overflow-auto '>
+
+                            <div className='h-full overflow-auto'>
                                 <div
                                     ref={chatContainerRef}
-                                    className='h-full max-h-[500px] bg-red overflow-auto '>
+                                    className='h-full max-h-[500px] bg-red overflow-auto'>
 
                                     {
                                         chatArray && chatArray != null && chatArray.length > 0 ?
@@ -491,17 +439,17 @@ const Chat:React.FC = () => {
                                                             initial={{ scale: 0.8, opacity: 0 }}  // Initial scale and opacity
                                                             animate={{ scale: 1, opacity: 1 }}    // Animate to full size and opacity
                                                             transition={{ duration: 0.3 }}          // Animation duration
-                                                            className={`${itm?.userid === user?.uid ? "ml-auto" : ""} flex gap-2 items-start justify-start`}>
+                                                            className={`${itm?.userid === user?.id ? "ml-auto" : ""} flex gap-2 items-start justify-start`}>
                                                             {
-                                                                !(user?.uid === itm?.userid) && (!itm?.id.toString().includes('muted-')) &&
+                                                                !(user?.id === itm?.userid) && (!itm?.id.toString().includes('muted-')) &&
                                                                 <div className='w-[30px] h-[30px] flex items-center justify-center rounded-full overflow-hidden'>
                                                                  <FetchPFP userUid={itm?.userid} />
                                                                 </div>
                                                             }
                                                             <div className='flex flex-col gap-1 items-start justify-start'>
                                                                 {
-                                                                    <div className={`${itm?.userid === user?.uid ? "text-right" : "text-left"} text-[10px] w-full text-[#888]`}>
-                                                                        {!(user?.uid === itm?.userid) && (!itm?.id.toString().includes('muted-')) && itm?.userEmail + " • "}
+                                                                    <div className={`${itm?.userid === user?.id ? "text-right" : "text-left"} text-[10px] w-full text-[#888]`}>
+                                                                        {!(user?.id === itm?.userid) && (!itm?.id.toString().includes('muted-')) && itm?.userEmail + " • "}
                                                                         {
                                                                             (!itm?.id.toString().includes('muted-')) &&
                                                                             itm?.id
@@ -511,7 +459,7 @@ const Chat:React.FC = () => {
                                                                 }
                                                                 <div
                                                                     className={`${itm?.id.toString().includes('muted-') ? "border-none mx-auto w-full text-[#888] max-w-100" :
-                                                                        (itm?.userid === user?.uid ? "bg-[#111111] ml-auto " : "bg-[#77777722] mr-auto w-auto")} shadow-md text-white border-[#535353] border-[1px] w-full max-w-[300px] text-sm  p-2 rounded-md break-all`}>
+                                                                        (itm?.userid === user?.id ? "bg-[#111111] ml-auto " : "bg-[#77777722] mr-auto w-auto")} shadow-md text-white border-[#535353] border-[1px] max-w-[300px] text-sm p-2 rounded-md break-all`}>
                                                                     {itm?.id.toString().includes('muted-') && itm?.userEmail + " "}
                                                                     {itm?.content}
                                                                 </div>

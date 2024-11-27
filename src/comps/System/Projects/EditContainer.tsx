@@ -56,7 +56,7 @@ interface dataType {
     boards: boardsType[]
 }
 const EditContainer:React.FC = () => {
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const params = useParams()
     const { settingsBoard, setSettingsBoard }: any = useStore()
     const [isExiting, setIsExiting] = useState(false);
@@ -165,7 +165,7 @@ const EditContainer:React.FC = () => {
         }
         
 
-        if((defData[0]?.is_shared === "private") && (defData[0]?.created_by != user?.uid)) {
+        if((defData[0]?.is_shared === "private") && (defData[0]?.created_by != user?.id)) {
                setSettingsBoard(null)
                setLoading(false)
                 return 
@@ -247,7 +247,7 @@ const EditContainer:React.FC = () => {
         }
 
         if(defData && defData.length > 0 && (
-            (defData[0]?.is_shared === "private" && defData[0]?.created_by === user?.uid)) ) {
+            (defData[0]?.is_shared === "private" && defData[0]?.created_by === user?.id)) ) {
                 setSettingsBoard(null)
                 setLoading(false)
                 return

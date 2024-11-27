@@ -16,7 +16,7 @@ const RetryGoal: React.FC<closerType> = ({ closer }) => {
     const [openDateVal, setOpenDateVal] = useState<string>("")
     const [loading, setLoading] = useState<boolean>(false)
     const params = useParams()
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
 
     const handleOutsideClick = () => {
@@ -54,7 +54,7 @@ const RetryGoal: React.FC<closerType> = ({ closer }) => {
             const { data: goalData, error: fetchError } = await supabase
                 .from('goals')
                 .select('sub_tasks')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .eq('created_at', params?.time)
                 .single();
 
@@ -74,7 +74,7 @@ const RetryGoal: React.FC<closerType> = ({ closer }) => {
                     deadline: openDateVal,
                     sub_tasks: updatedSubTasks, // Update with modified subtasks
                 })
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .eq('created_at', params?.time);
 
             if (updateError) {

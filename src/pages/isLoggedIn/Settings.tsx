@@ -5,15 +5,14 @@ import IsLoggedIn from '../../firebase/IsLoggedIn'
 import { supabase } from '../../supabase/supabaseClient'
 import imageCompression from 'browser-image-compression';
 import Loader from '../../comps/Loader'
-import moment from 'moment'
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { BiSolidError } from "react-icons/bi";
 import { FaCheck } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import { IoIosLogOut } from "react-icons/io";
 import Footer from '../../comps/Footer'
-import { signOut, getAuth } from 'firebase/auth'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
+import { useNavigate } from 'react-router-dom'
 
 interface pubsType {
     publicUrl: string
@@ -32,7 +31,7 @@ interface dataType {
 const Settings: React.FC = () => {
     const [file, setFile] = useState<File | null>(null);
     const [fileAttachment, setFileAttachment] = useState<File | null>(null);
-
+    const nav = useNavigate()
 
     const MAX_FILE_SIZE = 200 * 1024; // 200 KB
     const [imageUrl, setImageUrl] = useState<pubsType | null>(null); // Initialize as null
@@ -80,7 +79,7 @@ const Settings: React.FC = () => {
                 setIsAllowed(false)
                 return;
             }
-         
+
             setIsAllowed(true)
             setFile(selectedFile);
             setChangedImg(URL.createObjectURL(selectedFile)); // Set image preview URL
@@ -106,7 +105,7 @@ const Settings: React.FC = () => {
                 setFileAttachment(null);
                 return;
             }
-            
+
             setIsAllowed(true)
             setFileAttachment(selectedFile);
         }
@@ -120,7 +119,7 @@ const Settings: React.FC = () => {
             const { data: publicData, error: urlError }: any = supabase
                 .storage
                 .from('profile')
-                .getPublicUrl(`images/${user.uid}/profile_picture.jpg`);
+                .getPublicUrl(`images/${user.id}/profile_picture.jpg`);
 
             if (urlError || !publicData.publicUrl) {
                 console.error('Error getting public URL:', urlError?.message);
@@ -160,7 +159,7 @@ const Settings: React.FC = () => {
                 maxWidthOrHeight: 300
             });
             // Use the user's UID for the path and a fixed name
-            const filePath = `images/${user.uid}/profile_picture.jpg`; // Fixed file name for the profile picture
+            const filePath = `images/${user.id}/profile_picture.jpg`; // Fixed file name for the profile picture
 
             // Remove the existing image (optional but recommended)
             await supabase.storage.from('profile').remove([filePath]);
@@ -193,7 +192,7 @@ const Settings: React.FC = () => {
         }
     };
 
-   
+
     const [loadingFeedBacks, setLoadingFeedBacks] = useState<boolean>(false)
 
     const uploadImageAttachment = async () => {
@@ -212,7 +211,7 @@ const Settings: React.FC = () => {
             });
             const timestamp = Date.now(); // Get the current timestamp
             const newFileName = `${timestamp}-${fileAttachment.name}`; // Create a unique file name
-            const filePath = `attachments/${user.uid}/${newFileName}`; // Use the new unique file name
+            const filePath = `attachments/${user.id}/${newFileName}`; // Use the new unique file name
 
             const { data, error } = await supabase.storage
                 .from('profile')
@@ -223,7 +222,7 @@ const Settings: React.FC = () => {
 
                 return false; // Return false if upload failed
             } else {
-               
+
                 setFileAttachment(null);
                 setIsErrorAttach(null)
                 if (fileInputRefAttachment.current) {
@@ -257,7 +256,7 @@ const Settings: React.FC = () => {
                     description: description,
                     attachment: uploadSuccessful,
                     rating: rating,
-                    userid: user?.uid,
+                    userid: user?.id,
                     created_at: Date.now()
                 });
 
@@ -292,7 +291,7 @@ const Settings: React.FC = () => {
         try {
             const { data, error } = await supabase.from('accounts')
                 .select('*')
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
@@ -319,7 +318,7 @@ const Settings: React.FC = () => {
                 .update({
                     username: username
                 })
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
             if (error) {
                 console.error('Error fetching data:', error);
                 setIsCompletedName(false)
@@ -361,43 +360,67 @@ const Settings: React.FC = () => {
     const [completed, setCompleted] = useState<boolean>(false)
     const [loadingPass, setLoadingPass] = useState<boolean>(false)
 
-    async function handleChangePass() {
-        setLoadingPass(true)
-        if (loadingPass) return
-        if (!currentPassword) {
-            setLoadingPass(false)
-            return
-        };
 
-        // Check if new password and confirm password match
+
+
+    async function handleChangePass() {
+        setLoadingPass(true);
+        setError(null);
+    
+        // Prevent multiple submissions
+        if (loadingPass) return;
+    
+        // Validate current password
+        if (!currentPassword) {
+            setError("Current password is required.");
+            setLoadingPass(false);
+            return;
+        }
+    
+        // Validate if new password and confirm password match
         if (newPass !== confirmPass) {
             setError("New password and confirmation do not match.");
-            setLoadingPass(false)
-            throw new Error("New password and confirmation do not match.");
+            setLoadingPass(false);
+            return;
         }
-
-        // Check password strength
+    
+        // Validate password strength
         const hasUpperCase = /[A-Z]/.test(newPass);
         const hasLowerCase = /[a-z]/.test(newPass);
         const hasNumber = /\d/.test(newPass);
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPass);
-
+    
         if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
             setError("Password must contain uppercase, lowercase, number, and special character.");
-            setLoadingPass(false)
-            throw new Error("Password must contain uppercase, lowercase, number, and special character.");
+            setLoadingPass(false);
+            return;
         }
-
-        const credential = EmailAuthProvider.credential(user?.email, currentPassword);
-
+    
         try {
-            await reauthenticateWithCredential(user, credential);
-            // If re-authentication is successful, update the password
-
-            await updatePassword(user, newPass);
-            console.log("Password updated successfully.");
-
-            // Clear inputs after successful password change
+            // Authenticate with current password
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                email: user?.email,
+                password: currentPassword,
+            });
+    
+            if (signInError) {
+                setError("Authentication failed. Please check your current password.");
+                setLoadingPass(false);
+                return;
+            }
+    
+            // Update the password
+            const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+                password: newPass,
+            });
+    
+            if (updateError) {
+                setError("Failed to update password. Please try again.");
+                setLoadingPass(false);
+                return;
+            }
+    
+            // Success feedback
             setConfirmPass("");
             setCurr("");
             setNewPass("");
@@ -406,16 +429,14 @@ const Settings: React.FC = () => {
 
             setLoadingPass(false)
 
-        } catch (error: any) {
-            setLoadingPass(false)
-            console.error("Error updating password:", error.message);
-            setError("Error updating password");
-
-            if (error.code === "auth/invalid-credential") {
-                setError("Current password is wrong.");
-            }
+        } catch (err) {
+            console.error("Error changing password:", err);
+            setError("An unexpected error occurred. Please try again.");
+        } finally {
+            setLoadingPass(false);
         }
     }
+    
 
     useEffect(() => {
         if (completed) {
@@ -435,18 +456,18 @@ const Settings: React.FC = () => {
     const [description, setDescription] = useState('');
     const [rating, setRating] = useState<number | any>(3);
 
-
-    function logOutUser() {
-        const auth = getAuth()
-        const signOutUserFunc = signOut(auth)
-            .then(() => {
-                console.log("completed")
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-
-        return () => { signOutUserFunc }
+    async function logOutUser() {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Error logging out:', error.message);
+            } else {
+                console.log("Logout successful");
+                nav('/sign-in');
+            }
+        } catch (err) {
+            console.error('Error logging out:', err);
+        }
     }
 
     return (
@@ -609,7 +630,7 @@ const Settings: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className='mt-9 border-t-[1px] border-t-[#535353] pt-3'>
+                                {/* <div className='mt-9 border-t-[1px] border-t-[#535353] pt-3'>
 
                                     <div className='mb-2'>Other information</div>
                                     <div className='pt-3 flex gap-2'>
@@ -633,7 +654,7 @@ const Settings: React.FC = () => {
                                         </div>
 
                                     </div>
-                                </div>
+                                </div> */}
 
 
                             </div>

@@ -87,7 +87,7 @@ const InviteToProjects: React.FC = () => {
 
     const [myAccount, setMyAccount] = useState<accountType[] | null>(null);
 
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
     const [emailAdded, setEmailAdded] = useState<invitedEmails[] | null>(null);
 
     const [email, setEmail] = useState<string>("")
@@ -138,6 +138,12 @@ const InviteToProjects: React.FC = () => {
         }
     }
 
+    useEffect(() => {
+        if (emailAdded) {
+            console.log(emailAdded);
+        }
+    }, [emailAdded])
+
     function removeFromArr(emailToRemove: string) {
         setEmailAdded((prevEmails) => {
             if (!prevEmails) return null; // Return null if there are no emails
@@ -148,31 +154,32 @@ const InviteToProjects: React.FC = () => {
         });
     }
 
-
     async function getAccounts() {
-        try {
-            const { data, error } = await supabase
-                .from('accounts')
-                .select('*')
-                .eq('email', email);
-
-            if (error) {
-                console.error('Error fetching data:', error);
-            } else {
-                setFetchedData(data);
+      
+            try {
+                const { data, error } = await supabase
+                    .rpc('get_accounts_by_email', { p_email: email });
+        
+                if (error) {
+                    console.error('Error fetching data:', error.message);
+                } else {
+                    setFetchedData(data);
+                    console.log(data);
+                }
+            } catch (err) {
+                console.log('Error:', err);
             }
-        } catch (err) {
-            console.log('Error:', err);
-        }
+        
+        
     }
-
+    
 
     async function getMyAccount() {
         try {
             const { data, error } = await supabase
                 .from('accounts')
                 .select('*')
-                .eq('userid', user?.uid);
+                .eq('userid', user?.id);
 
             if (error) {
                 console.error('Error fetching data:', error);
@@ -202,7 +209,7 @@ const InviteToProjects: React.FC = () => {
                 .from('projects')
                 .select('*')
                 .eq('created_at', params?.time)
-                .eq('created_by', user?.uid);
+                .eq('created_by', user?.id);
 
             if (error) {
                 console.error('Error fetching data:', error);
@@ -255,7 +262,7 @@ const InviteToProjects: React.FC = () => {
                     invited_emails: emailAdded
                 })
                 .eq('created_at', params?.time)
-                .eq('created_by', user?.uid);
+                .eq('created_by', user?.id);
 
             if (error) {
                 console.error('Error fetching data:', error);
@@ -295,9 +302,7 @@ const InviteToProjects: React.FC = () => {
                     for (const email of newlyAddedEmails) {
                         // Fetch the user account using the email to get the `userid`, if not already in `emailAdded`
                         const { data: userAccount, error: userError } = await supabase
-                            .from('accounts')  // Assuming you have an accounts table
-                            .select('userid')
-                            .eq('userid', email?.userid); // Replace with the actual field for email if necessary
+                        .rpc('get_accounts_by_email', { p_email: email?.email });
 
                         if (userError || !userAccount || userAccount.length === 0) {
                             console.error(`Error fetching user account for ${email}:`, userError);
@@ -508,14 +513,14 @@ const InviteToProjects: React.FC = () => {
                                                 email != '' && fetchedData != null && fetchedData.map((itm, idx: number) => (
                                                     <div className='bg-[#535353]  w-full max-h-[200px] h-full rounded-lg overflow-auto p-2'>
                                                         <div
-                                                            onClick={() => { itm?.userid != user?.uid && addToArr(itm); console.log("CLICKED") }}
+                                                            onClick={() => { itm?.userid != user?.id && addToArr(itm); console.log("CLICKED") }}
                                                             key={idx}
                                                             className='w-full flex items-center gap-3 cursor-pointer p-3 hover:bg-[#111111] rounded-lg'>
                                                             <div className='w-[35px] h-[35px] rounded-full overflow-hidden flex items-center justify-center border-[#535353] border-[1px] '>
                                                             <FetchPFP userUid={itm?.userid} />
                                                             </div>
                                                             <div className='flex flex-col'>
-                                                                <div className={`${itm?.userid === user?.uid && "line-through"} font-bold text-sm`}>{itm?.userid === user?.uid && "(you) "}{itm?.email.length >= 26 ? itm?.email.slice(0, 25) + "..." : itm?.email}</div>
+                                                                <div className={`${itm?.userid === user?.id && "line-through"} font-bold text-sm`}>{itm?.userid === user?.id && "(you) "}{itm?.email.length >= 26 ? itm?.email.slice(0, 25) + "..." : itm?.email}</div>
                                                                 <div className='text-[#888] text-sm'>{itm?.username}</div>
                                                             </div>
                                                         </div>

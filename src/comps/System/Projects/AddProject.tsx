@@ -22,7 +22,7 @@ const AddProject: React.FC = () => {
     const { loading, setLoading }: any = useStore()
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState<string | null>(null)
-    const [user] = IsLoggedIn()
+    const [user]:any = IsLoggedIn()
 
     const handleOutsideClick = () => {
         setIsExiting(true);
@@ -49,7 +49,7 @@ const AddProject: React.FC = () => {
             const { data: existingProjects, error: fetchError } = await supabase
                 .from('projects')
                 .select('name')
-                .eq('created_by', user?.uid)
+                .eq('created_by', user?.id)
                 .like('name', `${nameVal}%`)
 
 
@@ -86,7 +86,7 @@ const AddProject: React.FC = () => {
                 created_at: Date.now(),
                 deadline: deadline,
                 is_shared: privacySel,
-                created_by: user?.uid,
+                created_by: user?.id,
                 category: category,
 
             });
