@@ -72,7 +72,7 @@ const SignIn: React.FC = () => {
                 const { data, error } = await supabase.auth.signInWithOAuth({
                     provider: provider,
                     options: {
-                        redirectTo: `${window.location.origin}/user/dashboard`,
+                        redirectTo: `https://www.orgamix.tech/user/dashboard`,
                     }
                 });
 
@@ -117,7 +117,6 @@ const SignIn: React.FC = () => {
             return errorNotif("Please type something!")
 
         }
-
 
         try {
             const { data: session, error: signInError }: any = await supabase.auth.signInWithPassword({
