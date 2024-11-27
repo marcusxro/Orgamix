@@ -250,8 +250,6 @@ function Main() {
 
 
 
-
-
   const { isProgress }: any = useStore()
 
   return (
@@ -276,20 +274,20 @@ function Main() {
         <Route path='/recover' element={<ForgotPassword />} />
 
         {/* system pages */}
-        <Route path='/user/dashboard' element={<System />} />
-        <Route path='/user/tasks' element={<Tasks />} />
-        <Route path='/user/notes' element={<Notes />} />
-        <Route path='/user/notes/:id/:time' element={<VisitNote />} />
-        <Route path='/user/goals' element={<Goals />} />
-        <Route path='/user/goals/templates' element={<GoalTemplates />} />
+        <Route path='/user/dashboard' element={user && <System />} />
+        <Route path='/user/tasks' element={user && <Tasks />} />
+        <Route path='/user/notes' element={user && <Notes />} />
+        <Route path='/user/notes/:id/:time' element={user && <VisitNote />} />
+        <Route path='/user/goals' element={user &&<Goals />} />
+        <Route path='/user/goals/templates' element={user && <GoalTemplates />} />
         <Route path='/user/goals/templates/:id/:time' element={<ViewGoal />} />
-        <Route path='/user/projects' element={<Projects />} />
-        <Route path='/user/projects/view/:id/:time' element={<Samp />} />
-        <Route path='/user/calendar' element={<CalendarPage />} />
+        <Route path='/user/projects' element={user && <Projects />} />
+        <Route path='/user/projects/view/:id/:time' element={user && <Samp />} />
+        <Route path='/user/calendar' element={user && <CalendarPage />} />
         <Route path='/user/ask-orgamix' element={<ArtificialIntelligence />} />
-        <Route path='/user/ask-orgamix/:time' element={<ViewAiChat />} />
-        <Route path='/user/pomodoro' element={<Pomodoro />} />
-        <Route path='/user/settings' element={<Settings />} />
+        <Route path='/user/ask-orgamix/:time' element={user && <ViewAiChat />} />
+        <Route path='/user/pomodoro' element={user && <Pomodoro />} />
+        <Route path='/user/settings' element={user && <Settings />} />
 
 
 
