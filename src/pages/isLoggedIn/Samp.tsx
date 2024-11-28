@@ -438,9 +438,6 @@ export default function Samp() {
         }
     }
 
-
-
-
     const findItemTask = (id: string): string => {
         const replacedString: string = id.replace("task-", "");
         const toInt: number = parseInt(replacedString);
@@ -503,7 +500,6 @@ export default function Samp() {
 
     const findContainerItems = (id: UniqueIdentifier | undefined) => {
         const container = findValueOfItems(id, 'container');
-
         return container as boardsType
     };
 

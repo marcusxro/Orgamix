@@ -33,6 +33,7 @@ import ArtificialIntelligence from './pages/isLoggedIn/ArtificialIntelligence';
 import ViewAiChat from './pages/isLoggedIn/ViewAiChat';
 import Pomodoro from './pages/isLoggedIn/Pomodoro';
 import TimerModal from './comps/System/Timer/TimerModal';
+import ResetPassword from './pages/AuthPages/Recover/ResetPassword';
 
 
 function App() {
@@ -272,6 +273,7 @@ function Main() {
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/recover' element={<ForgotPassword />} />
+        <Route path='/reset-password/:uuid' element={<ResetPassword />} />
 
         {/* system pages */}
         <Route path='/user/dashboard' element={user && <System />} />

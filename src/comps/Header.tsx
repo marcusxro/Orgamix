@@ -44,7 +44,9 @@ const Header: React.FC = () => {
             <div className='flex gap-3 justify-between items-center mx-auto w-full max-w-[1200px] '>
                 <div className='w-[20px] h-[20px] cursor-pointer flex gap-2 items-center'>
                     <img src={OrgamixLogo} className='w-full h-full object-cover' alt="" />
-                    <div className='font-bold'>ORGAMIX</div>
+                    <div
+                        onClick={() => { nav('/') }}
+                     className='font-bold'>ORGAMIX</div>
                     <div className='hidden text-[13px] gap-3 ml-[2rem] md:flex'>
                         <div onClick={() => { nav('/') }}>Home</div>
                         <div>Documentation</div>

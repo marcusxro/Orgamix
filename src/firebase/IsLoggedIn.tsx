@@ -14,12 +14,13 @@ const IsLoggedIn = (): [any | null, React.Dispatch<React.SetStateAction<any | nu
       if (user) {
         setUser(user);
         console.log(user)
-      } 
-      if(!user && location.pathname.includes("/user/")) {
-        nav('/sign-in')
       }
-
-
+      
+   
+   //middleware func
+   if(!user && location.pathname.includes("/user/")) {
+    nav('/sign-in')
+  }
     };
 
     fetchUser();

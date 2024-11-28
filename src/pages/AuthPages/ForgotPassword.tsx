@@ -9,13 +9,12 @@ import useStore from '../../Zustand/UseStore';
 import Loader from '../../comps/Loader';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 import { supabase } from '../../supabase/supabaseClient';
+import { v4 as uuidv4 } from 'uuid';
 
 const ForgotPassword:React.FC = () => {
     const [email, setEmail] = useState<string>("")
     const [loading, setLoading] = useState(false)
 
-
-    
     const resetPassword = async (e: FormEvent) => {
         e.preventDefault();
         if (loading) return;
@@ -23,8 +22,9 @@ const ForgotPassword:React.FC = () => {
         setLoading(true);
 
         try {
+
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password`, // Customize the redirect URL
+                redirectTo: `${window.location.origin}/reset-password/${uuidv4()}?email=${email}`,
             });
 
             if (error) {
@@ -92,6 +92,7 @@ const ForgotPassword:React.FC = () => {
             <div className='fixed top-0 left-0 w-full bg-[#222] z-[20]'>
                 <Header />
             </div>
+
             <motion.form
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1, transition: { duration: 0.2 } }}
@@ -99,6 +100,7 @@ const ForgotPassword:React.FC = () => {
                 onSubmit={resetPassword}
                 className='w-full flex flex-col z-[20] gap-2 max-w-[400px] p-3 rounded-lg bg-[#2e2e2e] border-[1px] border-[#414141]'
                 action="submit">
+
                 <div className='w-full text-center'>
                     Recover your account
                 </div>

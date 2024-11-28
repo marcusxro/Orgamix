@@ -107,7 +107,6 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
 
             }
 
-
             // Step 3: Insert the new note with the updated title
             const { error: insertError } = await supabase.from("notes").insert({
                 title: newTitle,
@@ -152,7 +151,6 @@ const AddNote: React.FC<AddNoteProps> = ({ purpose, closeMobile }) => {
     }
 
     useEffect(() => {
-        console.log(error)
         if(success){
            setError(null)
         }
