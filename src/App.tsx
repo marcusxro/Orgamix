@@ -34,6 +34,7 @@ import ViewAiChat from './pages/isLoggedIn/ViewAiChat';
 import Pomodoro from './pages/isLoggedIn/Pomodoro';
 import TimerModal from './comps/System/Timer/TimerModal';
 import ResetPassword from './pages/AuthPages/Recover/ResetPassword';
+import Pricing from './pages/Static/Pricing';
 
 
 function App() {
@@ -268,6 +269,7 @@ function Main() {
         <Route path='/contact' element={<Contact />} />
         <Route path='*' element={<NotFoundPage />} />
         <Route path='/test' element={<TestPage />} />
+        <Route path='/pricing' element={<Pricing />} />
     
         {/* auth pages */}
         <Route path='/sign-in' element={<SignIn />} />

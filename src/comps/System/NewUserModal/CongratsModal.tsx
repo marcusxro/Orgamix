@@ -40,7 +40,7 @@ const CongratsModal: React.FC = () => {
 
                     <div
                         onClick={() => {
-                            setProgress("Working")
+                            setProgress("Working"); window.location.reload()
                         }}
                      className='mt-5 bg-[#111] z-[20] hover:bg-[#222] px-8 py-[5px] rounded-lg border-[#535353] border-[1px] cursor-pointer'>
                         Let's go!

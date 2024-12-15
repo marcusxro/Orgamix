@@ -52,6 +52,7 @@ const Header: React.FC = () => {
                         <div>Documentation</div>
                         <div onClick={() => { nav('/about') }}>About</div>
                         <div onClick={() => { nav('/contact') }}>Contact</div>
+                        <div onClick={() => { nav('/pricing') }}>Pricing</div>
                     </div>
                 </div>
 

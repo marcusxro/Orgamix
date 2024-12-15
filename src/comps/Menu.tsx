@@ -67,6 +67,7 @@ const Menu: React.FC = () => {
             {
                 user &&
                 <div className='mt-5 flex gap-5 flex-col border-t-[1px] border-t-[#414141] pt-4'>
+
                     <div className='flex gap-5 justify-between'>
                         <div className='text-lg'>{user?.email}</div>
                         <div className='w-[30px] h-[30px] rounded-full overflow-hidden'>
@@ -165,6 +166,9 @@ const Menu: React.FC = () => {
                 </div>
                  <div className='cursor-pointer' onClick={() => {nav('/contact'); ; setShowMenu(!showMenu) }}>
                     Contact
+                </div>
+                <div className='cursor-pointer' onClick={() => {nav('/pricing'); ; setShowMenu(!showMenu) }}>
+                    Pricing
                 </div>
             </div>
 

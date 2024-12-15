@@ -19,7 +19,7 @@ interface TaskDataType {
 }
 
 const TaskData: React.FC = () => {
-    const [user] = IsLoggedIn();
+    const [user]:any = IsLoggedIn();
     const [groupedTasks, setGroupedTasks] = useState<{ today: TaskDataType[]; tomorrow: TaskDataType[] }>({ today: [], tomorrow: [] });
 
     useEffect(() => {
@@ -33,7 +33,7 @@ const TaskData: React.FC = () => {
             const { data, error } = await supabase
                 .from('tasks')
                 .select('*')
-                .eq('userid', user?.uid)
+                .eq('userid', user?.id)
                 .eq('isdone', false); // Filter out completed tasks 
 
             if (error) {

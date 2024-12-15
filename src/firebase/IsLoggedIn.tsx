@@ -15,12 +15,12 @@ const IsLoggedIn = (): [any | null, React.Dispatch<React.SetStateAction<any | nu
         setUser(user);
         console.log(user)
       }
-      
-   
-   //middleware func
-   if(!user && location.pathname.includes("/user/")) {
-    nav('/sign-in')
-  }
+
+
+      //middleware func
+      if (!user && location.pathname.includes("/user/")) {
+        nav('/sign-in')
+      }
     };
 
     fetchUser();
@@ -29,7 +29,7 @@ const IsLoggedIn = (): [any | null, React.Dispatch<React.SetStateAction<any | nu
       if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
         setUser(session?.user ?? null);
       }
-      
+
     });
 
     return () => {
