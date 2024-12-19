@@ -74,7 +74,7 @@ const Pricing: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className='mt-[5rem] grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-5 w-full items-start'>
+                    <div className='mt-[5rem] grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-5 w-full '>
 
                         <div className='bg-[#333] w-full items-start flex flex-col p-5 rounded-lg text-center border-[1px] border-[#535353]'>
                             <div className='text-2xl font-bold'>
@@ -85,7 +85,7 @@ const Pricing: React.FC = () => {
                             </div>
                             <div
                                 onClick={() => { nav('/sign-in') }}
-                                className='bg-green-800 border-[1px] border-[#888] w-full p-3 rounded-md mt-3 cursor-pointer'>
+                                className='bg-green-800 hover:bg-green-900 border-[1px] border-[#888] w-full p-3 rounded-md mt-3 cursor-pointer'>
                                 Start for Free
                             </div>
 
@@ -134,6 +134,12 @@ const Pricing: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
+                            <div className='my-[2rem] bg-[#535353] w-full h-[1px]'>
+
+                            </div>
+                            <div className='mt-auto text-[#888] text-sm'>
+                                Free plan is applicable for personal use only
+                            </div>
                         </div>
 
                         <div className='bg-[#333] w-full items-start flex flex-col p-5 rounded-lg text-center border-[1px] border-[#535353]'>
@@ -145,11 +151,11 @@ const Pricing: React.FC = () => {
                                 </div>
                             </div>
                             <div className='text-[#888] mt-2'>
-                                Perfect for users who are just starting out
+                                Plan for students who need more features
                             </div>
                             <div
                                 onClick={() => { nav('/sign-in') }}
-                                className='bg-green-800 border-[1px] border-[#888] w-full p-3 rounded-md mt-3 cursor-pointer'>
+                                className='bg-green-800 hover:bg-green-900  border-[1px] border-[#888] w-full p-3 rounded-md mt-3 cursor-pointer'>
                                 Upgrade now
 
                             </div>
@@ -171,19 +177,19 @@ const Pricing: React.FC = () => {
                                 <div className='text-[#888] text-sm'>Get started with:</div>
                                 <div className='flex flex-col gap-3 mt-2 w-full items-start'>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>   20 Tasks
+                                        <span className='text-md text-green-500'><FaCheck /></span>   30 Tasks
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>     15 Goals
+                                        <span className='text-md text-green-500'><FaCheck /></span>     20 Goals
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>    10 Notes
+                                        <span className='text-md text-green-500'><FaCheck /></span>    30 Notes
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>    10 Projects
+                                        <span className='text-md text-green-500'><FaCheck /></span>    15 Projects
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>     20 AI conversation
+                                        <span className='text-md text-green-500'><FaCheck /></span>     25 AI conversation
                                     </div>
                                     <div className='flex gap-2 items-center'>
                                         <span className='text-md text-green-500'><FaCheck /></span>     templates in goals unlocked
@@ -216,11 +222,11 @@ const Pricing: React.FC = () => {
                                 </div>
                             </div>
                             <div className='text-[#888] mt-2'>
-                                Perfect for users who are just starting out
+                                plan for teams who need more features
                             </div>
                             <div
                                 onClick={() => { nav('/sign-in') }}
-                                className='bg-green-800 border-[1px] border-[#888] w-full p-3 rounded-md mt-3 cursor-pointer'>
+                                className='bg-green-800 hover:bg-green-900  border-[1px] border-[#888] w-full p-3 rounded-md mt-3 cursor-pointer'>
                                 Upgrade now
 
                             </div>
@@ -242,19 +248,19 @@ const Pricing: React.FC = () => {
                                 <div className='text-[#888] text-sm'>Get started with:</div>
                                 <div className='flex flex-col gap-3 mt-2 w-full items-start'>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>   35 Tasks
+                                        <span className='text-md text-green-500'><FaCheck /></span>   50 Tasks
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>     25 Goals
+                                        <span className='text-md text-green-500'><FaCheck /></span>     35 Goals
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>    20 Notes
+                                        <span className='text-md text-green-500'><FaCheck /></span>    35 Notes
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>    20 Projects
+                                        <span className='text-md text-green-500'><FaCheck /></span>    30 Projects
                                     </div>
                                     <div className='flex gap-2 items-center'>
-                                        <span className='text-md text-green-500'><FaCheck /></span>     30 AI conversation
+                                        <span className='text-md text-green-500'><FaCheck /></span>     50 AI conversation
                                     </div>
                                     <div className='flex gap-2 items-center'>
                                         <span className='text-md text-green-500'><FaCheck /></span>     templates in goals unlocked
@@ -288,7 +294,6 @@ const Pricing: React.FC = () => {
                         <div className='text-sm text-[#888] mt-2'>
                             Here are some frequently asked questions about our pricing plans.
                         </div>
-
 
                         <div className='mt-[3rem]'>
                             {
@@ -348,7 +353,7 @@ const Pricing: React.FC = () => {
                                 </div>
 
                                 <div className='flex items-start mt-auto'>
-                                    <div className='mt-7 bg-[#191919] border-[1px] border-[#535353] p-3 rounded-md cursor-pointer flex items-center gap-3'>
+                                    <div className='mt-7 hover:bg-[#222] bg-[#191919] border-[1px] border-[#535353] p-3 rounded-md cursor-pointer flex items-center gap-3'>
                                         Read Article <span><MdArrowOutward /></span>
                                     </div>
                                 </div>
@@ -361,8 +366,8 @@ const Pricing: React.FC = () => {
                                 <div className='text-[#888] text-sm my-1'>
                                     Encountering an issue? From payment problems to login issues, this article covers the most common problems and how to resolve them quickly.                                </div>
 
-                                    <div className='flex items-start mt-auto'>
-                                    <div className='mt-7 bg-[#191919] border-[1px] border-[#535353] p-3 rounded-md cursor-pointer flex items-center gap-3'>
+                                <div className='flex items-start mt-auto'>
+                                    <div className='mt-7 hover:bg-[#222] bg-[#191919] border-[1px] border-[#535353] p-3 rounded-md cursor-pointer flex items-center gap-3'>
                                         Read Article <span><MdArrowOutward /></span>
                                     </div>
                                 </div>
@@ -371,7 +376,7 @@ const Pricing: React.FC = () => {
 
 
                         <div className='mt-[5rem] text-center text-lg'>
-                        If you still need help, feel free to contact our support team <span className='font-bold'>orgamixteam@gmail.com</span>—we’re here to assist you!
+                            If you still need help, feel free to contact our support team <span className='font-bold'>orgamixteam@gmail.com</span>—we’re here to assist you!
                         </div>
                     </div>
                 </div>
