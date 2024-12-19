@@ -101,7 +101,7 @@ const TypingEffect = ({ response, container }: any) => {
                 return () => clearInterval(typingInterval); // Cleanup interval
             }
         }
-    }, [index, response?.text, isDone, isUserScrolling]); 
+    }, [index, response?.text, isDone, isUserScrolling]);
 
 
 
@@ -266,7 +266,7 @@ const ArtificialIntelligence: React.FC = () => {
             if (error) {
                 console.log(error);
             } else {
-            
+
 
                 // After the chat is saved in the database, navigate
                 nav(`/user/ask-orgamix/${DateNow}`);
@@ -385,7 +385,7 @@ const ArtificialIntelligence: React.FC = () => {
 
 
 
-    const [user]:any = IsLoggedIn(); // Assuming you have an IsLoggedIn hook for fetching user info
+    const [user]: any = IsLoggedIn(); // Assuming you have an IsLoggedIn hook for fetching user info
 
     const [msgId, setMsgId] = useState<string | null>(null);
 
@@ -1004,18 +1004,31 @@ const ArtificialIntelligence: React.FC = () => {
 
 
                         <div className='flex items-start gap-2 max-w-[1200px] w-full mx-auto overflow-auto flex-wrap mt-auto text-[12px]'>
-                            <div
-                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]' onClick={runAnalyticsForTasks}>
-                                Analytics for my tasks
-                            </div>
-                            <div
-                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]' onClick={runAnalyticsForGoals}>
-                                Analytics for my goals
-                            </div>
-                            <div
-                                className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]' onClick={runAnalyticsForProjects}>
-                                Analytics for my projects
-                            </div>
+                            {
+                                myTasks && myTasks.length > 0 &&
+                                <div
+                                    className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                    onClick={runAnalyticsForTasks}>
+                                    Analytics for my tasks
+                                </div>
+                            }
+
+                            {
+                                myGoals && myGoals.length > 0 &&
+                                <div
+                                    className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                    onClick={runAnalyticsForGoals}>
+                                    Analytics for my goals
+                                </div>
+                            }
+                            {
+                                myProjects && myProjects.length > 0 &&
+                                <div
+                                    className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                    onClick={runAnalyticsForProjects}>
+                                    Analytics for my projects
+                                </div>
+                            }
                             <div
                                 className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]' onClick={() => { generateProjects("projects") }}>
                                 Generate projects idea

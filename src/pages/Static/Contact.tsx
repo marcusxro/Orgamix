@@ -13,6 +13,7 @@ import Menu from '../../comps/Menu';
 import { supabase } from '../../supabase/supabaseClient';
 import { BiSolidError } from "react-icons/bi";
 import Loader from '../../comps/Loader';
+import { IoLocationSharp } from "react-icons/io5";
 
 const Contact: React.FC = () => {
 
@@ -250,6 +251,15 @@ const Contact: React.FC = () => {
                             <div
                                 className='cursor-pointer text-[#888] flex items-center gap-2'>
                                 <FaPhoneAlt />  09625426771
+                            </div>
+                        </div>
+                        <div className='flex flex-col gap-2'>
+                            <div className='font-semibold'>
+                                Find us 
+                            </div>
+                            <div
+                                className='cursor-pointer text-[#888] flex items-center gap-2'>
+                                <IoLocationSharp />  Sauyo, Quezon City, Philippines
                             </div>
                         </div>
                         <div className='flex gap-4 mt-5 '>

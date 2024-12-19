@@ -43,7 +43,7 @@ interface NotificationType {
 
 const Sidebar: React.FC<paramsType> = ({ location }) => {
 
-    const [user]:any = IsLoggedIn()
+    const [user]: any = IsLoggedIn()
     const { inviteToProject }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const { isSidebarHover, setIsSidebarHover }: any = useStore()
@@ -368,19 +368,20 @@ const Sidebar: React.FC<paramsType> = ({ location }) => {
                     </div>
                     <span>Deadlines</span>
                 </div>
-                
+
                 <div
                     onClick={() => { navigateToPages("/user/ask-orgamix") }}
                     className={`${location === "Ask" && 'bg-[#414141]'} btnSidebar flex gap-2 items-center cursor-pointer py-2 rounded-lg w-full justify-start p-5 hover:bg-[#414141]`}
                 >
                     {/* Add motion.div for the rotating icon */}
                     <motion.div
-                        className="text-2xl"
+                        className="text-2xl bg-gradient-to-r from-orange-500 to-violet-500  rounded-full"
                         whileHover={{ rotate: 360 }}
-                        transition={{ duration: .5 }}
+                        transition={{ duration: 0.5 }}
                     >
                         <GiArtificialHive />
                     </motion.div>
+
                     <span>Ask AI</span>
                 </div>
 

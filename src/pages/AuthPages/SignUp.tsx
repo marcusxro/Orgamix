@@ -181,7 +181,7 @@ const SignUp: React.FC = () => {
                         setEmail(e.target.value)
                     }}
                     required
-                    className='p-2 rounded-md outline-none border-[1px] border-[#414141]'
+                    className='p-2 rounded-md outline-none border-[1px] border-[#414141] bg-[#111] text-white'
                     type="email" placeholder='Email' />
                 <input
                     value={Username}
@@ -190,7 +190,7 @@ const SignUp: React.FC = () => {
                     }}
                     maxLength={20}
                     required
-                    className='p-2 rounded-md outline-none border-[1px] border-[#414141]'
+                    className='p-2 rounded-md outline-none border-[1px] border-[#414141] bg-[#111] text-white'
                     type="text" placeholder='Username' />
                 <input
                     value={password}
@@ -199,7 +199,7 @@ const SignUp: React.FC = () => {
                         setPassword(e.target.value)
                     }}
                     required
-                    className='p-2 rounded-md outline-none border-[1px] border-[#414141] '
+                    className='p-2 rounded-md outline-none border-[1px] border-[#414141] bg-[#111] text-white'
                     type={`${seePass ? "text" : "password"}`} placeholder='Password' />
                 <input
                     value={repPassword}
@@ -208,7 +208,7 @@ const SignUp: React.FC = () => {
                         setRepPassword(e.target.value)
                     }}
                     required
-                    className='p-2 rounded-md outline-none border-[1px] border-[#414141] '
+                    className='p-2 rounded-md outline-none border-[1px] border-[#414141] bg-[#111] text-white'
                     type={`${seePass ? "text" : "password"}`} placeholder='Repeat Password' />
                 <div className='gap-2 flex px-1 w-auto items-center'>
                     <input
