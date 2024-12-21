@@ -35,6 +35,7 @@ import Pomodoro from './pages/isLoggedIn/Pomodoro';
 import TimerModal from './comps/System/Timer/TimerModal';
 import ResetPassword from './pages/AuthPages/Recover/ResetPassword';
 import Pricing from './pages/Static/Pricing';
+import Checkout from './pages/isLoggedIn/Checkout';
 
 
 function App() {
@@ -176,7 +177,7 @@ function Main() {
     });
   };
 
-  
+
   async function getNotifs() {
     try {
       const { data, error } = await supabase
@@ -257,7 +258,7 @@ function Main() {
   return (
     <div className="App">
       <ScrollToTop />
-    
+
       {
         location.pathname.includes('/user') && location.pathname !== '/user/pomodoro' &&
         <TimerModal />
@@ -270,7 +271,7 @@ function Main() {
         <Route path='*' element={<NotFoundPage />} />
         <Route path='/test' element={<TestPage />} />
         <Route path='/pricing' element={<Pricing />} />
-    
+
         {/* auth pages */}
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
@@ -282,7 +283,7 @@ function Main() {
         <Route path='/user/tasks' element={user && <Tasks />} />
         <Route path='/user/notes' element={user && <Notes />} />
         <Route path='/user/notes/:id/:time' element={user && <VisitNote />} />
-        <Route path='/user/goals' element={user &&<Goals />} />
+        <Route path='/user/goals' element={user && <Goals />} />
         <Route path='/user/goals/templates' element={user && <GoalTemplates />} />
         <Route path='/user/goals/templates/:id/:time' element={<ViewGoal />} />
         <Route path='/user/projects' element={user && <Projects />} />
@@ -292,8 +293,8 @@ function Main() {
         <Route path='/user/ask-orgamix/:time' element={user && <ViewAiChat />} />
         <Route path='/user/pomodoro' element={user && <Pomodoro />} />
         <Route path='/user/settings' element={user && <Settings />} />
-
-
+        {/* checkout */}
+        <Route path='/user/checkout/:type' element={user && <Checkout />} />
 
 
       </Routes>

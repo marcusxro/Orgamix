@@ -1017,7 +1017,7 @@ const ArtificialIntelligence: React.FC = () => {
                                 myGoals && myGoals.length > 0 &&
                                 <div
                                     className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
-                                    onClick={runAnalyticsForGoals}>
+                                    onClick={runAnalyticsForGoals}> 
                                     Analytics for my goals
                                 </div>
                             }

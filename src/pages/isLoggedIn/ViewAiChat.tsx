@@ -1012,22 +1012,23 @@ const ViewAiChat: React.FC = () => {
                                         Analytics for my tasks
                                     </div>
                                 }
-                          {
-                            myGoals && myGoals.length > 0 &&
-                            <div
-                            className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
-                            onClick={runAnalyticsForGoals}>
-                            Analytics for my goals
-                        </div>
-                          }
-                             {
-                            myProjects && myProjects.length > 0 &&
-                            <div
-                            className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
-                            onClick={runAnalyticsForProjects}>
-                            Analytics for my projects
-                        </div>
-                             }
+                                
+                                {
+                                    myGoals && myGoals.length > 0 &&
+                                    <div
+                                        className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                        onClick={runAnalyticsForGoals}>
+                                        Analytics for my goals
+                                    </div>
+                                }
+                                {
+                                    myProjects && myProjects.length > 0 &&
+                                    <div
+                                        className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
+                                        onClick={runAnalyticsForProjects}>
+                                        Analytics for my projects
+                                    </div>
+                                }
                                 <div
                                     className='bg-[#212121] px-2 py-1 rounded-md cursor-pointer hover:bg-[#25252525] text-[#888] border-[1px] border-[#535353]'
                                     onClick={() => { generateProjects("projects") }}>
