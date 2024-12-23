@@ -170,6 +170,9 @@ const Menu: React.FC = () => {
                 <div className='cursor-pointer' onClick={() => {nav('/pricing'); ; setShowMenu(!showMenu) }}>
                     Pricing
                 </div>
+                <div className='cursor-pointer' onClick={() => {nav('/articles'); ; setShowMenu(!showMenu) }}>
+                    Articles
+                </div>
             </div>
 
 

@@ -36,6 +36,7 @@ import TimerModal from './comps/System/Timer/TimerModal';
 import ResetPassword from './pages/AuthPages/Recover/ResetPassword';
 import Pricing from './pages/Static/Pricing';
 import Checkout from './pages/isLoggedIn/Checkout';
+import Articles from './pages/Static/articles/Articles';
 
 
 function App() {
@@ -278,6 +279,10 @@ function Main() {
         <Route path='/recover' element={<ForgotPassword />} />
         <Route path='/reset-password/:uuid' element={<ResetPassword />} />
 
+
+        <Route path='/articles' element={user && <Articles />} />
+
+
         {/* system pages */}
         <Route path='/user/dashboard' element={user && <System />} />
         <Route path='/user/tasks' element={user && <Tasks />} />
@@ -295,6 +300,8 @@ function Main() {
         <Route path='/user/settings' element={user && <Settings />} />
         {/* checkout */}
         <Route path='/user/checkout/:type' element={user && <Checkout />} />
+
+
 
 
       </Routes>

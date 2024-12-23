@@ -52,7 +52,7 @@ const Pricing: React.FC = () => {
             <Header />
 
             <MetaEditor
-                title='Pricing'
+                title='Orgamix | Pricing'
                 description='Pricing for our services'
                 keywords='Pricing, Services, Cost, Plans'
             />
