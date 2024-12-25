@@ -5,7 +5,6 @@ import IsLoggedIn from '../../firebase/IsLoggedIn'
 import { supabase } from '../../supabase/supabaseClient'
 import imageCompression from 'browser-image-compression';
 import Loader from '../../comps/Loader'
-import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { BiSolidError } from "react-icons/bi";
 import { FaCheck } from "react-icons/fa";
 import { motion } from 'framer-motion';
@@ -25,6 +24,7 @@ interface dataType {
     email: string;
     id: number;
     fullname: string;
+    plan: string;
 }
 
 
@@ -366,60 +366,60 @@ const Settings: React.FC = () => {
     async function handleChangePass() {
         setLoadingPass(true);
         setError(null);
-    
+
         // Prevent multiple submissions
         if (loadingPass) return;
-    
+
         // Validate current password
         if (!currentPassword) {
             setError("Current password is required.");
             setLoadingPass(false);
             return;
         }
-    
+
         // Validate if new password and confirm password match
         if (newPass !== confirmPass) {
             setError("New password and confirmation do not match.");
             setLoadingPass(false);
             return;
         }
-    
+
         // Validate password strength
         const hasUpperCase = /[A-Z]/.test(newPass);
         const hasLowerCase = /[a-z]/.test(newPass);
         const hasNumber = /\d/.test(newPass);
         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPass);
-    
+
         if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
             setError("Password must contain uppercase, lowercase, number, and special character.");
             setLoadingPass(false);
             return;
         }
-    
+
         try {
             // Authenticate with current password
             const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
                 email: user?.email,
                 password: currentPassword,
             });
-    
+
             if (signInError) {
                 setError("Authentication failed. Please check your current password.");
                 setLoadingPass(false);
                 return;
             }
-    
+
             // Update the password
             const { data: updateData, error: updateError } = await supabase.auth.updateUser({
                 password: newPass,
             });
-    
+
             if (updateError) {
                 setError("Failed to update password. Please try again.");
                 setLoadingPass(false);
                 return;
             }
-    
+
             // Success feedback
             setConfirmPass("");
             setCurr("");
@@ -436,7 +436,7 @@ const Settings: React.FC = () => {
             setLoadingPass(false);
         }
     }
-    
+
 
     useEffect(() => {
         if (completed) {
@@ -469,6 +469,8 @@ const Settings: React.FC = () => {
             console.error('Error logging out:', err);
         }
     }
+
+    const [chosenPlan, setChosenPlan] = useState<string>("student")
 
     return (
         <div className='selectionNone'>
@@ -599,6 +601,7 @@ const Settings: React.FC = () => {
                                             value={fetchedData != null && fetchedData[0]?.email || ""}
                                             className='bg-[#222] border-[1px] border-[#535353] text-[#888] w-full rounded-lg py-1 px-3 outline-none'
                                             type="text" placeholder='Email' />
+
                                         <div className='flex gap-2 w-full '>
                                             <button
                                                 onClick={() => { setIsEdit(prevs => !prevs) }}
@@ -659,10 +662,71 @@ const Settings: React.FC = () => {
 
                             </div>
 
+                            <div className='mt-9 border-t-[1px] border-t-[#535353] pt-3'>
+                                <div className='mb-2 font-bold'>Subscription</div>
+                                <p className='text-[#888] text-sm'>
+                                    {
+                                        
+                                      fetchedData &&  fetchedData && fetchedData[0]?.plan === "free" ?   
+                                            "You are currently on the free plan. Upgrade to student or team plan to unlock more features."
+                                        :   fetchedData &&  fetchedData[0]?.plan === "student" ?
+                                            "You are currently on the student plan. Enjoy your benefits!"
+                                        :   fetchedData &&  fetchedData[0]?.plan === "team" ?
+                                            "You are currently on the team plan. Enjoy all the features with your team!"
+                                        :
+                                            "You are on an unknown plan. Please contact support."
+                                    }
+                                </p>
+
+                                {
+                                    fetchedData && fetchedData[0]?.plan === "free" &&
+                                    <div className='flex gap-2 mt-3'>
+                                        <select
+                                            onChange={(e) => { setChosenPlan(e.target.value) }}
+                                        className='bg-[#222] border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none'
+                                         name="" id="">
+                                            <option value="student">Student</option>
+                                            <option value="team">Team</option>
+                                        </select>
+                                        <button
+                                        onClick={() => { nav(`/user/checkout/${chosenPlan}`) }}
+                                            className='bg-blue-500 border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none'>
+                                            Upgrade
+                                        </button>
+                                    </div>
+                                }
+                                {
+                                    fetchedData && fetchedData[0]?.plan === "student" &&
+                                    <div className='flex gap-2 mt-3'>
+                                        <button
+                                            className='bg-red-500 border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none'>
+                                            Downgrade
+                                        </button>
+                                        <button
+                                            className='bg-red-500 border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none'>
+                                            Refund
+                                        </button>
+                                    </div>
+                                }
+                                {
+                                    fetchedData && fetchedData[0]?.plan === "team" &&
+                                    <div className='flex gap-2 mt-3'>
+                                        <button
+                                            className='bg-red-500 border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none'>
+                                            Downgrade
+                                        </button>
+                                        <button
+                                            className='bg-red-500 border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none'>
+                                            Refund
+                                        </button>
+                                    </div>
+                                }
+                            </div>
                         </div>
 
 
                     </div>
+
 
 
                     <div className='mt-5 bg-[#111] p-3 border-[1px] border-[#535353] rounded-lg'>
