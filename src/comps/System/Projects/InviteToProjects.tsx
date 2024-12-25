@@ -203,17 +203,20 @@ const InviteToProjects: React.FC = () => {
 
 
     async function getProjectByID() {
+        const [unix, id]:any = params.time?.toString().split('_');
 
         try {
             const { data, error } = await supabase
                 .from('projects')
                 .select('*')
-                .eq('created_at', params?.time)
-                .eq('created_by', user?.id);
+                .eq('id', id)
+                .eq('created_at', unix)
 
             if (error) {
                 console.error('Error fetching data:', error);
             } else {
+                console.log("-------------------")
+                console.log(data)
                 setPrevData(data)
             }
         } catch (err) {
@@ -223,6 +226,8 @@ const InviteToProjects: React.FC = () => {
 
 
     async function saveEditData() {
+        const [unix, id]: any = params.time?.toString().split('_');
+
         setLoading(true)
         if (!myAccount) {
             setLoading(false)
@@ -261,8 +266,8 @@ const InviteToProjects: React.FC = () => {
                     is_shared: privacySel,
                     invited_emails: emailAdded
                 })
-                .eq('created_at', params?.time)
-                .eq('created_by', user?.id);
+                .eq('id', id)
+                .eq('created_at', unix)
 
             if (error) {
                 console.error('Error fetching data:', error);
@@ -280,7 +285,7 @@ const InviteToProjects: React.FC = () => {
                                 uid: email?.userid,  // Notify this invited user
                                 content: `The project "${prevData && prevData[0]?.name}" has been set to private by ${myAccount && myAccount[0]?.username}`,
                                 created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
-                                linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}`
+                                linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}_${prevData && prevData[0]?.id}`
                             });
 
                         if (notificationError) {
@@ -318,7 +323,7 @@ const InviteToProjects: React.FC = () => {
                                 uid: invitedUserId,  // Notify this invited user by their `userid`
                                 content: `You have been invited to the project "${prevData && prevData[0]?.name}" by ${myAccount && myAccount[0]?.username}`,
                                 created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
-                                linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}`
+                                linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}_${prevData && prevData[0]?.id}`
                             });
 
                         if (notificationError) {
@@ -350,7 +355,7 @@ const InviteToProjects: React.FC = () => {
                                     uid: removedUserId,  // Notify this removed user by their `userid`
                                     content: `You have been removed from the project "${prevData && prevData[0]?.name}" by ${myAccount && myAccount[0]?.username}`,
                                     created_at: new Date().toISOString().replace('T', ' ').slice(0, 26) + '+00',
-                                    linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}`
+                                    linkofpage: `user/projects/view/${prevData && prevData[0]?.created_by}/${prevData && prevData[0]?.created_at}_${prevData && prevData[0]?.id}`
                                 });
 
                             if (notificationError) {

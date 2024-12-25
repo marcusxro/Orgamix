@@ -136,7 +136,7 @@ export default function Samp() {
     const params = useParams()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [colorVal, setColorVal] = useState<string>("")
-    const [user]:any = IsLoggedIn()
+    const [user]: any = IsLoggedIn()
     const { loading, setLoading }: any = useStore()
     const { settingsTask, settingsBoard, viewNotifs, showDrawer }: any = useStore()
     const { inviteToProject, setInviteToProject }: any = useStore()
@@ -148,6 +148,7 @@ export default function Samp() {
     const [isEditing, setIsEditing] = useState<number | null>(null); // Track the ID of the subtask being edited
     const [editedTask, setEditedTask] = useState<string>("");
 
+    const [unix, idSearch]: any = params.time?.toString().split('_');
 
     useEffect(() => {
         if (user) {
@@ -205,7 +206,7 @@ export default function Samp() {
 
 
     async function getProjects() {
-        const [unix, id]:any = params.time?.toString().split('_');
+        const [unix, id]: any = params.time?.toString().split('_');
         try {
             const { data, error } = await supabase
                 .from('projects')
@@ -251,6 +252,8 @@ export default function Samp() {
 
 
     async function onAddContainer() {
+        const [unix, idz]: any = params.time?.toString().split('_');
+
         if (loading) return; // Prevent multiple submissions
         setLoading(true);
 
@@ -261,7 +264,9 @@ export default function Samp() {
         };
 
         try {
+
             const id = `container-${uuidv4()}`;
+
             const newData = {
                 title: containerName,
                 titleColor: colorVal,
@@ -274,7 +279,8 @@ export default function Samp() {
             const { data: projectData, error: fetchError } = await supabase
                 .from("projects")
                 .select("boards")
-                .eq("created_at", params?.time)
+                .eq('id', idz)
+                .eq('created_at', unix)
                 .single(); // Assuming you're fetching a single project
 
             if (fetchError) {
@@ -285,11 +291,16 @@ export default function Samp() {
             // Append the new board to the existing boards array
             const updatedBoards = [...existingBoards, newData];
 
+
+            console.log("hello")
             // Update the boards array in the project
             const { error: updateError } = await supabase
                 .from("projects")
                 .update({ boards: updatedBoards })
-                .eq("created_at", params?.time);
+                .eq('id', idz)
+                .eq('created_at', unix)
+
+
 
             if (updateError) {
                 console.log("Error updating boards:", updateError);
@@ -333,7 +344,8 @@ export default function Samp() {
             const { data: projectData, error: fetchError } = await supabase
                 .from("projects")
                 .select("boards")
-                .eq("created_at", params?.time)
+                .eq('id', idSearch)
+                .eq('created_at', unix)
                 .single();
 
             if (fetchError) {
@@ -380,7 +392,8 @@ export default function Samp() {
             const { error: updateError } = await supabase
                 .from("projects")
                 .update({ boards: existingBoards })
-                .eq("created_at", params?.time);
+                .eq('id', idSearch)
+                .eq('created_at', unix);
 
             if (updateError) {
                 console.log("Error updating tasks:", updateError);
@@ -715,7 +728,8 @@ export default function Samp() {
                 .from('projects')
                 .update({ boards: updatedContainers })
                 // .eq('created_by', user?.id)
-                .eq('created_at', params?.time);
+                .eq('id', idSearch)
+                .eq('created_at', unix);
 
             if (error) {
                 console.log('Error saving updated order:', error);

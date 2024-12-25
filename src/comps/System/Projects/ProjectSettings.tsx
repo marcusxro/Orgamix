@@ -85,6 +85,14 @@ const ProjectSettings: React.FC = () => {
 
     const [loading, setLoading] = useState<boolean>(false)
 
+
+
+    const [unix, id]:any = params.time?.toString().split('_');
+
+
+
+
+
     useEffect(() => {
         if (fetchedData) {
             setProjectTitle(fetchedData[0]?.name || "")
@@ -155,7 +163,8 @@ const ProjectSettings: React.FC = () => {
             const { data: projectData, error: projectError } = await supabase
                 .from('projects')
                 .select('*')
-                .eq('created_at', params?.time);
+                .eq('created_at', unix)
+                .eq('id', id) 
 
             // Handle error for the first query
             if (projectError) {
@@ -207,7 +216,8 @@ const ProjectSettings: React.FC = () => {
                 .update({
                     is_favorite: fetchedData && !fetchedData[0]?.is_favorite
                 })
-                .eq('created_at', params?.time)
+                .eq('created_at', unix)
+                .eq('id', id) 
 
             if (error) {
                 return console.error('Error fetching data:', error);
@@ -282,7 +292,8 @@ const ProjectSettings: React.FC = () => {
                     description: projectDesc,
                     deadline: projectDeadline
                 })
-                .eq('created_at', params?.time);
+                .eq('created_at', unix)
+                .eq('id', id) 
 
             if (error) {
                 console.error('Error updating data:', error);
@@ -312,7 +323,8 @@ const ProjectSettings: React.FC = () => {
             const { error } = await supabase
                 .from('projects')
                 .delete()
-                .eq('created_at', params?.time)
+                .eq('created_at', unix)
+                .eq('id', id) 
 
             if (error) {
                 setLoading(false)

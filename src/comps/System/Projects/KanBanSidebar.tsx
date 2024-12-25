@@ -101,6 +101,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
             const { data, error } = await supabase
                 .from('projects')
                 .select('*')
+                .eq('id', id)
                 .eq('created_at', unix)
                 .single();  // Use .single() if expecting exactly one row
 
@@ -113,6 +114,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
                 console.log(data)
                 setChatArray(data?.chatarr);  // Set the chat array if data is valid 
             } else {
+                setChatArray(null);
                 console.log("No chats found for this project.");
             }
         } catch (err) {
@@ -135,7 +137,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
                         onClick={() => { setOpenKanbanChat(true) }}
                         className={` w-auto md:w-full  flex items-center gap-2 md:text-md px-3 py-1 text-left rounded-lg cursor-pointer`}>
                         <CiChat1 /> Chats
-                        {chatArray && user && chatArray.length > 0 && (
+                        {chatArray != null && user && chatArray.length > 0 && (
                             <div className='text-[10px] bg-[#111] border-[1px] border-[#414141] p-2 rounded-lg'>
                                 {chatArray.length >= 999 ? "999+" : chatArray.length}
                             </div>
