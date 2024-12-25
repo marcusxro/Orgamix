@@ -263,7 +263,7 @@ const ProjectSidebar: React.FC<propsType> = ({ isUid }) => {
                                     duration: 0.2,
                                     delay: idx * 0.1 // Staggered animation for notifications
                                 }}
-                                onClick={() => { nav(`/user/projects/view/${itm?.created_by}/${itm?.created_at}`); }}
+                                onClick={() => { nav(`/user/projects/view/${itm?.created_by}/${itm?.created_at}_${itm?.id}`); }}
 
                                 className={`${isUid != undefined && isUid === itm?.created_at.toString() && 'bg-[#535353] rounded-lg text-white'} border-[#535353] border-[1px]  bg-[#1b1b1b] rounded-lg  p-2 text-[#888] cursor-pointer`}>
                                 <div className='text-white'>

@@ -29,7 +29,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
     const { openKanbanChat, setOpenKanbanChat, setShowDrawer }: any = useStore()
     const params = useParams()
     const [chatArray, setChatArray] = useState<MessageType[] | null>(null)
-    const [user]:any = IsLoggedIn()
+    const [user]: any = IsLoggedIn()
     const { chatListener }: any = useStore()
 
 
@@ -40,7 +40,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
                 .channel('public:projects')
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, (payload) => {
                     handleRealtimeEvent(payload);
-          
+
                     getChatArray();
                 })
                 .subscribe();
@@ -49,7 +49,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
             return () => {
                 subscription.unsubscribe();
             };
-        } 
+        }
     }, [user, params, chatListener, openKanbanChat]);
 
 
@@ -87,22 +87,31 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
 
 
     async function getChatArray() {
-        console.log("Fetching chats for project:", params?.id);
+        console.log("Fetching chats for project:", params);
+
+        const [unix, id]:any = params.time?.toString().split('_');
+
+        // Log the results
+        console.log("Unix:", unix); // Output: 1732705034508
+        console.log("ID:", id);     // Output: 58
+
+
         try {
             // Query for the project, checking both the created_by and invited_emails
             const { data, error } = await supabase
                 .from('projects')
-                .select('chatarr')
-                .or(`created_by.eq.2280e045-fb4e-4443-b15e-738798a05f2f,invited_emails->>userid.eq.14520956-0ae2-4c52-8797-4eefbb5afc8e`)
+                .select('*')
+                .eq('created_at', unix)
                 .single();  // Use .single() if expecting exactly one row
-    
+
             if (error) {
                 console.error("Error fetching chats:", error);
                 return;
             }
-    
-            if (data?.chatarr) {
-                setChatArray(data.chatarr);  // Set the chat array if data is valid
+
+            if (data) {
+                console.log(data)
+                setChatArray(data?.chatarr);  // Set the chat array if data is valid 
             } else {
                 console.log("No chats found for this project.");
             }
@@ -110,7 +119,7 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
             console.error("Error in getChatArray:", err);
         }
     }
-    
+
 
 
 
@@ -134,10 +143,10 @@ const KanBanSidebar: React.FC<KanBanType> = ({ location }) => {
 
                     </div>
                     <div
-                    onClick={() => { setShowDrawer(true) }}
+                        onClick={() => { setShowDrawer(true) }}
                         className={` w-auto md:w-full  flex items-center gap-2 md:text-md px-3 py-1 text-left rounded-lg cursor-pointer`}
                     >
-                    <FaFlipboard/>    Draw
+                        <FaFlipboard />    Draw
                     </div>
                 </div>
 

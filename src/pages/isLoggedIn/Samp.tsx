@@ -205,12 +205,13 @@ export default function Samp() {
 
 
     async function getProjects() {
-
+        const [unix, id]:any = params.time?.toString().split('_');
         try {
             const { data, error } = await supabase
                 .from('projects')
                 .select('*')
-                .eq('created_at', params?.time)
+                .eq('id', id)
+                .eq('created_at', unix)
 
             if (data) {
                 setFetchedData(data);

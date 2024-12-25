@@ -87,6 +87,7 @@ const Chat:React.FC = () => {
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, (payload) => {
                     handleRealtimeEvent(payload);
                     getChatArray()
+                    getChats();
                 })
                 .subscribe();
             return () => {
@@ -105,9 +106,6 @@ const Chat:React.FC = () => {
                 setChatArray((prevData) =>
                     prevData ? [...prevData, payload.new] : [payload.new]
                 );
-
-
-
                 break;
             case 'UPDATE':
 
@@ -133,11 +131,14 @@ const Chat:React.FC = () => {
     };
 
     async function getChats() {
+        const [unix, id]:any = params.time?.toString().split('_');
+
         try {
             const { data, error } = await supabase
                 .from('projects')
                 .select('chats')
-                .eq('created_at', params?.time)
+                .eq('created_at', unix)
+                .eq('id', id)
                 .single(); // Ensures we get a single result (not an array)
 
           
@@ -162,12 +163,15 @@ const Chat:React.FC = () => {
 
 
     async function createSchemaIfChatsNull() {
+        const [unix, id]:any = params.time?.toString().split('_');
+
         try {
             // Fetch the chats field for the specific project
             const { data, error } = await supabase
                 .from('projects')
                 .select('chats')
-                .eq('created_at', params?.time)
+                .eq('created_at', unix)
+                .eq('id', id)
                 .single(); // Ensures we get a single result (not an array)
 
             if (error) {
@@ -186,8 +190,8 @@ const Chat:React.FC = () => {
                             bgColor: "313131",
                         })
                     })
-                    .eq('created_at', params?.time)
-                    .eq('created_by', user?.id);
+                    .eq('created_at', unix)
+                    .eq('id', id)
 
                 if (updateError) {
                     console.error("Error updating project with new chat schema:", updateError);
@@ -201,11 +205,14 @@ const Chat:React.FC = () => {
     }
 
     async function getChatArray() {
+        const [unix, id]:any = params.time?.toString().split('_');
+
         try {
             const { data, error } = await supabase
                 .from('projects')
                 .select('chatarr')
-                .eq('created_at', params?.time)
+                .eq('created_at', unix)
+                .eq('id', id)
                 .single();
 
             if (error) {
@@ -301,7 +308,9 @@ const Chat:React.FC = () => {
     async function sendChat() {
         setLoading(true)
         console.log("sending chat")
+
         if (loading) {
+            console.log("faled")
             setLoading(false)
             return
         }
@@ -312,9 +321,11 @@ const Chat:React.FC = () => {
         };
         if (!myAccount) {
             console.log("no account")
+
             setLoading(false)
             return
         }
+        const [unix, id]:any = params.time?.toString().split('_');
 
 
         try {
@@ -322,7 +333,8 @@ const Chat:React.FC = () => {
             const { data, error } = await supabase
                 .from('projects')
                 .select('chatarr')
-                .eq('created_at', params?.time)
+                .eq('created_at', unix)
+                .eq('id', id) 
                 .single();
 
             if (error) {
@@ -346,7 +358,8 @@ const Chat:React.FC = () => {
                 const { error: updateError } = await supabase
                     .from('projects')
                     .update({ chatarr: updatedChatArr })
-                    .eq('created_at', params?.time)
+                  .eq('created_at', unix)
+                .eq('id', id) 
 
                 if (updateError) {
                     console.log("Error updating chatArr:", updateError);
@@ -468,7 +481,7 @@ const Chat:React.FC = () => {
                                                                         (itm?.userid === user?.id ? "bg-[#111111] ml-auto " : "bg-[#77777722] mr-auto w-auto")} shadow-md text-white border-[#535353] border-[1px] max-w-[300px] text-sm p-2 rounded-md break-all`}>
                                                                     {itm?.id.toString().includes('muted-') && itm?.userEmail + " "}
                                                                     {itm?.content}
-                                                                        ssss
+                                                                 
                                                                 </div>
                                                             </div>
                                                         </motion.div>
