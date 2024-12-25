@@ -10,6 +10,7 @@ import { CiStar } from "react-icons/ci";
 import { IoMdStar } from "react-icons/io"; //filled star color
 import { Button } from './Button';
 import moment from 'moment';
+import FetchPFP from '../../FetchPFP';
 
 interface invitedEmails {
     username: string;
@@ -68,9 +69,9 @@ interface accountType {
     id: number;
     fullname: string;
 }
-const ProjectSettings:React.FC = () => {
+const ProjectSettings: React.FC = () => {
     const [isExiting, setIsExiting] = useState(false);
-    const { setOpenKanbanSettings}: any = useStore()
+    const { setOpenKanbanSettings }: any = useStore()
     const params = useParams()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [projectTitle, setProjectTitle] = useState<string>("");
@@ -82,7 +83,7 @@ const ProjectSettings:React.FC = () => {
     const [isEdit, setIsEdit] = useState<boolean>(false)
     const [isEq, setIsEq] = useState("")
 
-    const [loading,setLoading] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
 
     useEffect(() => {
         if (fetchedData) {
@@ -93,7 +94,7 @@ const ProjectSettings:React.FC = () => {
         }
     }, [fetchedData, isEdit])
 
-    const [user]:any = IsLoggedIn()
+    const [user]: any = IsLoggedIn()
 
     const handleOutsideClick = () => {
         setIsExiting(true);
@@ -163,31 +164,35 @@ const ProjectSettings:React.FC = () => {
             }
 
             // Check if project data exists
+
             if (projectData && projectData.length > 0) {
                 const createdBy = projectData[0]?.created_by;
 
+                console.log(createdBy)
                 // Second query: Fetching related accounts based on created_by from the first query
-                const { data: accountData, error: accountError } = await supabase
-                    .from('accounts')
-                    .select('*')
-                    .eq('userid', createdBy);
+                if (createdBy) {
+                    const { data: accountData, error: accountError } = await supabase
+                        .rpc('get_accounts_by_uid', { p_uid: createdBy });
 
-                // Handle error for the second query
-                if (accountError) {
-                    console.error('Error fetching account data:', accountError);
-                    return;
-                }
+                    // Handle error for the second query
+                    if (accountError) {
+                        console.error('Error fetching account data:', accountError);
+                        return;
+                    }
 
-                // If account data exists, update the state with it
-                if (accountData) {
-                    setAdminData(accountData);  // Set admin data from the second query
+                    // If account data exists, update the state with it
+                    if (accountData) {
+                        console.log(accountData)
+                        setAdminData(accountData);  // Set admin data from the second query
+                    }
                 }
             }
 
             // After both queries are done, update fetched data if projectData is available
             if (projectData) {
+                console.log(projectData)
                 setFetchedData(projectData);
-            
+
             }
 
         } catch (err) {
@@ -217,26 +222,26 @@ const ProjectSettings:React.FC = () => {
 
     async function editProject() {
         setLoading(true);
-    
+
         if (!fetchedData) {
             setLoading(false);
             return;
         }
-    
+
         if (loading) {
             setLoading(false);
             return;
         }
-    
+
         if (!projectDesc || !projectTitle) {
             console.log("haha");
             setLoading(false);
             return;
         }
-    
+
         try {
             let finalTitle = projectTitle;
-    
+
             // Check if the title is changing
             if (projectTitle !== fetchedData[0]?.name) {
                 // Check if any project has a similar name
@@ -244,18 +249,18 @@ const ProjectSettings:React.FC = () => {
                     .from('projects')
                     .select('name')
                     .like('name', `${projectTitle}%`);
-    
+
                 if (fetchError) {
                     console.error('Error fetching data:', fetchError);
                     setLoading(false);
                     return;
                 }
-    
+
                 // Find the highest index if there are similar names
                 if (existingProjects.length > 0) {
                     const namePattern = new RegExp(`^${projectTitle} \\((\\d+)\\)$`);
                     let maxIndex = 1;
-    
+
                     existingProjects.forEach(project => {
                         const match = project.name.match(namePattern);
                         if (match) {
@@ -264,11 +269,11 @@ const ProjectSettings:React.FC = () => {
                             maxIndex = 2;
                         }
                     });
-    
+
                     finalTitle = `${projectTitle} (${maxIndex})`;
                 }
             }
-    
+
             // Update the project
             const { error } = await supabase
                 .from('projects')
@@ -278,7 +283,7 @@ const ProjectSettings:React.FC = () => {
                     deadline: projectDeadline
                 })
                 .eq('created_at', params?.time);
-    
+
             if (error) {
                 console.error('Error updating data:', error);
             } else {
@@ -291,7 +296,7 @@ const ProjectSettings:React.FC = () => {
             setLoading(false);
         }
     }
-    
+
 
     const nav = useNavigate()
 
@@ -299,30 +304,43 @@ const ProjectSettings:React.FC = () => {
     async function deleteProject() {
         setLoading(true)
 
-        if(loading) {
+        if (loading) {
             return setLoading(false)
         }
 
         try {
             const { error } = await supabase
-            .from('projects')
-            .delete()
-            .eq('created_at', params?.time)
+                .from('projects')
+                .delete()
+                .eq('created_at', params?.time)
 
-        if (error) {
-            setLoading(false)
-            return console.error('Error fetching data:', error);
-        } else {
-            handleOutsideClick()
-          
-            setLoading(false)
-            setIsEdit(false)
-            nav('/user/projects')
+            if (error) {
+                setLoading(false)
+                return console.error('Error fetching data:', error);
+            } else {
+                handleOutsideClick()
+
+                setLoading(false)
+                setIsEdit(false)
+                nav('/user/projects')
+            }
         }
-        }
-        catch(err) {
+        catch (err) {
             console.log(err)
             setLoading(false)
+        }
+    }
+
+
+
+    const [slicedLength, setSlicedLength] = useState<number>(2)
+
+
+    function toggleLength() {
+        if (slicedLength === 2) {
+            setSlicedLength(fetchedData != null && fetchedData[0]?.invited_emails ? fetchedData[0].invited_emails.length : 2)
+        } else {
+            setSlicedLength(2)
         }
     }
 
@@ -330,7 +348,7 @@ const ProjectSettings:React.FC = () => {
     return (
         <AnimatePresence>
             {
-                !isExiting &&       (fetchedData && fetchedData.length > 0 && (
+                !isExiting && (fetchedData && fetchedData.length > 0 && (
                     (fetchedData[0]?.is_shared !== "private") ||
                     (fetchedData[0]?.is_shared === "private" && fetchedData[0]?.created_by === user?.id))) &&
                 <motion.div
@@ -338,7 +356,7 @@ const ProjectSettings:React.FC = () => {
                     animate={{ opacity: 1, transition: { duration: 0.2 } }}
                     exit={{ opacity: 0, transition: { duration: 0.2 } }}
                     className='ml-auto positioners flex items-center p-3 justify-center w-full h-full'
-                    onClick={() => {!loading && handleOutsideClick()}}>
+                    onClick={() => { !loading && handleOutsideClick() }}>
 
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
@@ -346,7 +364,8 @@ const ProjectSettings:React.FC = () => {
                         exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
                         className={`w-[450px] h-full max-h-[700px] bg-[#313131] z-[5000] rounded-lg p-3 overflow-auto border-[#535353] border-[1px]  flex flex-col justify-between`}
                         onClick={(e) => e.stopPropagation()} >
-                        <div className='overflow-auto  h-full' >
+
+                        <div className='overflow-auto h-full' >
                             <div className='mb-4'>
                                 <div className='text-xl font-bold'>Project settings</div>
                                 <div className='text-sm text-[#888] mt-1'>
@@ -377,28 +396,28 @@ const ProjectSettings:React.FC = () => {
                                                         isEdit ?
                                                             <>
                                                                 <div
-                                                                  onClick={() => {!loading && setIsEdit(prevs => !prevs) }}
-                                                                 className={`${isEdit && "text-red-500"}  hover:bg-[#1111] bg-[#222] border-[#535353] border-[1px]  p-2  rounded-lg cursor-pointer`}>
+                                                                    onClick={() => { !loading && setIsEdit(prevs => !prevs) }}
+                                                                    className={`${isEdit && "text-red-500"}  hover:bg-[#1111] bg-[#222] border-[#535353] border-[1px]  p-2  rounded-lg cursor-pointer`}>
                                                                     Cancel
                                                                 </div>
-                                                                <div 
-                                                                onClick={editProject}
-                                                                className={`${isEdit && "text-green-500 flex items-center"} hover:bg-[#1111] bg-[#222] border-[#535353] border-[1px]  p-2  rounded-lg cursor-pointer`}>
+                                                                <div
+                                                                    onClick={editProject}
+                                                                    className={`${isEdit && "text-green-500 flex items-center"} hover:bg-[#1111] bg-[#222] border-[#535353] border-[1px]  p-2  rounded-lg cursor-pointer`}>
                                                                     {
-                                                                        loading ? 
-                                                                        <div className='w-[20px] h-[20px] flex items-center justify-center'>
-                                                                            <Loader />
-                                                                        </div>
-                                                                        :
-                                                                        "Save"
+                                                                        loading ?
+                                                                            <div className='w-[20px] h-[20px] flex items-center justify-center'>
+                                                                                <Loader />
+                                                                            </div>
+                                                                            :
+                                                                            "Save"
                                                                     }
                                                                 </div>
                                                             </>
 
                                                             :
                                                             <div
-                                                            onClick={() => {(!loading && fetchedData && fetchedData[0]?.created_by === user?.id )&& setIsEdit(prevs => !prevs) }}
-                                                             className={`${isEdit && "text-green-500"} ${fetchedData && fetchedData[0]?.created_by === user?.id && "cursor-pointer"}  cursor-not-allowed bg-[#222] border-[#535353] border-[1px]  p-2 text-2xl rounded-lg`}>
+                                                                onClick={() => { (!loading && fetchedData && fetchedData[0]?.created_by === user?.id) && setIsEdit(prevs => !prevs) }}
+                                                                className={`${isEdit && "text-green-500"} ${fetchedData && fetchedData[0]?.created_by === user?.id && "cursor-pointer"}  cursor-not-allowed bg-[#222] border-[#535353] border-[1px]  p-2 text-2xl rounded-lg`}>
                                                                 <CiEdit />
                                                             </div>
 
@@ -434,7 +453,7 @@ const ProjectSettings:React.FC = () => {
 
                                             <div className='mt-5 text-sm text-[#888] flex items-start justify-between  gap-2'>
                                                 <div
-                                                    onClick={() => {fetchedData && fetchedData[0]?.created_by === user?.id && setAsFav()}}
+                                                    onClick={() => { fetchedData && fetchedData[0]?.created_by === user?.id && setAsFav() }}
                                                     className={`${fetchedData && fetchedData[0]?.created_by === user?.id ? "cursor-pointer" : "cursor-not-allowed"}  flex items-center gap-2 w-auto bg-[#222] p-2 rounded-lg`}>
                                                     Favorite
                                                     <div className='text-2xl'>
@@ -464,8 +483,68 @@ const ProjectSettings:React.FC = () => {
                                                         <div>Created by:</div>
                                                         <div>
                                                             {adminData != null && adminData[0]?.username.length >= 10 ? (adminData[0]?.username.slice(0, 10) + "...") : (adminData && adminData[0]?.username)}
+
                                                         </div>
                                                     </div>
+                                                </div>
+                                            </div>
+
+                                            <div className='mt-6'>
+                                                <div>Members</div>
+
+                                                <div className='flex flex-col gap-2 mt-2'>
+                                                    {
+                                                        adminData && adminData[0] &&
+                                                        <div
+                  
+                                                            className='flex cursor-pointer items-center gap-3 bg-[#222] p-2 rounded-lg'>
+
+                                                            <div className='w-[30px] border-[1px] border-[#888] h-[30px] overflow-hidden rounded-full'>
+                                                                <FetchPFP userUid={adminData[0].userid as string} />
+                                                            </div>
+
+
+                                                            <div>
+                                                                <div className='font-semibold'>{adminData[0].email}</div>
+                                                                <div className='text-sm text-[#888]'>{adminData[0].username}</div>
+                                                                <div className='text-sm text-[#888]'>Admin</div>
+                                                            </div>
+
+                                                        </div>
+                                                    }
+                                                    {
+                                                        fetchedData[0]?.invited_emails?.slice(0, slicedLength).map((email: any, index) => {
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                    className='flex cursor-pointer items-center gap-3 bg-[#222] p-2 rounded-lg'>
+
+                                                                    <div className='w-[30px]   border-[1px] border-[#888]  h-[30px] overflow-hidden rounded-full'>
+                                                                        <FetchPFP userUid={email.userid as string} />
+                                                                    </div>
+
+
+                                                                    <div>
+                                                                        <div className='font-semibold'>{email.email}</div>
+                                                                        <div className='text-sm text-[#888]'>{email.username}</div>
+                                                                    </div>
+
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                    {
+                                                        fetchedData[0]?.invited_emails && fetchedData[0].invited_emails.length >= 3 &&
+                                                        <div className='flex items-start'>
+                                                            <div
+                                                                onClick={toggleLength}
+                                                                className='cursor-pointer hover:text-[#888]'>
+                                                                {
+                                                                    slicedLength === 2 ? "Show more" : "Show less"
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
                                                 </div>
                                             </div>
 
@@ -478,20 +557,20 @@ const ProjectSettings:React.FC = () => {
                                                 </div>
                                                 <input
                                                     value={isEq}
-                                                    onChange={(e) => { fetchedData && fetchedData[0]?.created_by === user?.id &&  setIsEq(e.target.value) }}
+                                                    onChange={(e) => { fetchedData && fetchedData[0]?.created_by === user?.id && setIsEq(e.target.value) }}
                                                     placeholder='Confirm the text above'
                                                     type="text"
                                                     readOnly={(!isEdit && (fetchedData && fetchedData[0]?.created_by === user?.id)) ? false : true}
                                                     className="mt-2 bg-[#111] border-[#535353] border-[1px]  outline-none p-3 rounded-lg w-full"
                                                 />
                                                 <div
-                                                onClick={() => {!loading && isEq === ("delete/" +  fetchedData[0]?.name)  && deleteProject()}}
-                                                    className={`${isEq === ("delete/" +  fetchedData[0]?.name) && "bg-red-950 text-white cursor-pointer"} 
+                                                    onClick={() => { !loading && isEq === ("delete/" + fetchedData[0]?.name) && deleteProject() }}
+                                                    className={`${isEq === ("delete/" + fetchedData[0]?.name) && "bg-red-950 text-white cursor-pointer"} 
                                                   mt-2  text-[#888] bg-[#2222] cursor-not-allowed text-center border-[#535353] border-[1px]  outline-none p-2 rounded-lg w-full`}>
                                                     Delete
                                                 </div>
                                                 <div className='my-2 text-sm text-[#888]'>
-                                                  Once you delete this, there is no way to retrieve this project back.
+                                                    Once you delete this, there is no way to retrieve this project back.
                                                 </div>
                                             </div>
 
@@ -507,7 +586,7 @@ const ProjectSettings:React.FC = () => {
 
                         <div className='rounded-lg overflow-hidden border-[#535353] border-[1px]'>
                             <Button
-                            onClick={() => {!loading && handleOutsideClick()}}
+                                onClick={() => { !loading && handleOutsideClick() }}
                                 variant={"withCancel"}>
                                 Close
                             </Button>
