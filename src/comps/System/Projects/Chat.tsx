@@ -446,22 +446,29 @@ const Chat:React.FC = () => {
                                                                  <FetchPFP userUid={itm?.userid} />
                                                                 </div>
                                                             }
-                                                            <div className='flex flex-col gap-1 items-start justify-start'>
-                                                                {
-                                                                    <div className={`${itm?.userid === user?.id ? "text-right" : "text-left"} text-[10px] w-full text-[#888]`}>
-                                                                        {!(user?.id === itm?.userid) && (!itm?.id.toString().includes('muted-')) && itm?.userEmail + " • "}
-                                                                        {
-                                                                            (!itm?.id.toString().includes('muted-')) &&
-                                                                            itm?.id
-                                                                            && moment(parseInt(itm?.id.toString())).fromNow() // Show time ago (e.g., "2 minutes ago")
-                                                                        }
-                                                                    </div>
-                                                                }
+                                                                <div className='flex flex-col gap-1 items-start justify-start'>
+                                                                    {
+                                                                        <div className={`${itm?.userid === user?.id ? "text-right" : "text-left"} text-[10px] w-full text-[#888]`}>
+                                                                            {!(user?.id === itm?.userid) && (!itm?.id.toString().includes('muted-')) && itm?.userEmail + " • "}
+                                                                            {
+                                                                                (!itm?.id.toString().includes('muted-')) &&
+                                                                                itm?.id &&
+                                                                                moment(itm?.id).calendar(null, {
+                                                                                    sameDay: '[Today at] LT',
+                                                                                    lastDay: '[Yesterday at] LT',
+                                                                                    lastWeek: '[Last] dddd [at] LT',
+                                                                                    sameElse: 'MMMM Do YYYY, h:mm:ss a'
+                                                                                }) // Show formatted date and time
+                                                                            }
+                                                                        </div>
+                                                                    }
+                                                                
                                                                 <div
                                                                     className={`${itm?.id.toString().includes('muted-') ? "border-none mx-auto w-full text-[#888] max-w-100" :
                                                                         (itm?.userid === user?.id ? "bg-[#111111] ml-auto " : "bg-[#77777722] mr-auto w-auto")} shadow-md text-white border-[#535353] border-[1px] max-w-[300px] text-sm p-2 rounded-md break-all`}>
                                                                     {itm?.id.toString().includes('muted-') && itm?.userEmail + " "}
                                                                     {itm?.content}
+                                                                        ssss
                                                                 </div>
                                                             </div>
                                                         </motion.div>
