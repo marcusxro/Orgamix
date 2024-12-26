@@ -4,7 +4,7 @@ import Sidebar from '../../comps/Sidebar'
 import orgamixLogo from '../../assets/Orgamix.png'
 import * as GoogleGenerativeAI from "@google/generative-ai";
 import FetchPFP from '../../comps/FetchPFP';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import Loader from '../../comps/Loader';
 import { IoIosSend } from "react-icons/io";
 import useStore from '../../Zustand/UseStore';

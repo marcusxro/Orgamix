@@ -2,7 +2,7 @@ import React from 'react'
 import OrgamixLogo from '../assets/Orgamix.png'
 import { IoMdClose } from "react-icons/io";
 import useStore from '../Zustand/UseStore';
-import IsLoggedIn from '../firebase/IsLoggedIn';
+import IsLoggedIn from './Utils/IsLoggedIn';
 import FetchPFP from './FetchPFP';
 
 

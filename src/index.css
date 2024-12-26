@@ -56,6 +56,18 @@ body {
   -webkit-backdrop-filter: blur(2px);
 }
 
+
+.maxedIndex{
+  position: fixed;
+  top: 0;
+  z-index: 99999999999999999999999999999999999999;
+  left: 0;
+  background: rgba(41, 41, 41, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(223, 223, 223, 0.37);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
 .blurred{
   background: rgba(41, 41, 41, 0.25);
   box-shadow: 0 8px 32px 0 rgba(223, 223, 223, 0.37);

@@ -7,7 +7,7 @@ import { GoProjectSymlink } from "react-icons/go";
 import { useNavigate, useParams } from 'react-router-dom';
 import useStore from '../../../Zustand/UseStore';
 import { supabase } from '../../../supabase/supabaseClient';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { FaFlipboard } from "react-icons/fa";
 
 interface KanBanType {

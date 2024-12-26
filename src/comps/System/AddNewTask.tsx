@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { supabase } from '../../supabase/supabaseClient'
 import Loader from '../Loader'
-import IsLoggedIn from '../../firebase/IsLoggedIn'
+import IsLoggedIn from '../Utils/IsLoggedIn'
 import 'react-toastify/dist/ReactToastify.css';
 import { MdModeEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -95,15 +95,11 @@ const AddNewTask: React.FC<propsPurpose> = ({ purpose }) => {
                 setLoading(false);
                 return;
             }
-
             // Check if any tasks have a similar title and calculate the next index
             let newTitle = title;
-
-
             if (existingTasks.length > 0) {
                 const exactMatches = existingTasks.filter(itm =>
                     itm?.title === title || itm?.title.startsWith(`${title} (`));
-
                 if (exactMatches.length > 0) {
                     const maxIndex = exactMatches.reduce((acc, itm) => {
                         const match = itm.title.match(/\((\d+)\)$/); // Check for pattern "renameGoal (index)"
@@ -113,13 +109,7 @@ const AddNewTask: React.FC<propsPurpose> = ({ purpose }) => {
 
                     newTitle = `${title} (${maxIndex + 1})`;
                 }
-
-
             }
-
-            
-
-
             // Insert the new task with the modified title
             const { error } = await supabase.from('tasks').insert({
                 title: newTitle,

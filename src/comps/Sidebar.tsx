@@ -7,7 +7,7 @@ import { GoProjectSymlink } from "react-icons/go";
 import { MdDateRange } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { supabase } from '../supabase/supabaseClient';
-import IsLoggedIn from '../firebase/IsLoggedIn';
+import IsLoggedIn from './Utils/IsLoggedIn';
 import gsap from 'gsap'
 import { useNavigate } from 'react-router-dom';
 import { IoIosNotifications } from "react-icons/io";

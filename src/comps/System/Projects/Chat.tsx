@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import useStore from '../../../Zustand/UseStore';
 import { useParams } from 'react-router-dom';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { supabase } from '../../../supabase/supabaseClient';
 import { IoMdClose } from "react-icons/io";
 import { IoSend } from "react-icons/io5";

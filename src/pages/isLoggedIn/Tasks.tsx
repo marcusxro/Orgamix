@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Sidebar from '../../comps/Sidebar'
 import AddNewTask from '../../comps/System/AddNewTask'
-import IsLoggedIn from '../../firebase/IsLoggedIn'
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
 import { supabase } from '../../supabase/supabaseClient'
 import { CiCalendarDate } from "react-icons/ci";
 import { GoSortAsc } from "react-icons/go";

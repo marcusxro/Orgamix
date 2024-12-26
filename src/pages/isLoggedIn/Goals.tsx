@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Sidebar from '../../comps/Sidebar'
 import { FaPlus } from "react-icons/fa6";
 import CreateGoals from '../../comps/System/CreateGoals';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import { supabase } from '../../supabase/supabaseClient';
 import moment from 'moment';
 import { BiCategory } from "react-icons/bi";

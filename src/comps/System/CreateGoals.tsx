@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import IsLoggedIn from '../../firebase/IsLoggedIn'
+import IsLoggedIn from '../Utils/IsLoggedIn'
 import { FaPlus } from "react-icons/fa6";
 import { RxUpdate } from "react-icons/rx";
 import { supabase } from '../../supabase/supabaseClient';

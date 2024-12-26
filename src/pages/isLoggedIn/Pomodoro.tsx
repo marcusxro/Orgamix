@@ -6,7 +6,7 @@ import { FaPause } from "react-icons/fa";
 import { FaPlay } from "react-icons/fa";
 import useStore from '../../Zustand/UseStore';
 import { supabase, supabaseTwo } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import songList from '../../comps/System/Timer/SongList';
 import Switch from "react-switch";
 import Loader from '../../comps/Loader';

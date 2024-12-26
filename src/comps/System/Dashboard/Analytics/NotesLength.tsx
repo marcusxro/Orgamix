@@ -1,7 +1,7 @@
 // useTaskData.ts
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../../supabase/supabaseClient';
-import IsLoggedIn from '../../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../../Utils/IsLoggedIn';
 
 interface fetchedDataType {
     id: number;

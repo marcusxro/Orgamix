@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../../../supabase/supabaseClient';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import IsLoggedIn from '../../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../../Utils/IsLoggedIn';
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 

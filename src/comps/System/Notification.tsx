@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import userNoProfile from '../../assets/UserNoProfile.jpg';
 import { AiTwotoneCloseCircle } from "react-icons/ai";
 import { supabase } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../Utils/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import FetchPFP from '../FetchPFP';

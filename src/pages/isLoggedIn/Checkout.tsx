@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import IsLoggedIn from '../../firebase/IsLoggedIn'
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
 import orgamixLogo from '../../assets/Orgamix.png'
 import { FaInfoCircle } from "react-icons/fa";
 import { IoChevronBack } from "react-icons/io5";
@@ -41,7 +41,6 @@ const Checkout: React.FC = () => {
                         </div>
                         ORGAMIX
                     </div>
-
 
 
                     <div className='flex gap-3 items-center'>

@@ -17,7 +17,7 @@ import 'tldraw/tldraw.css'
 import { Toggle } from './toggle/Toggle'
 import { AnimatePresence, motion } from 'framer-motion'
 import useStore from '../../../Zustand/UseStore'
-import IsLoggedIn from '../../../firebase/IsLoggedIn'
+import IsLoggedIn from '../../Utils/IsLoggedIn'
 import { supabase } from '../../../supabase/supabaseClient'
 import orgamixLogo from '../../../assets/Orgamix.png'
 

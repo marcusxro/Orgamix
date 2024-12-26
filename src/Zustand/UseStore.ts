@@ -120,6 +120,9 @@ interface AppState {
 
     isPaused: boolean | null;
     setIsPaused: (params: boolean) => void;
+
+    isBanned: boolean | null;
+    setIsbanned: (params: boolean) => void;
 }
 
 const useStore = create<AppState>((set) => ({
@@ -223,6 +226,9 @@ const useStore = create<AppState>((set) => ({
 
     isPaused: false,
     setIsPaused: (task) => set({ isPaused: task }),
+
+    isBanned: false,
+    setIsbanned: (task) => set({ isBanned: task }),
 }));
 
 export default useStore;

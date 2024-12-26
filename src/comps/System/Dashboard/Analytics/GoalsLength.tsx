@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../../supabase/supabaseClient';
-import IsLoggedIn from '../../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../../Utils/IsLoggedIn';
 
 interface subtaskType {
     is_done: boolean;

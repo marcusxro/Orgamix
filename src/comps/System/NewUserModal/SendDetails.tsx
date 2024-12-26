@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion';
 import NoUserProfile from '../../../assets/UserNoProfile.jpg'
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { BiSolidError } from "react-icons/bi";
 import projectImage from '../../../assets/ProjectImages/Untitled design (3).png'
 import imageCompression from 'browser-image-compression';

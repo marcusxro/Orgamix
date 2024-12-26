@@ -11,7 +11,7 @@ import useStore from '../../Zustand/UseStore';
 import ImportGoals from '../../comps/System/ImportGoals';
 import UploadImport from '../../comps/System/UploadImport';
 import { supabase } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import moment from 'moment';
 import Loader from '../../comps/Loader';
 import { BiCategory } from "react-icons/bi";

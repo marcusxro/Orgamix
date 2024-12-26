@@ -3,7 +3,7 @@ import { ImUnlocked } from "react-icons/im";
 import { FaLock } from "react-icons/fa";
 import { BsShareFill } from "react-icons/bs";
 import { supabase } from '../../../supabase/supabaseClient';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import Loader from '../../Loader';
 import useStore from '../../../Zustand/UseStore';
 import { motion, AnimatePresence } from 'framer-motion';

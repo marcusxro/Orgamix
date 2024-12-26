@@ -8,7 +8,7 @@ import Deadlines from '../../../assets/Tutorial/Deadlines.png';
 import SetttingsImg from '../../../assets/Tutorial/Settings.png';
 import useStore from '../../../Zustand/UseStore';
 import { supabase } from '../../../supabase/supabaseClient';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import Loader from '../../Loader';
 import { FaArrowAltCircleLeft } from "react-icons/fa";
 import { FaArrowAltCircleRight } from "react-icons/fa";

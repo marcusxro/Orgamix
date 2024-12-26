@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../Utils/IsLoggedIn';
 import 'react-toastify/dist/ReactToastify.css';
 import useStoreBoolean from '../../Zustand/UseStore';
 import { FaPlus } from "react-icons/fa6";

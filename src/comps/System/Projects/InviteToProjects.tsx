@@ -4,7 +4,7 @@ import useStore from '../../../Zustand/UseStore';
 import { ImUnlocked } from "react-icons/im";
 import { FaLock } from "react-icons/fa";
 import { BsShareFill } from "react-icons/bs";
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { Button } from './Button';
 import noUserProfile from '../../../assets/UserNoProfile.jpg'
 import { supabase } from '../../../supabase/supabaseClient';

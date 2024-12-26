@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import useStore from '../../Zustand/UseStore';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../Utils/IsLoggedIn';
 import { supabase } from '../../supabase/supabaseClient';
 import { BiCategory } from "react-icons/bi";
 import { MdOutlineQueryStats } from "react-icons/md";

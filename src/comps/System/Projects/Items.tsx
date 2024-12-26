@@ -9,7 +9,7 @@ import { MdMenuOpen } from "react-icons/md";
 import { supabase } from '../../../supabase/supabaseClient';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { TbSubtask } from "react-icons/tb";
 
 type ItemsType = {

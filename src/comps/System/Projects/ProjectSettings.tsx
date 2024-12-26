@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useStore from '../../../Zustand/UseStore';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../../supabase/supabaseClient';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { CiEdit } from "react-icons/ci";
 import Loader from '../../Loader';
 import { CiStar } from "react-icons/ci";

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import IsLoggedIn from '../firebase/IsLoggedIn';
+import IsLoggedIn from './Utils/IsLoggedIn';
 import { supabase } from '../supabase/supabaseClient';
 import userNoProfile from '../assets/UserNoProfile.jpg';
 import Loader from './Loader';

@@ -154,7 +154,7 @@ const Pricing: React.FC = () => {
                                 Plan for students who need more features
                             </div>
                             <div
-                                onClick={() => { nav('/sign-in') }}
+                                onClick={() => { nav('/user/checkout/student') }}
                                 className='bg-green-800 hover:bg-green-900  border-[1px] border-[#888] w-full p-3 rounded-md mt-3 cursor-pointer'>
                                 Upgrade now
 
@@ -225,7 +225,7 @@ const Pricing: React.FC = () => {
                                 plan for teams who need more features
                             </div>
                             <div
-                                onClick={() => { nav('/sign-in') }}
+                                onClick={() => { nav('/user/checkout/team') }}
                                 className='bg-green-800 hover:bg-green-900  border-[1px] border-[#888] w-full p-3 rounded-md mt-3 cursor-pointer'>
                                 Upgrade now
 

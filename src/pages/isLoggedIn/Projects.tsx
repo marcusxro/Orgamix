@@ -4,7 +4,7 @@ import ProjectSidebar from '../../comps/System/Projects/ProjectSidebar'
 import useStore from '../../Zustand/UseStore'
 import AddProject from '../../comps/System/Projects/AddProject'
 import { supabase } from '../../supabase/supabaseClient'
-import IsLoggedIn from '../../firebase/IsLoggedIn'
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
 import imageBg from '../../assets/ProjectImages/Untitled design (2).png'
 
 import { CiStar } from "react-icons/ci";

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { supabase, supabaseTwo } from '../../../supabase/supabaseClient';
 import { AnimatePresence, motion } from 'framer-motion';
 import { RiMessage3Fill } from "react-icons/ri";

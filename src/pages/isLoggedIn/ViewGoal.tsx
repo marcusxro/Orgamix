@@ -5,7 +5,7 @@ import NoUserProfile from '../../assets/UserNoProfile.jpg'
 import { LuLayoutDashboard } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import { supabase } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import { MdDateRange } from "react-icons/md";
 import Loader from '../../comps/Loader';
 import { GoTasklist } from "react-icons/go";

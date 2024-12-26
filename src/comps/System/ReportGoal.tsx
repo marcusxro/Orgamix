@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../Utils/IsLoggedIn';
 import Loader from '../Loader';
 import { motion, AnimatePresence } from 'framer-motion';
 

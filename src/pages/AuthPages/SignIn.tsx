@@ -12,7 +12,7 @@ import { FaGoogle } from "react-icons/fa";
 import { FaDiscord } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import Loader from '../../comps/Loader';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 import { supabase } from '../../supabase/supabaseClient';
 

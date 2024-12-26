@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../../../../supabase/supabaseClient';
-import IsLoggedIn from '../../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../../Utils/IsLoggedIn';
 import { Carousel, Progress } from "flowbite-react";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';

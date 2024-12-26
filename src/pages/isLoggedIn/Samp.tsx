@@ -43,7 +43,7 @@ import Input from '../../comps/System/Projects/Input';
 import { Button } from '../../comps/System/Projects/Button';
 import KanBanSidebar from '../../comps/System/Projects/KanBanSidebar';
 import { supabase } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import Visualizer from '../../comps/System/Projects/Visualizer';
 import useStore from '../../Zustand/UseStore';
 import EditTaskProject from '../../comps/System/Projects/EditTaskProject';

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../../supabase/supabaseClient'
 import Sidebar from '../../comps/Sidebar'
-import IsLoggedIn from '../../firebase/IsLoggedIn'
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
 import { useLocation } from 'react-router-dom';
 import SidebarDash from '../../comps/System/Dashboard/SidebarDash';
 import TasksAnalytics from '../../comps/System/Dashboard/Analytics/TasksAnalytics';
@@ -59,6 +59,7 @@ const System: React.FC = () => {
 
     return (
         <div className='h-auto selectionNone relative'>
+            
          {
             user && 
             <MetaEditor

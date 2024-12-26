@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { supabase } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../Utils/IsLoggedIn';
 import Loader from '../Loader';
 import ShareNotes from './ShareNotes';
 import { MdModeEdit } from "react-icons/md";

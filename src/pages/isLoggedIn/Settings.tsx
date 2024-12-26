@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Sidebar from '../../comps/Sidebar'
 import NoUserProfile from '../../assets/UserNoProfile.jpg'
-import IsLoggedIn from '../../firebase/IsLoggedIn'
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
 import { supabase } from '../../supabase/supabaseClient'
 import imageCompression from 'browser-image-compression';
 import Loader from '../../comps/Loader'

@@ -18,7 +18,7 @@ import Notification from './comps/System/Notification';
 import { useEffect, useState } from 'react';
 import useNotification from './comps/Notifs';
 import { supabase } from './supabase/supabaseClient';
-import IsLoggedIn from './firebase/IsLoggedIn';
+import IsLoggedIn from './comps/Utils/IsLoggedIn';
 import CalendarPage from './pages/isLoggedIn/CalendarPage';
 import Settings from './pages/isLoggedIn/Settings';
 import SendDetails from './comps/System/NewUserModal/SendDetails';
@@ -37,6 +37,7 @@ import ResetPassword from './pages/AuthPages/Recover/ResetPassword';
 import Pricing from './pages/Static/Pricing';
 import Checkout from './pages/isLoggedIn/Checkout';
 import Articles from './pages/Static/articles/Articles';
+import ShowModalBan from './comps/Utils/ShowModalBan';
 
 
 function App() {
@@ -253,7 +254,6 @@ function Main() {
 
 
 
-
   const { isProgress }: any = useStore()
 
   return (
@@ -264,6 +264,11 @@ function Main() {
         location.pathname.includes('/user') && location.pathname !== '/user/pomodoro' &&
         <TimerModal />
       }
+      {
+        location.pathname.includes('/user') &&
+        <ShowModalBan />
+      }
+
       <Routes>
         {/* static pages */}
         <Route path='/' element={<Homepage />} />

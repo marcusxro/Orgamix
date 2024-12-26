@@ -3,7 +3,7 @@ import { FaHome, FaRegStar } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import useStore from '../../../Zustand/UseStore';
 import { supabase } from '../../../supabase/supabaseClient';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
 import { BsShareFill } from "react-icons/bs";
 import Loader from '../../Loader';

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { supabaseTwo } from '../../../supabase/supabaseClient';
 import { motion } from 'framer-motion';
 import { IoIosArrowBack } from "react-icons/io";

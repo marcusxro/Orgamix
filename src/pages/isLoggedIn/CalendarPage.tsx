@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../../comps/Sidebar';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import { supabase } from '../../supabase/supabaseClient';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import moment from 'moment';

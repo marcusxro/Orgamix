@@ -13,7 +13,7 @@ import ConnectedSvg from '../comps/ConnectedSvg';
 import Footer from '../comps/Footer';
 import AllDevices from '../assets/Homepage/AllDe.png'
 import { MdOutlineArrowOutward } from "react-icons/md";
-import IsLoggedIn from '../firebase/IsLoggedIn';
+import IsLoggedIn from '../comps/Utils/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../Zustand/UseStore';
 import Menu from '../comps/Menu';

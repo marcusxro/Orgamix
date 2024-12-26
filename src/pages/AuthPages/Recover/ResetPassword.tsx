@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { supabase } from '../../../supabase/supabaseClient'
 import { BiSolidError } from "react-icons/bi";
 import Loader from '../../../comps/Loader'
-import IsLoggedIn from '../../../firebase/IsLoggedIn'
+import IsLoggedIn from '../../../comps/Utils/IsLoggedIn'
 
 const ResetPassword: React.FC = () => {
     const { showMenu }: any = useStore()

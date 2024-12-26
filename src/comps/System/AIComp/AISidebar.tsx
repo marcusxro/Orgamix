@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { FaPlus } from "react-icons/fa6";
 import { supabaseTwo } from '../../../supabase/supabaseClient';
-import IsLoggedIn from '../../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../Loader';
 import useStore from '../../../Zustand/UseStore';

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '../../comps/Sidebar';
 import { IoMdAdd } from "react-icons/io";
 import AddNote from '../../comps/System/AddNote';
-import IsLoggedIn from '../../firebase/IsLoggedIn';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import { supabase } from '../../supabase/supabaseClient';
 import moment from 'moment';
 import { CiCalendarDate } from "react-icons/ci";
