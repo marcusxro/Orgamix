@@ -28,6 +28,7 @@ const Checkout: React.FC = () => {
     const nav = useNavigate()
     const [user] = IsLoggedIn()
     const price: number = typeParams.type === 'free' ? 0.00 : typeParams.type?.toLocaleLowerCase() === 'student' ? 50 : 100
+    const planType = typeParams.type?.toLocaleUpperCase() + "-"  + 'PLAN'
     const [finalPrice, setFinalPrice] = useState<number>(price)
     const [selectedMethod, setSelectedMethod] = React.useState('gcash')
 
@@ -176,21 +177,34 @@ const Checkout: React.FC = () => {
         }
     }
 
+
+    const formatDate = (timestamp: number): string => {
+        const date = new Date(timestamp);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // Months are zero-indexed
+        const day = date.getDate();
+        return `${year}-${month}-${day}`;
+      };
+
+      
+      
     async function payNow() {
 
         try {
+
+            const referenceID = user?.id + '-' + formatDate(new Date().getTime())
             const response = await axios.post(
                 'https://api.xendit.co/ewallets/charges',
                 {
-                    reference_id: 'order-id-123',
+                    reference_id: referenceID,
                     currency: 'PHP',
                     amount: finalPrice,
                     checkout_method: 'ONE_TIME_PAYMENT',
                     channel_code: getChannelCode(selectedMethod),
                     customer_id: user?.id,
                     channel_properties: {
-                        success_redirect_url: 'https://www.orgamix.tech/articles',
-                        failure_redirect_url: 'https://www.orgamix.tech/pricing',
+                        success_redirect_url: `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}`,
+                        failure_redirect_url: 'http://localhost:3000/user/failed-payment',
                     },
                     metadata: {
                         branch_area: 'PLUIT',
