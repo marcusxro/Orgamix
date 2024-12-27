@@ -285,7 +285,7 @@ function Main() {
         <Route path='/reset-password/:uuid' element={<ResetPassword />} />
 
 
-        <Route path='/articles' element={user && <Articles />} />
+        <Route path='/articles' element={<Articles />} />
 
 
         {/* system pages */}

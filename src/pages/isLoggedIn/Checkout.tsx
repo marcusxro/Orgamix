@@ -116,27 +116,19 @@ const Checkout: React.FC = () => {
     async function getDiscount(code: string) {
         setLoading(true)
         setErrorMessage(null)
-
         if (loading) return
-
         if (!code) {
             setErrorMessage('Please enter a discount code')
             setLoading(false)
             return
         }
-
         try {
-
-
           const isAllowed = await isCodeValid(code)
-
-
             if(!isAllowed){
                 console.log(isAllowed)
                 setLoading(false)
                 return
             }
-
             const { data: discount, error } = await supabase
                 .from('vouchers')
                 .select('*')
@@ -153,13 +145,9 @@ const Checkout: React.FC = () => {
                 setLoading(false)
                 setDiscountCode(code)
                 console.log(discount)
-
                 const finalizedDiscount = discount.perc ? discount.perc : discount.fixed
-
                 const discountType = discount.perc ? 'percentage' : 'fixed'
-
                 applyDiscount(discountType, finalizedDiscount)
-
                 return discount
             }
         }
@@ -175,12 +163,7 @@ const Checkout: React.FC = () => {
 
     async function payNow() {
 
-        
-
         try {
-
-    
-
             const { data: discount, error }: any = await supabase
                 .from('vouchers')
                 .update({

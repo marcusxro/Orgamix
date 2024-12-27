@@ -117,8 +117,6 @@ const Chat:React.FC = () => {
                         : [payload.new]
                 );
 
-
-
                 break;
             case 'DELETE':
                 setChatArray((prevData) =>
@@ -416,7 +414,6 @@ const Chat:React.FC = () => {
                         exit={{ scale: 0.95, opacity: 0, transition: { duration: 0.2 } }}
                         className={`w-[550px] h-full bg-[#313131] z-[5000] max-h-[700px] rounded-lg  overflow-auto border-[#535353] border-[1px]  flex flex-col justify-between`}
                         onClick={(e) => e.stopPropagation()}>
-
                         <div className='h-auto flex gap-2 justify-between p-3 bg-[#222]  border-b-[#535353] border-b-[1px]'>
                             <div className='flex gap-4 items-center'>
                                 <div>
