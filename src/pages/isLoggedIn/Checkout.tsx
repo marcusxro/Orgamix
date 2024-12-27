@@ -55,17 +55,60 @@ const Checkout: React.FC = () => {
     async function applyDiscount(type: string, discount: number) {
         console.log(type, discount)
 
-        if(type === 'percentage') {
+        if (type === 'percentage') {
             console.log('percentage')
 
             const percentage = (price / 100) * discount
             console.log(percentage)
             setDiscountInt(percentage)
             setFinalPrice(price - percentage)
-        }else {
+        } else {
             console.log('fixed')
             setDiscountInt(discount)
             setFinalPrice(price - discount)
+        }
+    }
+
+    const [discountCode, setDiscountCode] = useState<null | string>(null)
+
+    async function isCodeValid(code: string) {
+        try {
+            const { data: discount, error } = await supabase
+                .from('vouchers')
+                .select('*')
+                .eq('code', code)
+                .single()
+
+            if (error) {
+                setErrorMessage('Discount code not found')
+                throw console.error('code not found');
+            }
+
+
+            //if found
+            if (discount) {
+               
+                const isExpired = new Date(discount.date) < new Date()
+
+                if(isExpired){
+                     setErrorMessage('Discount code is expired')
+                     return false
+                }
+
+                const isMaxed = discount.count >= discount.max_count
+
+                if(isMaxed){
+                     setErrorMessage('Discount code is maxed out')
+                        return false
+                }
+
+                return true
+            }
+        }
+
+        catch (error) {
+            setErrorMessage('Error getting discount')
+            console.error('Error getting discount:', error);
         }
     }
 
@@ -83,6 +126,17 @@ const Checkout: React.FC = () => {
         }
 
         try {
+
+
+          const isAllowed = await isCodeValid(code)
+
+
+            if(!isAllowed){
+                console.log(isAllowed)
+                setLoading(false)
+                return
+            }
+
             const { data: discount, error } = await supabase
                 .from('vouchers')
                 .select('*')
@@ -97,6 +151,7 @@ const Checkout: React.FC = () => {
 
             if (discount) {
                 setLoading(false)
+                setDiscountCode(code)
                 console.log(discount)
 
                 const finalizedDiscount = discount.perc ? discount.perc : discount.fixed
@@ -116,6 +171,37 @@ const Checkout: React.FC = () => {
 
     }
 
+
+
+    async function payNow() {
+
+        
+
+        try {
+
+    
+
+            const { data: discount, error }: any = await supabase
+                .from('vouchers')
+                .update({
+                    count: +1
+                })
+                .eq('code', discountCode)
+                .single()
+
+                if (error) {
+                    throw console.error('code not found');
+                }
+
+            if (discount) {
+                console.log("updated")
+            }
+
+        }
+        catch (error) {
+            console.error('Error paying:', error);
+        }
+    }
 
 
 
@@ -219,7 +305,7 @@ const Checkout: React.FC = () => {
 
                     <div className='mt-5 flex flex-col gap-2'>
                         <div className='text-sm text-[#888]'>Subtotal       ₱{price}</div>
-                        <div className='text-sm text-[#888]'>Discount ₱{discountInt}</div>
+                        <div className='text-sm text-[#888]'>Discount ₱{discountInt != 0 ? `-${discountInt}` : 0}</div>
                         <div className='font-semibold'>Total       ₱{finalPrice}</div>
                     </div>
                     <div className='border-b-[1px] border-b-[#535353] w-full mt-3'>
