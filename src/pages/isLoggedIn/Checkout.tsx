@@ -8,6 +8,8 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { CiLock } from "react-icons/ci";
 import { supabase } from '../../supabase/supabaseClient';
 import Loader from '../../comps/Loader';
+import axios from 'axios';
+import PaymentHeader from '../../comps/System/Payment/PaymentHeader';
 
 
 interface voucherTypes {
@@ -28,7 +30,6 @@ const Checkout: React.FC = () => {
     const price: number = typeParams.type === 'free' ? 0.00 : typeParams.type?.toLocaleLowerCase() === 'student' ? 50 : 100
     const [finalPrice, setFinalPrice] = useState<number>(price)
     const [selectedMethod, setSelectedMethod] = React.useState('gcash')
-    console.log(user)
 
     useEffect(() => {
         if (typeParams.type === 'free') {
@@ -87,19 +88,19 @@ const Checkout: React.FC = () => {
 
             //if found
             if (discount) {
-               
+
                 const isExpired = new Date(discount.date) < new Date()
 
-                if(isExpired){
-                     setErrorMessage('Discount code is expired')
-                     return false
+                if (isExpired) {
+                    setErrorMessage('Discount code is expired')
+                    return false
                 }
 
                 const isMaxed = discount.count >= discount.max_count
 
-                if(isMaxed){
-                     setErrorMessage('Discount code is maxed out')
-                        return false
+                if (isMaxed) {
+                    setErrorMessage('Discount code is maxed out')
+                    return false
                 }
 
                 return true
@@ -123,8 +124,8 @@ const Checkout: React.FC = () => {
             return
         }
         try {
-          const isAllowed = await isCodeValid(code)
-            if(!isAllowed){
+            const isAllowed = await isCodeValid(code)
+            if (!isAllowed) {
                 console.log(isAllowed)
                 setLoading(false)
                 return
@@ -160,30 +161,66 @@ const Checkout: React.FC = () => {
     }
 
 
+    function getChannelCode(code: string) {
+        if (code === 'gcash') {
+            return 'PH_GCASH'
+        }
+        if (code === 'visa') {
+            return 'PH_VISA'
+        }
+        if (code === 'bpi') {
+            return 'PH_BPI'
+        }
+        if (code === 'bdo') {
+            return 'PH_BDO'
+        }
+    }
 
     async function payNow() {
 
         try {
-            const { data: discount, error }: any = await supabase
-                .from('vouchers')
-                .update({
-                    count: +1
-                })
-                .eq('code', discountCode)
-                .single()
-
-                if (error) {
-                    throw console.error('code not found');
+            const response = await axios.post(
+                'https://api.xendit.co/ewallets/charges',
+                {
+                    reference_id: 'order-id-123',
+                    currency: 'PHP',
+                    amount: finalPrice,
+                    checkout_method: 'ONE_TIME_PAYMENT',
+                    channel_code: getChannelCode(selectedMethod),
+                    customer_id: user?.id,
+                    channel_properties: {
+                        success_redirect_url: 'https://www.orgamix.tech/articles',
+                        failure_redirect_url: 'https://www.orgamix.tech/pricing',
+                    },
+                    metadata: {
+                        branch_area: 'PLUIT',
+                        branch_city: 'JAKARTA',
+                    },
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    auth: {
+                        username: import.meta.env.VITE_XENDIT_SECRET_KEY as string,
+                        password: '', // Leave this blank if not using a password
+                    },
                 }
+            );
 
-            if (discount) {
-                console.log("updated")
+            console.log('Success:', response.data);
+
+            if (response.data) {
+                const desktopCHeckoutUrl = response.data.actions.desktop_web_checkout_url
+                console.log(desktopCHeckoutUrl)
+                window.open(desktopCHeckoutUrl)
             }
+        } catch (error) {
+            console.error('Error:', error);
+        }
 
-        }
-        catch (error) {
-            console.error('Error paying:', error);
-        }
+
+
     }
 
 
@@ -191,26 +228,7 @@ const Checkout: React.FC = () => {
 
     return (
         <div className='w-full'>
-            <header className='p-4 w-full flex items-center justify-between border-b-[1px] border-b-[#535353]'>
-                <div className='flex items-center justify-between  max-w-[1200px] mx-auto  w-full'>
-                    <div className='font-bold flex items-center gap-2'>
-                        <div className='w-[30px] h-[30px] overflow-hidden'>
-                            <img src={orgamixLogo} alt="Orgamix Logo" className='h-full w-full object-cover' />
-                        </div>
-                        ORGAMIX
-                    </div>
-
-
-                    <div className='flex gap-3 items-center'>
-                        <div className='border-[1px] flex items-center gap-1 border-[#535353] bg-[#313131] px-3 p-2 rounded-md cursor-pointer hover:bg-[#414141] ' onClick={() => nav(-1)}>
-                            <IoChevronBack /> Back
-                        </div>
-                        <div className='border-[1px] flex items-center gap-2 border-[#535353] bg-[#313131] px-3 p-2 rounded-md cursor-pointer  hover:bg-[#414141] ' onClick={() => nav('/user/settings')}>
-                            Settings <IoSettingsOutline />
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <PaymentHeader />
 
             <div className='rounded-lg max-w-[1200px] mx-auto mt-[3rem]  bg-[#313131] border-[1px] border-[#535353]'>
                 <div className='text-[20px] p-3 flex w-full items-center justify-between font-bold border-b-[1px] border-b-[#535353] pb-2'>
@@ -322,7 +340,9 @@ const Checkout: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className='w-full p-3 rounded-md bg-[#111] cursor-pointer hover:bg-[#151515] border-[1px] border-[#535353] mt-5 text-center'>
+                    <div
+                        onClick={() => payNow()}
+                        className='w-full p-3 rounded-md bg-[#111] cursor-pointer hover:bg-[#151515] border-[1px] border-[#535353] mt-5 text-center'>
                         Pay Now
                     </div>
                     <div className='mt-3'>

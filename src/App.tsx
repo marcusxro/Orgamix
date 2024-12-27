@@ -38,6 +38,9 @@ import Pricing from './pages/Static/Pricing';
 import Checkout from './pages/isLoggedIn/Checkout';
 import Articles from './pages/Static/articles/Articles';
 import ShowModalBan from './comps/Utils/ShowModalBan';
+import Test from './pages/Static/Test';
+import SuccessPayment from './pages/isLoggedIn/Callbacks/SuccessPayment';
+import FailedPayment from './pages/isLoggedIn/Callbacks/FailedPayment';
 
 
 function App() {
@@ -285,7 +288,14 @@ function Main() {
         <Route path='/reset-password/:uuid' element={<ResetPassword />} />
 
 
-        <Route path='/articles' element={<Articles />} />
+
+
+        <Route path='/articles' element={user && <Articles />} />
+
+        <Route path='/test-payment' element={<Test />} />
+
+
+
 
 
         {/* system pages */}
@@ -305,6 +315,12 @@ function Main() {
         <Route path='/user/settings' element={user && <Settings />} />
         {/* checkout */}
         <Route path='/user/checkout/:type' element={user && <Checkout />} />
+
+
+
+        {/* payment callback urls */}
+        <Route path='/user/success-payment' element={<SuccessPayment />} />
+        <Route path='/user/failed-payment' element={<FailedPayment />} />
 
 
 
