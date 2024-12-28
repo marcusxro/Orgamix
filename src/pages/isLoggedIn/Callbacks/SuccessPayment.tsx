@@ -1,9 +1,27 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PaymentHeader from '../../../comps/System/Payment/PaymentHeader'
 import { FaCheckCircle } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
 import { useSearchParams } from 'react-router-dom';
+import IsLoggedIn from '../../../comps/Utils/IsLoggedIn';
+import { supabase } from '../../../supabase/supabaseClient';
 
+interface paymentTokens {
+    token: string;
+    is_used: boolean;
+    created_at: string;
+    expires_at: string;
+    userPlan: string;
+}
+
+interface accountDetails {
+    username: string;
+    email: string;
+    userId: string;
+    id: number;
+    plan: string;
+    payment_tokens: paymentTokens
+}
 
 const SuccessPayment: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -12,6 +30,119 @@ const SuccessPayment: React.FC = () => {
     const item = searchParams.get('item');
     const dateVal = searchParams.get('date');
     const type = searchParams.get('type');
+    const transactionToken: string | null = searchParams.get('token');
+
+    const [user] = IsLoggedIn();
+
+    const [isError, setIsError] = useState<string | null>(null);
+
+
+    // Validate and update token on success
+
+
+    async function validateProcess() {
+        try {
+            const { data: userAccount, error } = await supabase
+                .from('accounts')
+                .select('*')
+                .eq('userid', user.id)
+                .single();
+
+            if (error || !userAccount) {
+                console.error('Failed to fetch user account:', error);
+                return null;
+            }
+
+            console.log('User account fetched:', userAccount);
+            return userAccount;
+        } catch (error) {
+            console.error('Unexpected error while fetching user account:', error);
+            return null;
+        }
+    }
+
+
+
+    async function validateAndProcessToken(token: string) {
+
+        console.log("Validating token");
+
+        const userAccount = await validateProcess();
+
+        if (!userAccount) {
+            setIsError('Failed to fetch user account');
+            return;
+        }
+
+        console.log(userAccount);
+
+
+        // Check if token is valid
+        if (userAccount.payment_tokens.token !== token) {
+            setIsError('Invalid token (not found)');
+            return;
+        }
+
+        // Check if token is used
+        if (userAccount.payment_tokens.is_used) {
+            setIsError('Token already used');
+            return;
+        }
+
+        // Check if token is expired
+        if (userAccount.payment_tokens.expires_at < new Date().toISOString()) {
+            setIsError('Token expired');
+            return;
+        }
+
+        // Check if user plan is the same as the token
+        if (userAccount.payment_tokens.user_plan !== item) {
+            setIsError('Invalid token (not matching user plan)');
+            return;
+        }
+
+        const updatedTokens = {
+            token: token,
+            is_used: true,
+            created_at: new Date().toISOString(),
+            expires_at: new Date().toISOString(),
+            user_plan: item
+        }
+        
+
+  
+        // Mark token as used
+        const { error: updateError } = await supabase
+            .from('accounts')
+            .update({
+                payment_tokens: { ...updatedTokens }, // Ensure the JSON structure matches
+            })
+            .eq('userid', user.id)
+
+
+        if (updateError) {
+            console.error('Failed to update token:', updateError);
+            setIsError('Failed to update token');
+            return;
+        }
+
+        // Update user's subscription plan
+        const { error: userUpdateError } = await supabase
+            .from('accounts')
+            .update({ plan: item })
+            .eq('userid', user.id)
+
+        if (userUpdateError) {
+            setIsError('Failed to update user subscription');
+        }
+
+        return { success: true };
+    }
+
+    useEffect(() => {
+        validateAndProcessToken(transactionToken != null ? transactionToken : '');
+    }, [transactionId, searchParams, user]);
+
 
     return (
         <div className='w-full h-[85vh]'>
@@ -58,17 +189,24 @@ const SuccessPayment: React.FC = () => {
                                 <div className='text-[#888]'>Status</div>
                                 <div className='font-semibold bg-[#292929] p-1 px-5 rounded-md border-[#535353]
                                   border-[1px] text-green-500 flex items-center gap-2'>
-                                    <FaCheck/>
+                                    <FaCheck />
                                     Success</div>
                             </div>
 
                         </div>
 
-                   
+
                     </div>
                     <div className='w-full max-w-[600px] mt-5 p-3 border-[1px] bg-green-600 border-[#535353] text-center rounded-md cursor-pointer hover:bg-green-700  text-[#fff]'>
-                            Download receipt
+                        Download receipt
+                    </div>
+
+                    {
+                        isError &&
+                        <div className='text-red-500 mt-5'>
+                            {isError}
                         </div>
+                    }
                 </div>
             </div>
         </div>

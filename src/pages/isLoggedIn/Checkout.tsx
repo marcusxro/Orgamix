@@ -10,6 +10,7 @@ import { supabase } from '../../supabase/supabaseClient';
 import Loader from '../../comps/Loader';
 import axios from 'axios';
 import PaymentHeader from '../../comps/System/Payment/PaymentHeader';
+import { v4 as uuidv4 } from 'uuid'; // For generating unique tokens
 
 
 interface voucherTypes {
@@ -28,10 +29,10 @@ const Checkout: React.FC = () => {
     const nav = useNavigate()
     const [user] = IsLoggedIn()
     const price: number = typeParams.type === 'free' ? 0.00 : typeParams.type?.toLocaleLowerCase() === 'student' ? 50 : 100
-    const planType = typeParams.type?.toLocaleUpperCase() + "-"  + 'PLAN'
+    const planType = typeParams.type?.toLocaleUpperCase() + "-" + 'PLAN'
     const [finalPrice, setFinalPrice] = useState<number>(price)
     const [selectedMethod, setSelectedMethod] = React.useState('gcash')
-
+    const normalPlan = typeParams?.type
     useEffect(() => {
         if (typeParams.type === 'free') {
             console.log('free')
@@ -175,6 +176,11 @@ const Checkout: React.FC = () => {
         if (code === 'bdo') {
             return 'PH_BDO'
         }
+
+        if (code === 'maya') {
+
+            return 'PH_PAYMAYA'
+        }
     }
 
 
@@ -184,51 +190,125 @@ const Checkout: React.FC = () => {
         const month = date.getMonth() + 1; // Months are zero-indexed
         const day = date.getDate();
         return `${year}-${month}-${day}`;
-      };
+    };
 
-      
-      
+
+    async function findUser(userId: string) {
+        const { data, error } = await supabase
+            .from('accounts')
+            .select('*')
+            .eq('userid', userId)
+            .single()
+
+        if (error) {
+            console.error('Error getting user:', error);
+            return null
+        }
+
+        if (data) {
+            return data
+        }
+    }
+
+
+    async function saveTokenToDatabase(userId: string, data: any) {
+        console.log(data)
+
+        const { error } = await supabase
+            .from('accounts')
+            .update({
+                payment_tokens: { ...data }, // Ensure the JSON structure matches
+            })
+            .eq('userid', userId)
+
+
+    
+            if (error) {
+                console.error('Error saving token:', error);
+                return false;
+            }
+        
+            console.log('Token saved');
+            return true; // Indicate success
+    }
+
     async function payNow() {
 
+        if(!user){
+            return
+        }
+
         try {
+            const userDetails = await findUser(user?.id)
 
-            const referenceID = user?.id + '-' + formatDate(new Date().getTime())
-            const response = await axios.post(
-                'https://api.xendit.co/ewallets/charges',
-                {
-                    reference_id: referenceID,
-                    currency: 'PHP',
-                    amount: finalPrice,
-                    checkout_method: 'ONE_TIME_PAYMENT',
-                    channel_code: getChannelCode(selectedMethod),
-                    customer_id: user?.id,
-                    channel_properties: {
-                        success_redirect_url: `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}`,
-                        failure_redirect_url: 'http://localhost:3000/user/failed-payment',
+            console.log(userDetails)
+
+            console.log(getChannelCode(selectedMethod))
+
+            const referenceToken = uuidv4(); // Generate a unique token
+
+
+            const tokenData = {
+                token: referenceToken, ///
+                is_used: false,///
+                created_at: new Date().toISOString(), ///
+                expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Token valid for 24 hours///
+                user_plan: planType, //change to normalPlan if not working
+            };
+
+            const tokenSaved = await saveTokenToDatabase(user?.id, tokenData);
+
+
+            const referenceID = user.id + '-' + formatDate(new Date().getTime())
+      
+
+            const successRedirectUrl = `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}`;
+
+
+            if (tokenSaved) {
+        
+                const response = await axios.post(
+                    'https://api.xendit.co/ewallets/charges',
+                    {
+                        reference_id: referenceID,
+                        currency: 'PHP',
+                        amount: finalPrice,
+                        checkout_method: 'ONE_TIME_PAYMENT',
+                        channel_code: getChannelCode(selectedMethod),
+                        customer_id: user?.id,
+                        channel_properties: {
+                            success_redirect_url: successRedirectUrl,
+                            failure_redirect_url: 'http://localhost:3000/user/failed-payment',
+                            cancel_redirect_url: "https://redirect.me/cancel"
+                        },
+                        metadata: {
+                            branch_area: 'METRO_MANILA',
+                            branch_city: 'QUEZON_CITY',
+                        },
                     },
-                    metadata: {
-                        branch_area: 'PLUIT',
-                        branch_city: 'JAKARTA',
-                    },
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    auth: {
-                        username: import.meta.env.VITE_XENDIT_SECRET_KEY as string,
-                        password: '', // Leave this blank if not using a password
-                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        auth: {
+                            username: import.meta.env.VITE_XENDIT_SECRET_KEY as string,
+                            password: '', // Leave this blank if not using a password
+                        },
+                    }
+                );
+
+                // console.log('Success:', response.data);
+
+                if (response.data) {
+                    const desktopCHeckoutUrl = response.data.actions.desktop_web_checkout_url
+                    console.log(desktopCHeckoutUrl)
+
+                    console.log('Token saved')
+                    window.open(desktopCHeckoutUrl)
+
                 }
-            );
-
-            console.log('Success:', response.data);
-
-            if (response.data) {
-                const desktopCHeckoutUrl = response.data.actions.desktop_web_checkout_url
-                console.log(desktopCHeckoutUrl)
-                window.open(desktopCHeckoutUrl)
             }
+
         } catch (error) {
             console.error('Error:', error);
         }
@@ -336,6 +416,13 @@ const Checkout: React.FC = () => {
                             <img src="https://iqftyamgipfbmjmcqnnq.supabase.co/storage/v1/object/public/assets/checkout/gcash.png" alt="" />
                         </div>
 
+
+                        <div
+                            onClick={() => setSelectedMethod('maya')}
+                            className={`w-[100px]  h-[30px]   flex gap-3 items-center justify-center rounded-md overflow-hidden cursor-pointer ${selectedMethod === 'maya' && 'border-[3px] border-green-300'} `}>
+                            <img src="https://iqftyamgipfbmjmcqnnq.supabase.co/storage/v1/object/public/assets/checkout/maya.jpg" alt="" />
+                        </div>
+
                         <div
                             onClick={() => setSelectedMethod('visa')}
                             className={`w-[100px] h-[30px]  flex gap-3 items-center justify-center rounded-md overflow-hidden cursor-pointer ${selectedMethod === 'visa' && 'border-[3px] border-green-300'}`}>
@@ -352,6 +439,9 @@ const Checkout: React.FC = () => {
                             className={`w-[100px] h-[30px]  flex gap-3 items-center justify-center rounded-md overflow-hidden cursor-pointer ${selectedMethod === 'bdo' && 'border-[3px] border-green-300'}`}>
                             <img src="https://iqftyamgipfbmjmcqnnq.supabase.co/storage/v1/object/public/assets/checkout/bdo.png" alt="" />
                         </div>
+
+
+
                     </div>
 
                     <div
