@@ -17,6 +17,14 @@ interface pubsType {
     publicUrl: string
 }
 
+interface payment_tokens {
+    token: string;
+    is_used: boolean;
+    created_at: string;
+    expires_at: string;
+    userPlan: string;
+}
+
 interface dataType {
     userid: string;
     username: string;
@@ -25,6 +33,7 @@ interface dataType {
     id: number;
     fullname: string;
     plan: string;
+    payment_tokens: payment_tokens
 }
 
 
@@ -139,9 +148,6 @@ const Settings: React.FC = () => {
     };
 
     const [isCompletedPfp, setIsCompletedPfp] = useState<boolean>(false)
-
-
-
 
     const uploadImage = async () => {
 
@@ -666,16 +672,48 @@ const Settings: React.FC = () => {
                                 <div className='mb-2 font-bold'>Subscription</div>
                                 <p className='text-[#888] text-sm'>
                                     {
-                                        
-                                      fetchedData &&  fetchedData && fetchedData[0]?.plan === "free" ?   
+
+                                        fetchedData && fetchedData && fetchedData[0]?.plan === "free" ?
                                             "You are currently on the free plan. Upgrade to student or team plan to unlock more features."
-                                        :   fetchedData &&  fetchedData[0]?.plan === "student" ?
-                                            "You are currently on the student plan. Enjoy your benefits!"
-                                        :   fetchedData &&  fetchedData[0]?.plan === "team" ?
-                                            "You are currently on the team plan. Enjoy all the features with your team!"
-                                        :
-                                            "You are on an unknown plan. Please contact support."
+                                            : fetchedData && fetchedData[0]?.plan === "STUDENT-PLAN" ?
+                                                "You are currently on the student plan. Enjoy your benefits!"
+                                                : fetchedData && fetchedData[0]?.plan === "TEAM-PLAN" ?
+                                                    "You are currently on the team plan. Enjoy all the features with your team!"
+                                                    :
+                                                    "You are on an unknown plan. Please contact support."
                                     }
+
+                                </p>
+
+                                <p className='text-sm'>
+                                    {
+                                        fetchedData && (() => {
+                                            const subscriptionStartDate = new Date(fetchedData[0]?.payment_tokens?.expires_at || new Date());
+                                            const currentDate = new Date();
+
+                                            // Calculate the expiration date as the same date next month
+                                            const expirationDate = new Date(subscriptionStartDate);
+                                            expirationDate.setMonth(subscriptionStartDate.getMonth() + 1);
+
+                                            // Adjust the day if the next month has fewer days (e.g., February)
+                                            if (expirationDate.getDate() !== subscriptionStartDate.getDate()) {
+                                                expirationDate.setDate(0); // Set to the last valid day of the month
+                                            }
+
+                                            const isExpired = currentDate > expirationDate;
+
+                                            return isExpired ? (
+                                                <span className="text-red-500">
+                                                    Your subscription has expired. Please renew your subscription.
+                                                </span>
+                                            ) : (
+                                                <span>
+                                                    Your subscription is active until {expirationDate.toLocaleDateString()}
+                                                </span>
+                                            );
+                                        })()
+                                    }
+
                                 </p>
 
                                 {
@@ -683,13 +721,13 @@ const Settings: React.FC = () => {
                                     <div className='flex gap-2 mt-3'>
                                         <select
                                             onChange={(e) => { setChosenPlan(e.target.value) }}
-                                        className='bg-[#222] border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none'
-                                         name="" id="">
+                                            className='bg-[#222] border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none'
+                                            name="" id="">
                                             <option value="student">Student</option>
                                             <option value="team">Team</option>
                                         </select>
                                         <button
-                                        onClick={() => { nav(`/user/checkout/${chosenPlan}`) }}
+                                            onClick={() => { nav(`/user/checkout/${chosenPlan}`) }}
                                             className='bg-blue-500 border-[1px] border-[#535353] w-full max-w-[100px] rounded-lg p-[4px] outline-none'>
                                             Upgrade
                                         </button>

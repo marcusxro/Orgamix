@@ -221,8 +221,6 @@ const Checkout: React.FC = () => {
             })
             .eq('userid', userId)
 
-
-    
             if (error) {
                 console.error('Error saving token:', error);
                 return false;
@@ -233,40 +231,28 @@ const Checkout: React.FC = () => {
     }
 
     async function payNow() {
-
         if(!user){
             return
         }
-
         try {
             const userDetails = await findUser(user?.id)
-
             console.log(userDetails)
-
             console.log(getChannelCode(selectedMethod))
-
             const referenceToken = uuidv4(); // Generate a unique token
 
-
             const tokenData = {
-                token: referenceToken, ///
-                is_used: false,///
-                created_at: new Date().toISOString(), ///
-                expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Token valid for 24 hours///
-                user_plan: planType, //change to normalPlan if not working
+                token: referenceToken, // Your token reference
+                is_used: false, // Indicates token usage
+                created_at: Date.now(), // Timestamp for when the token was created
+                expires_at: Date.now() + 86400000, // Set to tomorrow's date in UNIX timestamp (milliseconds)
+                user_plan: planType, // Change to normalPlan if not working
             };
 
             const tokenSaved = await saveTokenToDatabase(user?.id, tokenData);
-
-
             const referenceID = user.id + '-' + formatDate(new Date().getTime())
-      
-
-            const successRedirectUrl = `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}`;
-
-
-            if (tokenSaved) {
-        
+            const successRedirectUrl = `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}`;
+           
+             if (tokenSaved) {
                 const response = await axios.post(
                     'https://api.xendit.co/ewallets/charges',
                     {
