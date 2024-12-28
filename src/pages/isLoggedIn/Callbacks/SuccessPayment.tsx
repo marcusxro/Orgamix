@@ -5,6 +5,7 @@ import { FaCheck } from "react-icons/fa";
 import { useSearchParams } from 'react-router-dom';
 import IsLoggedIn from '../../../comps/Utils/IsLoggedIn';
 import { supabase } from '../../../supabase/supabaseClient';
+import { useRef } from "react";
 
 interface paymentTokens {
     token: string;
@@ -14,17 +15,18 @@ interface paymentTokens {
     userPlan: string;
 }
 
-interface accountDetails {
-    username: string;
-    email: string;
-    userId: string;
-    id: number;
-    plan: string;
-    payment_tokens: paymentTokens
-}
+// interface accountDetails {
+//     username: string;
+//     email: string;
+//     userId: string;
+//     id: number;
+//     plan: string;
+//     payment_tokens: paymentTokens
+// }
 
 const SuccessPayment: React.FC = () => {
     const [searchParams] = useSearchParams();
+    const receiptRef = useRef<HTMLDivElement>(null);
 
     const transactionId = searchParams.get('transaction_id');
     const item = searchParams.get('item');
@@ -38,9 +40,24 @@ const SuccessPayment: React.FC = () => {
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
+
+    const handleDownload = async () => {
+        if (receiptRef.current) {
+            // Dynamically import html2pdf.js
+            const html2pdf = (await import('html2pdf.js')).default; // Dynamically import the module
+            
+            const element = receiptRef.current;
+    
+            element.style.height='100%'
+            // Convert HTML to PDF using html2pdf.js
+            html2pdf()
+                .from(element)        // Pass in the element to be converted
+                .save('receipt.pdf'); // Save the PDF
+        }
+    };
+    
+    
     // Validate and update token on success
-
-
     async function validateProcess() {
         try {
             const { data: userAccount, error } = await supabase
@@ -139,10 +156,10 @@ const SuccessPayment: React.FC = () => {
             .from('accounts')
             .update({
                 'payment_tokens': {
-                  ...userAccount.payment_tokens, // Keep previous payment token data
-                  token: token,
-                  is_used: true,
-                  user_plan: item
+                    ...userAccount.payment_tokens, // Keep previous payment token data
+                    token: token,
+                    is_used: true,
+                    user_plan: item
                 }
             })
             .eq('userid', user.id); // Targeting the correct user by their ID
@@ -188,7 +205,9 @@ const SuccessPayment: React.FC = () => {
              bg-[#313131] border-[1px] border-[#535353]'>
 
 
-                <div className='flex flex-col items-center gap-2 w-full'>
+                <div
+                    ref={receiptRef}
+                    className='flex flex-col items-center gap-2 w-full bg-[#313131] p-5'>
                     {
                         user != null &&
                         isLoaded &&
@@ -245,7 +264,10 @@ const SuccessPayment: React.FC = () => {
 
 
                             </div>
-                            <div className='w-full max-w-[600px] mt-5 p-3 border-[1px] bg-green-600 border-[#535353] text-center rounded-md cursor-pointer hover:bg-green-700  text-[#fff]'>
+                            <div
+                                data-html2canvas-ignore
+                                onClick={() => handleDownload()}
+                                className='w-full max-w-[600px] mt-5 p-3 border-[1px] bg-green-600 border-[#535353] text-center rounded-md cursor-pointer hover:bg-green-700  text-[#fff]'>
                                 Download receipt
                             </div>
                         </>
@@ -253,7 +275,9 @@ const SuccessPayment: React.FC = () => {
 
                     {
                         isError &&
-                        <div className='text-red-500 mt-5'>
+                        <div
+                            data-html2canvas-ignore
+                            className='text-red-500 mt-5'>
                             {isError}
                         </div>
                     }
