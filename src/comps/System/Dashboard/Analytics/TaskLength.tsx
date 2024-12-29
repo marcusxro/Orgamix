@@ -1,6 +1,6 @@
 // useTaskData.ts
 import { useEffect, useState } from 'react';
-import { supabase } from '../../../../supabase/supabaseClient';
+import { supabase } from '../../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../../Utils/IsLoggedIn';
 
 export interface TaskDataType {

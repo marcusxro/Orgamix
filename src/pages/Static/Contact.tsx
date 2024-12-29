@@ -1,18 +1,18 @@
 import React from 'react'
-import Header from '../../comps/Header'
+import Header from '../../comps/System/layouts/Header'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
-import Footer from '../../comps/Footer'
+import Footer from '../../comps/System/layouts/Footer'
 import { FaLocationArrow } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
 import { FaCheck, FaPhoneAlt } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa6";
 import { FaGithub } from "react-icons/fa";
 import { FaInstagramSquare } from "react-icons/fa";
-import useStore from '../../Zustand/UseStore';
-import Menu from '../../comps/Menu';
-import { supabase } from '../../supabase/supabaseClient';
+import useStore from '../../comps/Utils/Zustand/UseStore';
+import Menu from '../../comps/System/layouts/Menu';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import { BiSolidError } from "react-icons/bi";
-import Loader from '../../comps/Loader';
+import Loader from '../../comps/Svg/Loader';
 import { IoLocationSharp } from "react-icons/io5";
 
 const Contact: React.FC = () => {

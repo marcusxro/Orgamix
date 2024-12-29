@@ -4,7 +4,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
 import { useSearchParams } from 'react-router-dom';
 import IsLoggedIn from '../../../comps/Utils/IsLoggedIn';
-import { supabase } from '../../../supabase/supabaseClient';
+import { supabase } from '../../../comps/Utils/supabase/supabaseClient';
 import { useRef } from "react";
 
 interface paymentTokens {

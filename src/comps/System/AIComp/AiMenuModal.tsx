@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import IsLoggedIn from '../../Utils/IsLoggedIn';
-import { supabase, supabaseTwo } from '../../../supabase/supabaseClient';
+import { supabase, supabaseTwo } from '../../Utils/supabase/supabaseClient';
 import { AnimatePresence, motion } from 'framer-motion';
 import { RiMessage3Fill } from "react-icons/ri";
 import { useNavigate } from 'react-router-dom';
-import Loader from '../../Loader';
+import Loader from '../../Svg/Loader';
 import { FaPlus } from "react-icons/fa6";
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 import { LuLayoutDashboard } from "react-icons/lu";
 import FetchPFP from '../../FetchPFP';
 

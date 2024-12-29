@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
-import Sidebar from '../../comps/Sidebar'
+import Sidebar from '../../comps/System/layouts/Sidebar'
 import NoUserProfile from '../../assets/UserNoProfile.jpg'
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
-import { supabase } from '../../supabase/supabaseClient'
+import { supabase } from '../../comps/Utils/supabase/supabaseClient'
 import imageCompression from 'browser-image-compression';
-import Loader from '../../comps/Loader'
+import Loader from '../../comps/Svg/Loader'
 import { BiSolidError } from "react-icons/bi";
 import { FaCheck } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import { IoIosLogOut } from "react-icons/io";
-import Footer from '../../comps/Footer'
+import Footer from '../../comps/System/layouts/Footer'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 import { useNavigate } from 'react-router-dom'
 

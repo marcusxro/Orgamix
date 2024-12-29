@@ -8,7 +8,7 @@ import { TbDragDrop } from "react-icons/tb";
 import { IoSettingsOutline } from "react-icons/io5";
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 
 
 

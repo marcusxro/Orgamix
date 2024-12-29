@@ -1,10 +1,10 @@
 import React from 'react'
-import Header from '../../comps/Header'
-import Footer from '../../comps/Footer'
+import Header from '../../comps/System/layouts/Header'
+import Footer from '../../comps/System/layouts/Footer'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 import { useNavigate } from 'react-router-dom'
-import useStore from '../../Zustand/UseStore'
-import Menu from '../../comps/Menu'
+import useStore from '../../comps/Utils/Zustand/UseStore'
+import Menu from '../../comps/System/layouts/Menu'
 
 const NotFoundPage: React.FC = () => {
     const nav = useNavigate()

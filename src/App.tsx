@@ -6,18 +6,18 @@ import ForgotPassword from './pages/AuthPages/ForgotPassword';
 import System from './pages/isLoggedIn/System';
 import Tasks from './pages/isLoggedIn/Tasks';
 import Notes from './pages/isLoggedIn/Notes';
-import VisitNote from './comps/System/VisitNote';
+import VisitNote from './pages/isLoggedIn/VisitNote';
 import Goals from './pages/isLoggedIn/Goals';
 import GoalTemplates from './pages/isLoggedIn/GoalTemplates';
 import ViewGoal from './pages/isLoggedIn/ViewGoal';
 import ScrollToTop from './comps/ScrollToTop';
 import Projects from './pages/isLoggedIn/Projects';
 import Samp from './pages/isLoggedIn/Samp';
-import useStore from './Zustand/UseStore';
+import useStore from './comps/Utils/Zustand/UseStore';
 import Notification from './comps/System/Notification';
 import { useEffect, useState } from 'react';
 import useNotification from './comps/Notifs';
-import { supabase } from './supabase/supabaseClient';
+import { supabase } from './comps/Utils/supabase/supabaseClient';
 import IsLoggedIn from './comps/Utils/IsLoggedIn';
 import CalendarPage from './pages/isLoggedIn/CalendarPage';
 import Settings from './pages/isLoggedIn/Settings';
@@ -272,7 +272,7 @@ function Main() {
         location.pathname.includes('/user') &&
         <ShowModalBan />
       }
-      
+
       {
         location.pathname.includes('/user') &&
         <PlanChecker />

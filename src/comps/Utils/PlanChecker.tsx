@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import IsLoggedIn from './IsLoggedIn';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from './supabase/supabaseClient';
 import ExpirationModal from '../System/ExpirationModal';
 
 const PlanChecker: React.FC = () => {

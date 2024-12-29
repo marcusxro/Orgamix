@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from './supabase/supabaseClient';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CheckBan from './CheckBan';
-import useStore from '../../Zustand/UseStore';
+import useStore from './Zustand/UseStore';
 
 const IsLoggedIn = (): [any | null, React.Dispatch<React.SetStateAction<any | null>>] => {
   const [user, setUser] = useState<any | null>(null);

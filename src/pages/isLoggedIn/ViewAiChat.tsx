@@ -1,13 +1,13 @@
 
 import React, { useEffect, useRef, useState } from 'react'
-import Sidebar from '../../comps/Sidebar'
+import Sidebar from '../../comps/System/layouts/Sidebar'
 import orgamixLogo from '../../assets/Orgamix.png'
 import * as GoogleGenerativeAI from "@google/generative-ai";
 import FetchPFP from '../../comps/FetchPFP';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
-import Loader from '../../comps/Loader';
+import Loader from '../../comps/Svg/Loader';
 import { IoIosSend } from "react-icons/io";
-import useStore from '../../Zustand/UseStore';
+import useStore from '../../comps/Utils/Zustand/UseStore';
 import { FaArrowDown } from "react-icons/fa6";
 import { motion } from 'framer-motion'
 import { IoCopyOutline } from "react-icons/io5";
@@ -15,7 +15,7 @@ import { PiSpeakerHigh } from "react-icons/pi";
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import { FaCircleStop } from "react-icons/fa6";
 import AISidebar from '../../comps/System/AIComp/AISidebar';
-import { supabase, supabaseTwo } from '../../supabase/supabaseClient';
+import { supabase, supabaseTwo } from '../../comps/Utils/supabase/supabaseClient';
 import { useLocation, useParams } from 'react-router-dom';
 import AIHeader from '../../comps/System/AIComp/AIHeader';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';

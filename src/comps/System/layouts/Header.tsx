@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import IsLoggedIn from './Utils/IsLoggedIn'
+import IsLoggedIn from '../../Utils/IsLoggedIn'
 import { useNavigate } from 'react-router-dom'
 import OrgamixLogo from '../assets/Orgamix.png'
 import { HiOutlineMenuAlt4 } from "react-icons/hi"
-import useStore from '../Zustand/UseStore'
+import useStore from '../../Utils/Zustand/UseStore'
 
 const Header: React.FC = () => {
     const [user]:any = IsLoggedIn()

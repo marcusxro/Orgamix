@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { supabase } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../Utils/IsLoggedIn';
+import { supabase } from '../../Utils/supabase/supabaseClient';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import 'react-toastify/dist/ReactToastify.css';
-import useStoreBoolean from '../../Zustand/UseStore';
+import useStoreBoolean from '../../Utils/Zustand/UseStore';
 import { FaPlus } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { MdModeEdit } from "react-icons/md";
 import { motion, AnimatePresence } from 'framer-motion'
-import useStore from '../../Zustand/UseStore';
-import Loader from '../Loader';
+import useStore from '../../Utils/Zustand/UseStore';
+import Loader from '../../Svg/Loader';
 
 
 interface objPassContent {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '../../../supabase/supabaseClient';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { CiEdit } from "react-icons/ci";
-import Loader from '../../Loader';
+import Loader from '../../Svg/Loader';
 import { CiStar } from "react-icons/ci";
 import { IoMdStar } from "react-icons/io"; //filled star color
 import { Button } from './Button';

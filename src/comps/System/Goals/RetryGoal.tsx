@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { supabase } from '../../supabase/supabaseClient'
+import { supabase } from '../Utils/supabase/supabaseClient'
 import { useParams } from 'react-router-dom'
 import IsLoggedIn from '../Utils/IsLoggedIn'
 import Loader from '../Loader'

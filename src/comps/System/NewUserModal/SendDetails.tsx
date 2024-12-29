@@ -5,8 +5,8 @@ import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { BiSolidError } from "react-icons/bi";
 import projectImage from '../../../assets/ProjectImages/Untitled design (3).png'
 import imageCompression from 'browser-image-compression';
-import { supabase } from '../../../supabase/supabaseClient';
-import Loader from '../../Loader';
+import { supabase } from '../../Utils/supabase/supabaseClient';
+import Loader from '../../Svg/Loader';
 
 interface AccType {
     userid: string;

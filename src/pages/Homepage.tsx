@@ -1,5 +1,5 @@
 import React from 'react'
-import Header from '../comps/Header'
+import Header from '../comps/System/layouts/Header'
 import gradientVideo from '../assets/gradient.mp4'
 import Marquee from 'react-fast-marquee'
 import { CiRepeat } from "react-icons/ci";
@@ -10,13 +10,13 @@ import noteSample from '../assets/Homepage/Notes/Note.jpeg'
 import { MdOutlineFileDownload } from "react-icons/md";
 import KanbanDemo from '../assets/Homepage/Kanban/KanbanDemo.mp4'
 import ConnectedSvg from '../comps/ConnectedSvg';
-import Footer from '../comps/Footer';
+import Footer from '../comps/System/layouts/Footer';
 import AllDevices from '../assets/Homepage/AllDe.png'
 import { MdOutlineArrowOutward } from "react-icons/md";
 import IsLoggedIn from '../comps/Utils/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
-import useStore from '../Zustand/UseStore';
-import Menu from '../comps/Menu';
+import useStore from '../comps/Utils/Zustand/UseStore';
+import Menu from '../comps/System/layouts/Menu';
 import MetaEditor from '../comps/MetaHeader/MetaEditor';
 
 const Homepage: React.FC = () => {

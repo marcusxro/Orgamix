@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import WeeklyActivity from './Analytics/WeeklyActivity';
 import InvitedProjects from './Analytics/InvitedProjects';
 import NotifShow from './NotifShow';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 
 const SidebarDash: React.FC = () => {
   const { showActivity, setShowActivity }: any = useStore();

@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import { supabase } from '../../supabase/supabaseClient'
-import Loader from '../Loader'
-import IsLoggedIn from '../Utils/IsLoggedIn'
+import { supabase } from '../../Utils/supabase/supabaseClient'
+import Loader from '../../Svg/Loader'
+import IsLoggedIn from '../../Utils/IsLoggedIn'
 import 'react-toastify/dist/ReactToastify.css';
 import { MdModeEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { AnimatePresence, motion } from 'framer-motion';
-import useStore from '../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 
 interface propsPurpose {
     purpose: string;

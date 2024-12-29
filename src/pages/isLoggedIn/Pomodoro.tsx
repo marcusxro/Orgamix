@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
-import Sidebar from '../../comps/Sidebar'
+import Sidebar from '../../comps/System/layouts/Sidebar'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { FaPause } from "react-icons/fa";
 import { FaPlay } from "react-icons/fa";
-import useStore from '../../Zustand/UseStore';
-import { supabase, supabaseTwo } from '../../supabase/supabaseClient';
+import useStore from '../../comps/Utils/Zustand/UseStore';
+import { supabase, supabaseTwo } from '../../comps/Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import songList from '../../comps/System/Timer/SongList';
 import Switch from "react-switch";
-import Loader from '../../comps/Loader';
+import Loader from '../../comps/Svg/Loader';
 import { set } from 'date-fns';
 
 interface worksType {

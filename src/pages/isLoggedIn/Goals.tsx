@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import Sidebar from '../../comps/Sidebar'
+import Sidebar from '../../comps/System/layouts/Sidebar'
 import { FaPlus } from "react-icons/fa6";
-import CreateGoals from '../../comps/System/CreateGoals';
+import CreateGoals from '../../comps/System/Goals/CreateGoals';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import moment from 'moment';
 import { BiCategory } from "react-icons/bi";
 import { MdOutlineQueryStats } from "react-icons/md";
 import { MdDateRange } from "react-icons/md";
 import { LuLayoutTemplate } from "react-icons/lu";
 import { useNavigate } from 'react-router-dom';
-import Loader from '../../comps/Loader';
+import Loader from '../../comps/Svg/Loader';
 import { motion, AnimatePresence } from 'framer-motion'
 import { GoSortAsc } from "react-icons/go";
-import GoalSorter from '../../comps/System/GoalSorter';
+import GoalSorter from '../../comps/System/Goals/GoalSorter';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 interface subtaskType {

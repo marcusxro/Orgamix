@@ -1,10 +1,10 @@
 import React from 'react'
-import Header from '../../comps/Header'
-import Menu from '../../comps/Menu'
+import Header from '../../comps/System/layouts/Header'
+import Menu from '../../comps/System/layouts/Menu'
 import { useNavigate } from 'react-router-dom'
-import useStore from '../../Zustand/UseStore'
+import useStore from '../../comps/Utils/Zustand/UseStore'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
-import Footer from '../../comps/Footer'
+import Footer from '../../comps/System/layouts/Footer'
 import { FaCheck } from "react-icons/fa";
 import PricingFaqs from '../../comps/FaqsComps/FaqsObj'
 import { CiCirclePlus } from "react-icons/ci";

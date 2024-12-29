@@ -1,9 +1,9 @@
 import React from 'react'
 import OrgamixLogo from '../assets/Orgamix.png'
 import { IoMdClose } from "react-icons/io";
-import useStore from '../Zustand/UseStore';
-import IsLoggedIn from './Utils/IsLoggedIn';
-import FetchPFP from './FetchPFP';
+import useStore from '../../Utils/Zustand/UseStore';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
+import FetchPFP from '../../FetchPFP';
 
 
 import { LuLayoutDashboard } from "react-icons/lu";

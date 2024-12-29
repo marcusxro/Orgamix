@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import IsLoggedIn from '../../../Utils/IsLoggedIn';
-import { supabase } from '../../../../supabase/supabaseClient';
+import { supabase } from '../../../Utils/supabase/supabaseClient';
 import moment from 'moment';
 import { BarChart, Bar, Tooltip, XAxis, ResponsiveContainer } from 'recharts';
 import AnalyticsLoader from './Loader/AnalyticsLoader';

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '../../../supabase/supabaseClient';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { useParams } from 'react-router-dom';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 import Loader from '../../Loader';
 import Input from './Input';
 import { Button } from './Button';

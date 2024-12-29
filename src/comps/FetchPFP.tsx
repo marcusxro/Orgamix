@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import IsLoggedIn from './Utils/IsLoggedIn';
-import { supabase } from '../supabase/supabaseClient';
+import { supabase } from './Utils/supabase/supabaseClient';
 import userNoProfile from '../assets/UserNoProfile.jpg';
-import Loader from './Loader';
+import Loader from './Svg/Loader';
 
 interface pubsType {
     publicUrl: string;

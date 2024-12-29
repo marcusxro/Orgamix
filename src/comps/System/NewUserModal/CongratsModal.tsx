@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import Confetti from 'react-confetti'
-import useStore from '../../../Zustand/UseStore'
+import useStore from '../../Utils/Zustand/UseStore'
 
 
 const CongratsModal: React.FC = () => {

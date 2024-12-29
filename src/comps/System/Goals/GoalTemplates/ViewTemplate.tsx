@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import useStore from '../../Zustand/UseStore'
-import { supabase } from '../../supabase/supabaseClient'
-import IsLoggedIn from '../Utils/IsLoggedIn';
+import useStore from '../../../Utils/Zustand/UseStore'
+import { supabase } from '../../../Utils/supabase/supabaseClient'
+import IsLoggedIn from '../../../Utils/IsLoggedIn';
 import { FaPlus } from "react-icons/fa6";
 import { GoTasklist } from "react-icons/go";
 import { GiDna2 } from "react-icons/gi";
-import Loader from '../Loader';
+import Loader from '../../../Svg/Loader';
 import { motion, AnimatePresence } from 'framer-motion';
 
 

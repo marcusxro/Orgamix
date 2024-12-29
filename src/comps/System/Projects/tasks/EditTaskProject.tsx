@@ -1,8 +1,8 @@
 import React, {useEffect, useState } from 'react';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
-import { supabase } from '../../../supabase/supabaseClient';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { IoIosContact } from "react-icons/io";
 import { FaLinesLeaning } from "react-icons/fa6";

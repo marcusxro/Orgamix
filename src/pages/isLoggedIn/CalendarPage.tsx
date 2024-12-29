@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../../comps/Sidebar';
+import Sidebar from '../../comps/System/layouts/Sidebar';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import moment from 'moment';
 import { MdOutlineClass } from "react-icons/md";
@@ -9,7 +9,7 @@ import { BiCategory } from "react-icons/bi";
 import { motion } from 'framer-motion'
 
 import Confetti from 'react-confetti'
-import Loader from '../../comps/Loader';
+import Loader from '../../comps/Svg/Loader';
 
 const CalendarPage: React.FC = () => {
     const [user]:any = IsLoggedIn();

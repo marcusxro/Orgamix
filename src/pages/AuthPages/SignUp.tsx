@@ -1,15 +1,15 @@
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
 import React, { FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { firebaseAuthKey } from '../../firebase/FirebaseKey'
-import Loader from '../../comps/Loader'
-import { supabase } from '../../supabase/supabaseClient'
+import { firebaseAuthKey } from '../../comps/Utils/firebase/FirebaseKey'
+import Loader from '../../comps/Svg/Loader'
+import { supabase } from '../../comps/Utils/supabase/supabaseClient'
 import { motion } from 'framer-motion'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Header from '../../comps/Header'
-import Menu from '../../comps/Menu'
-import useStore from '../../Zustand/UseStore'
+import Header from '../../comps/System/layouts/Header'
+import Menu from '../../comps/System/layouts/Menu'
+import useStore from '../../comps/Utils/Zustand/UseStore'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 
 

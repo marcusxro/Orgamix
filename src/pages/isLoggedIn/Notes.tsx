@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../../comps/Sidebar';
+import Sidebar from '../../comps/System/layouts/Sidebar';
 import { IoMdAdd } from "react-icons/io";
-import AddNote from '../../comps/System/AddNote';
+import AddNote from '../../comps/System/Notes/AddNote';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import moment from 'moment';
 import { CiCalendarDate } from "react-icons/ci";
 import { BiCategory } from "react-icons/bi";
 import { useNavigate } from 'react-router-dom';
-import useStore from '../../Zustand/UseStore';
-import Loader from '../../comps/Loader';
+import useStore from '../../comps/Utils/Zustand/UseStore';
+import Loader from '../../comps/Svg/Loader';
 import { motion, AnimatePresence } from 'framer-motion'
 import { GoSortAsc } from "react-icons/go";
-import NoteSorter from '../../comps/NoteSorter';
+import NoteSorter from '../../comps/System/Notes/NoteSorter';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 

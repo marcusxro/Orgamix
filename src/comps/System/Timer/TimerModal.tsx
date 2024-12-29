@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
-import { supabaseTwo } from '../../../supabase/supabaseClient';
+import { supabaseTwo } from '../../Utils/supabase/supabaseClient';
 import { motion } from 'framer-motion';
 import { IoIosArrowBack } from "react-icons/io";
 import { GrPowerReset } from "react-icons/gr";
@@ -9,7 +9,7 @@ import { FaPlay } from "react-icons/fa";
 import { FaPause } from "react-icons/fa";
 import { GiNextButton } from "react-icons/gi";
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 
 interface WorksType {
     title: string;

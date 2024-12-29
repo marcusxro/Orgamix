@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { supabase } from '../../../../supabase/supabaseClient';
+import { supabase } from '../../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../../Utils/IsLoggedIn';
 import { Carousel, Progress } from "flowbite-react";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { FaArrowAltCircleLeft } from "react-icons/fa";
 import { FaArrowAltCircleRight } from "react-icons/fa";
-import Loader from '../../../Loader';
+import Loader from '../../../Svg/Loader';
 import { useNavigate } from 'react-router-dom';
-import useStore from '../../../../Zustand/UseStore';
+import useStore from '../../../Utils/Zustand/UseStore';
 
 interface fetchedDataType {
     id: number;

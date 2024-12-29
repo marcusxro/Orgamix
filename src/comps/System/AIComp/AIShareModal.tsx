@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 import { IoMdClose } from "react-icons/io";
 import { IoCopyOutline } from "react-icons/io5";
 import { Tooltip as ReactTooltip } from 'react-tooltip'

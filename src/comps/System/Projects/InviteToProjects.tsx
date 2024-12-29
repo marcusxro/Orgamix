@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 import { ImUnlocked } from "react-icons/im";
 import { FaLock } from "react-icons/fa";
 import { BsShareFill } from "react-icons/bs";
 import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { Button } from './Button';
 import noUserProfile from '../../../assets/UserNoProfile.jpg'
-import { supabase } from '../../../supabase/supabaseClient';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import { useParams } from 'react-router-dom';
-import Loader from '../../Loader';
+import Loader from '../../Svg/Loader';
 import FetchPFP from '../../FetchPFP';
 
 

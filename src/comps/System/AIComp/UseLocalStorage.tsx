@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 
 function useLocalStorage(key: string, initialValue: any) {
   const { setIsHidden } = useStore();  // Using Zustand to update the store

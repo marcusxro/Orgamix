@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import MetaEditor from '../../../comps/MetaHeader/MetaEditor'
-import Header from '../../../comps/Header'
-import useStore from '../../../Zustand/UseStore'
-import Menu from '../../../comps/Menu'
+import Header from '../../../comps/System/layouts/Header'
+import useStore from '../../../comps/Utils/Zustand/UseStore'
+import Menu from '../../../comps/System/layouts/Menu'
 import { motion } from 'framer-motion'
-import { supabase } from '../../../supabase/supabaseClient'
+import { supabase } from '../../../comps/Utils/supabase/supabaseClient'
 import { BiSolidError } from "react-icons/bi";
-import Loader from '../../../comps/Loader'
+import Loader from '../../../comps/Svg/Loader'
 import IsLoggedIn from '../../../comps/Utils/IsLoggedIn'
 
 const ResetPassword: React.FC = () => {

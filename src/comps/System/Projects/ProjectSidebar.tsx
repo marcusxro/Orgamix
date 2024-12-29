@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { FaHome, FaRegStar } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
-import useStore from '../../../Zustand/UseStore';
-import { supabase } from '../../../supabase/supabaseClient';
+import useStore from '../../Utils/Zustand/UseStore';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
 import { BsShareFill } from "react-icons/bs";
-import Loader from '../../Loader';
+import Loader from '../../Svg/Loader';
 import { motion } from 'framer-motion'
 interface propsType {
     isUid: string | undefined

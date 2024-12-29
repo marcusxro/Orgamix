@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { FaLinkSlash } from "react-icons/fa6";
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../Utils/IsLoggedIn';
 import NoUserPfp from '../../assets/UserNoProfile.jpg'
 import { useParams } from 'react-router-dom';

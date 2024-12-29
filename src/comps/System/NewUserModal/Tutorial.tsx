@@ -6,10 +6,10 @@ import modalImage from '../../../assets/Tutorial/Modal.png';
 import actionsOne from '../../../assets/Tutorial/ActionsOne.png';
 import Deadlines from '../../../assets/Tutorial/Deadlines.png';
 import SetttingsImg from '../../../assets/Tutorial/Settings.png';
-import useStore from '../../../Zustand/UseStore';
-import { supabase } from '../../../supabase/supabaseClient';
+import useStore from '../../Utils/Zustand/UseStore';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
-import Loader from '../../Loader';
+import Loader from '../../Svg/Loader';
 import { FaArrowAltCircleLeft } from "react-icons/fa";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 

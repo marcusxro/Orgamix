@@ -1,5 +1,5 @@
 import React from 'react'
-import useStore from '../../Zustand/UseStore'
+import useStore from './Zustand/UseStore'
 import BannedUser from '../System/BannedUser'
 
 const ShowModalBan:React.FC = () => {

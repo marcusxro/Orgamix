@@ -3,12 +3,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion'
-import Menu from '../../comps/Menu';
-import Header from '../../comps/Header';
-import useStore from '../../Zustand/UseStore';
-import Loader from '../../comps/Loader';
+import Menu from '../../comps/System/layouts/Menu';
+import Header from '../../comps/System/layouts/Header';
+import useStore from '../../comps/Utils/Zustand/UseStore';
+import Loader from '../../comps/Svg/Loader';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 
 const ForgotPassword:React.FC = () => {

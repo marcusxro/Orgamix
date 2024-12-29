@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import Sidebar from '../../comps/Sidebar'
+import Sidebar from '../../comps/System/layouts/Sidebar'
 import ProjectSidebar from '../../comps/System/Projects/ProjectSidebar'
-import useStore from '../../Zustand/UseStore'
+import useStore from '../../comps/Utils/Zustand/UseStore'
 import AddProject from '../../comps/System/Projects/AddProject'
-import { supabase } from '../../supabase/supabaseClient'
+import { supabase } from '../../comps/Utils/supabase/supabaseClient'
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
 import imageBg from '../../assets/ProjectImages/Untitled design (2).png'
 
@@ -13,7 +13,7 @@ import { MdDateRange } from "react-icons/md";
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import Loader from '../../comps/Loader'
+import Loader from '../../comps/Svg/Loader'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 
 

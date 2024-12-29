@@ -4,10 +4,10 @@ import { IoChevronBackOutline } from "react-icons/io5";
 import NoUserProfile from '../../assets/UserNoProfile.jpg'
 import { LuLayoutDashboard } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import { MdDateRange } from "react-icons/md";
-import Loader from '../../comps/Loader';
+import Loader from '../../comps/Svg/Loader';
 import { GoTasklist } from "react-icons/go";
 import { FaPlus } from "react-icons/fa6";
 import { GiDna2 } from "react-icons/gi";

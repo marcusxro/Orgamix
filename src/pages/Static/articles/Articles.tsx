@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import Menu from '../../../comps/Menu'
-import Header from '../../../comps/Header'
-import useStore from '../../../Zustand/UseStore'
+import Menu from '../../../comps/System/layouts/Menu'
+import Header from '../../../comps/System/layouts/Header'
+import useStore from '../../../comps/Utils/Zustand/UseStore'
 import MetaEditor from '../../../comps/MetaHeader/MetaEditor'
 import ArticleArr from './ArticleJSON'
-import Footer from '../../../comps/Footer'
+import Footer from '../../../comps/System/layouts/Footer'
 
 interface Article {
     id: number,

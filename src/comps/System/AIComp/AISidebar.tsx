@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { FaPlus } from "react-icons/fa6";
-import { supabaseTwo } from '../../../supabase/supabaseClient';
+import { supabaseTwo } from '../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { useNavigate } from 'react-router-dom';
-import Loader from '../../Loader';
-import useStore from '../../../Zustand/UseStore';
+import Loader from '../../Svg/Loader';
+import useStore from '../../Utils/Zustand/UseStore';
 import { motion } from 'framer-motion';
 import { RiMessage3Fill } from "react-icons/ri";
 

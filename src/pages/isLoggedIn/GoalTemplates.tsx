@@ -6,22 +6,22 @@ import { IoSettingsOutline } from "react-icons/io5";
 import Marquee from 'react-fast-marquee'
 import { MdPublish } from "react-icons/md";
 import CreateGoals from '../../comps/System/CreateGoals';
-import ChooseMethod from '../../comps/System/ChooseMethod';
-import useStore from '../../Zustand/UseStore';
+import ChooseMethod from '../../comps/System/Goals/GoalTemplates/ChooseMethod';
+import useStore from '../../comps/Utils/Zustand/UseStore';
 import ImportGoals from '../../comps/System/ImportGoals';
 import UploadImport from '../../comps/System/UploadImport';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import moment from 'moment';
-import Loader from '../../comps/Loader';
+import Loader from '../../comps/Svg/Loader';
 import { BiCategory } from "react-icons/bi";
 import { FaEllipsisH } from "react-icons/fa";
 import { MdOutlineFileDownload } from "react-icons/md";
 import GetAuthor from '../../comps/System/GetAuthor';
-import ViewTemplate from '../../comps/System/ViewTemplate';
+import ViewTemplate from '../../comps/System/Goals/GoalTemplates/ViewTemplate';
 import ReportGoal from '../../comps/System/ReportGoal';
 import { motion, AnimatePresence } from 'framer-motion';
-import Footer from '../../comps/Footer';
+import Footer from '../../comps/System/layouts/Footer';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 import FetchPFP from '../../comps/FetchPFP';
 

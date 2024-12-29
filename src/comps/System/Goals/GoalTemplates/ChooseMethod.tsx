@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import useStore from '../../Zustand/UseStore'
+import useStore from '../../../Utils/Zustand/UseStore'
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface myTypes {

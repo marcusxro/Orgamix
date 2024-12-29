@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import IsLoggedIn from '../../Utils/IsLoggedIn';
-import { supabase } from '../../../supabase/supabaseClient';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { motion, AnimatePresence } from 'framer-motion';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 
 interface dataType {
     id: number;

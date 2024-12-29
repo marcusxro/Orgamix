@@ -4,17 +4,17 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
-import Header from '../../comps/Header';
-import useStore from '../../Zustand/UseStore';
-import Menu from '../../comps/Menu';
+import Header from '../../comps/System/layouts/Header';
+import useStore from '../../comps/Utils/Zustand/UseStore';
+import Menu from '../../comps/System/layouts/Menu';
 import { motion } from 'framer-motion'
 import { FaGoogle } from "react-icons/fa";
 import { FaDiscord } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
-import Loader from '../../comps/Loader';
+import Loader from '../../comps/Svg/Loader';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 
 const SignIn: React.FC = () => {
 

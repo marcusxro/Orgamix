@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import useStore from '../../Zustand/UseStore';
+import useStore from '../Utils/Zustand/UseStore';
 import IsLoggedIn from '../Utils/IsLoggedIn';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../Utils/supabase/supabaseClient';
 import { BiCategory } from "react-icons/bi";
 import { MdOutlineQueryStats } from "react-icons/md";
 import { MdDateRange } from "react-icons/md";

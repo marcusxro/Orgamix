@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { supabase } from '../../supabase/supabaseClient'
-import Sidebar from '../../comps/Sidebar'
+import { supabase } from '../../comps/Utils/supabase/supabaseClient'
+import Sidebar from '../../comps/System/layouts/Sidebar'
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
 import { useLocation } from 'react-router-dom';
 import SidebarDash from '../../comps/System/Dashboard/SidebarDash';
@@ -15,7 +15,7 @@ import NotesLength from '../../comps/System/Dashboard/Analytics/NotesLength';
 import GoalsLength from '../../comps/System/Dashboard/Analytics/GoalsLength';
 import ProjectsLength from '../../comps/System/Dashboard/Analytics/ProjectsLength';
 import { FiActivity } from "react-icons/fi";
-import useStore from '../../Zustand/UseStore';
+import useStore from '../../comps/Utils/Zustand/UseStore';
 import { motion } from 'framer-motion'
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 interface dataType {

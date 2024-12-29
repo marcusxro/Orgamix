@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import Sidebar from '../../comps/Sidebar'
-import AddNewTask from '../../comps/System/AddNewTask'
+import Sidebar from '../../comps/System/layouts/Sidebar'
+import AddNewTask from '../../comps/System/Tasks/AddNewTask'
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
-import { supabase } from '../../supabase/supabaseClient'
+import { supabase } from '../../comps/Utils/supabase/supabaseClient'
 import { CiCalendarDate } from "react-icons/ci";
 import { GoSortAsc } from "react-icons/go";
-import EditTask from '../../comps/System/EditTask'
+import EditTask from '../../comps/System/Tasks/EditTask'
 import 'react-toastify/dist/ReactToastify.css';
-import useStoreBoolean from '../../Zustand/UseStore'
+import useStoreBoolean from '../../comps/Utils/Zustand/UseStore'
 import { IoMdAdd } from "react-icons/io";
 import ViewTask from '../../comps/System/ViewTask'
 import TaskSorter from '../../comps/System/TaskSorter'
-import Loader from '../../comps/Loader'
+import Loader from '../../comps/Svg/Loader'
 import { motion, AnimatePresence } from 'framer-motion'
-import useStore from '../../Zustand/UseStore'
+import useStore from '../../comps/Utils/Zustand/UseStore'
 import { CiRepeat } from "react-icons/ci";
 import MetaEditor from '../../comps/MetaHeader/MetaEditor'
 

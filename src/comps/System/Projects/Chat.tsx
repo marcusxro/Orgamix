@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 import { useParams } from 'react-router-dom';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
-import { supabase } from '../../../supabase/supabaseClient';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import { IoMdClose } from "react-icons/io";
 import { IoSend } from "react-icons/io5";
 import moment from 'moment';
@@ -11,12 +11,11 @@ import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { CiChat1 } from "react-icons/ci";
 import { FaArrowDown } from "react-icons/fa6";
-import Loader from '../../Loader';
+import Loader from '../../Svg/Loader';
 import FetchPFP from '../../FetchPFP';
 
 
 interface MessageType {
-
     userEmail: any;
     userid: any;
     id: number; //timestamp

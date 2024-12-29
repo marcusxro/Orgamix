@@ -16,9 +16,9 @@ import {
 import 'tldraw/tldraw.css'
 import { Toggle } from './toggle/Toggle'
 import { AnimatePresence, motion } from 'framer-motion'
-import useStore from '../../../Zustand/UseStore'
+import useStore from '../../Utils/Zustand/UseStore'
 import IsLoggedIn from '../../Utils/IsLoggedIn'
-import { supabase } from '../../../supabase/supabaseClient'
+import { supabase } from '../../Utils/supabase/supabaseClient'
 import orgamixLogo from '../../../assets/Orgamix.png'
 
 

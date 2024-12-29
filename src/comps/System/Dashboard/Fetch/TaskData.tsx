@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../../../../supabase/supabaseClient';
+import { supabase } from '../../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../../Utils/IsLoggedIn';
 import { CiCalendarDate } from "react-icons/ci";
 import { CiRepeat } from "react-icons/ci";

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { GiScrollQuill } from "react-icons/gi";
+import { supabase } from '../../Utils/supabase/supabaseClient';
 
-import { supabase } from '../../supabase/supabaseClient';
+
 
 async function fetchAuthorByID(params: string): Promise<userType | null> {
     try {
-        const { data, error } = await supabase 
+        const { data, error } = await supabase
             .from('accounts')
             .select('username') 
             .eq("userid", params)

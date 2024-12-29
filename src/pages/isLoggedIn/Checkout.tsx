@@ -6,8 +6,8 @@ import { FaInfoCircle } from "react-icons/fa";
 import { IoChevronBack } from "react-icons/io5";
 import { IoSettingsOutline } from "react-icons/io5";
 import { CiLock } from "react-icons/ci";
-import { supabase } from '../../supabase/supabaseClient';
-import Loader from '../../comps/Loader';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
+import Loader from '../../comps/Svg/Loader';
 import axios from 'axios';
 import PaymentHeader from '../../comps/System/Payment/PaymentHeader';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique tokens

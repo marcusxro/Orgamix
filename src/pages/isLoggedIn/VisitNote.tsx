@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { supabase } from '../../supabase/supabaseClient';
-import IsLoggedIn from '../Utils/IsLoggedIn';
-import Loader from '../Loader';
-import ShareNotes from './ShareNotes';
+import { supabase } from '../../comps/Utils/supabase/supabaseClient';
+import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
+import Loader from '../../comps/Svg/Loader';
+import ShareNotes from '../../comps/System/ShareNotes';
 import { MdModeEdit } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
-import MetaEditor from '../MetaHeader/MetaEditor';
+import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 
 const fontOptions = [

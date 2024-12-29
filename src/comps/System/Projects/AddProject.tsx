@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import { ImUnlocked } from "react-icons/im";
 import { FaLock } from "react-icons/fa";
 import { BsShareFill } from "react-icons/bs";
-import { supabase } from '../../../supabase/supabaseClient';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
-import Loader from '../../Loader';
-import useStore from '../../../Zustand/UseStore';
+import Loader from '../../Svg/Loader';
+import useStore from '../../Utils/Zustand/UseStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BiSolidError } from "react-icons/bi";
 import { FaCheck } from "react-icons/fa";

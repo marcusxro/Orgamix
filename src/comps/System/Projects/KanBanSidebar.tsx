@@ -5,8 +5,8 @@ import { CiChat1 } from "react-icons/ci";
 import { IoSettingsOutline } from "react-icons/io5";
 import { GoProjectSymlink } from "react-icons/go";
 import { useNavigate, useParams } from 'react-router-dom';
-import useStore from '../../../Zustand/UseStore';
-import { supabase } from '../../../supabase/supabaseClient';
+import useStore from '../../Utils/Zustand/UseStore';
+import { supabase } from '../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { FaFlipboard } from "react-icons/fa";
 

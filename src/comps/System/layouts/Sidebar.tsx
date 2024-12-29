@@ -6,13 +6,13 @@ import { LuGoal } from "react-icons/lu";
 import { GoProjectSymlink } from "react-icons/go";
 import { MdDateRange } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
-import { supabase } from '../supabase/supabaseClient';
-import IsLoggedIn from './Utils/IsLoggedIn';
+import { supabase } from '../../Utils/supabase/supabaseClient';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import gsap from 'gsap'
 import { useNavigate } from 'react-router-dom';
 import { IoIosNotifications } from "react-icons/io";
-import useStore from '../Zustand/UseStore';
-import FetchPFP from './FetchPFP';
+import useStore from '../../Utils/Zustand/UseStore';
+import FetchPFP from '../../FetchPFP';
 import { GiArtificialHive } from "react-icons/gi";
 import { motion } from 'framer-motion'
 import { IoTimer } from "react-icons/io5";

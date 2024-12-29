@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '../../supabase/supabaseClient';
+import { supabase } from '../Utils/supabase/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 const BannedUser: React.FC = () => {

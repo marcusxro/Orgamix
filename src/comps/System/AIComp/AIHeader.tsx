@@ -4,7 +4,7 @@ import { CiShare1 } from "react-icons/ci";
 import { RiMenu4Line } from "react-icons/ri";
 import AiMenuModal from './AiMenuModal';
 import { useParams } from 'react-router-dom';
-import useStore from '../../../Zustand/UseStore';
+import useStore from '../../Utils/Zustand/UseStore';
 import AIShareModal from './AIShareModal';
 import AIInfo from './AIInfo';
 import OrgamixLogo from '../../../assets/Orgamix.png'
