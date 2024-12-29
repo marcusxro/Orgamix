@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FaLinkSlash } from "react-icons/fa6";
 import { supabase } from '../../Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
-import NoUserPfp from '../../assets/UserNoProfile.jpg'
+import NoUserPfp from '../../../assets/UserNoProfile.jpg';
 import { useParams } from 'react-router-dom';
 import Loader from '../../Svg/Loader';
 import { motion, AnimatePresence } from 'framer-motion';
