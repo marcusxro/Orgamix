@@ -13,8 +13,8 @@ import { FaPlus } from "react-icons/fa6";
 import { GiDna2 } from "react-icons/gi";
 import { MdDelete } from "react-icons/md";
 import moment from 'moment';
-import RetryGoal from '../../comps/System/RetryGoal';
-import DeleteGoal from '../../comps/System/DeleteGoal';
+import RetryGoal from '../../comps/System/Goals/RetryGoal';
+import DeleteGoal from '../../comps/System/Goals/DeleteGoal';
 import { motion, AnimatePresence } from 'framer-motion'
 
 
