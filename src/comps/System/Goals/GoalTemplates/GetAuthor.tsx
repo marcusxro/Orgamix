@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { GiScrollQuill } from "react-icons/gi";
-import { supabase } from '../../Utils/supabase/supabaseClient';
+import { supabase } from '../../../Utils/supabase/supabaseClient';
+
 
 
 
