@@ -41,6 +41,7 @@ import ShowModalBan from './comps/Utils/ShowModalBan';
 import Test from './pages/Static/Test';
 import SuccessPayment from './pages/isLoggedIn/Callbacks/SuccessPayment';
 import FailedPayment from './pages/isLoggedIn/Callbacks/FailedPayment';
+import PlanChecker from './comps/Utils/PlanChecker';
 
 
 function App() {
@@ -270,6 +271,11 @@ function Main() {
       {
         location.pathname.includes('/user') &&
         <ShowModalBan />
+      }
+      
+      {
+        location.pathname.includes('/user') &&
+        <PlanChecker />
       }
 
       <Routes>

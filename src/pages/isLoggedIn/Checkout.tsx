@@ -144,9 +144,6 @@ const Checkout: React.FC = () => {
                 throw console.error('code not found');
             }
 
-
-
-
             if (discount) {
         
                 if(discount.listed_uid != null && discount.listed_uid.some((uid: string) => uid === user.id)) {
