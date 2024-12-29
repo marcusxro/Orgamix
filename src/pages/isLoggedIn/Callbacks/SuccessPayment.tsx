@@ -34,6 +34,7 @@ const SuccessPayment: React.FC = () => {
     const type = searchParams.get('type');
     const transactionToken: string | null = searchParams.get('token');
     const finalPrice = searchParams.get('finalprice');
+    const discountCode = searchParams.get('discount');
 
     const [user] = IsLoggedIn();
     const [isError, setIsError] = useState<string | null>(null);
@@ -45,7 +46,6 @@ const SuccessPayment: React.FC = () => {
         if (receiptRef.current) {
             // Dynamically import html2pdf.js
             const html2pdf = (await import('html2pdf.js')).default; // Dynamically import the module
-            
             const element = receiptRef.current;
     
             element.style.height='100%'
@@ -59,6 +59,12 @@ const SuccessPayment: React.FC = () => {
     
     // Validate and update token on success
     async function validateProcess() {
+
+        if(user == null) {
+            setIsError('User not found');
+            return null;
+        }
+
         try {
             const { data: userAccount, error } = await supabase
                 .from('accounts')
@@ -70,8 +76,6 @@ const SuccessPayment: React.FC = () => {
                 console.error('Failed to fetch user account:', error);
                 return null;
             }
-
-            console.log('User account fetched:', userAccount);
             return userAccount;
         } catch (error) {
             console.error('Unexpected error while fetching user account:', error);
@@ -101,7 +105,6 @@ const SuccessPayment: React.FC = () => {
                 return null;
             }
 
-            console.log('User account fetched:', userAccount);
             return userAccount;
         }
         catch (error) {
@@ -110,15 +113,83 @@ const SuccessPayment: React.FC = () => {
         }
     }
 
+    const [isDoneLoading, setIsDoneLoading] = useState<boolean>(false);
+
+    async function validateDiscount(){
+
+        if(isDoneLoading){
+         return
+        }
+
+        if(user == null) {
+            setIsError('User not found');
+            return;
+        }
+
+        setIsDoneLoading(true);
+
+        try {
+            const { data: discountData, error } = await supabase
+                .from('vouchers')
+                .select('*')
+                .eq('code', discountCode)
+                .single();
+
+            if (error || !discountData) {
+                console.error('Failed to fetch discount:', error);
+                return null;
+            }
+
+            if(discountData) {
+                console.log('Discount fetched:', discountData);
+                
+
+                if(discountData.listed_uid != null && discountData.listed_uid.some((uid: string) => uid === user.id)) {
+                    console.error('Discount code has already been used');
+                    return;
+                }   
+
+                if(discountData.max_count === discountData.count) {
+                    console.error('Discount code has reached its limit');
+                    return;
+                }
+
+                if(discountData.expiry_date < new Date().getTime()) {
+                    console.error('Discount code has expired');
+                    return;
+                }
+
+                console.log('======================')
+                const { error: updateError } = await supabase
+                    .from('vouchers')
+                    .update({
+                        count: discountData.count + 1,
+                        listed_uid: [...(discountData.listed_uid || []), user.id]
+                    })
+                    .eq('code', discountCode);
+
+                if (updateError) {
+                    console.error("Error updating discount:", updateError);
+                } else {
+                    console.log("Discount successfully updated.");
+                }
+            }
+       
+        } catch (error) {
+            console.error('Unexpected error while fetching discount:', error);
+            return null;
+        }
+    }
+
+
+    useEffect(() => {
+        validateDiscount();
+    }, [discountCode, isDoneLoading, user]);
 
 
     async function validateAndProcessToken(token: string) {
 
-        console.log("Validating token");
-
         const userAccount = await validateProcess();
-
-        console.log("User account:", userAccount);
 
         if (userAccount === null) {
             setIsError('Failed to fetch user account');
@@ -193,7 +264,7 @@ const SuccessPayment: React.FC = () => {
 
     useEffect(() => {
         validateAndProcessToken(transactionToken != null ? transactionToken : '');
-    }, [transactionId, searchParams, user]);
+    }, [transactionToken, user]);
 
 
     return (

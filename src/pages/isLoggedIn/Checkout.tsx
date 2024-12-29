@@ -144,7 +144,18 @@ const Checkout: React.FC = () => {
                 throw console.error('code not found');
             }
 
+
+
+
             if (discount) {
+        
+                if(discount.listed_uid != null && discount.listed_uid.some((uid: string) => uid === user.id)) {
+                    console.error('Discount code has already been used');
+                    setErrorMessage('Discount code has already been used')
+                    setLoading(false)
+                    return;
+                }   
+
                 setLoading(false)
                 setDiscountCode(code)
                 console.log(discount)
@@ -250,7 +261,7 @@ const Checkout: React.FC = () => {
 
             const tokenSaved = await saveTokenToDatabase(user?.id, tokenData);
             const referenceID = user.id + '-' + formatDate(new Date().getTime())
-            const successRedirectUrl = `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}`;
+            const successRedirectUrl = `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}${discountCode ? `&discount=${discountCode}` : ''}`;
            
              if (tokenSaved) {
                 const response = await axios.post(

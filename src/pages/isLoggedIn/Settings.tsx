@@ -687,7 +687,7 @@ const Settings: React.FC = () => {
 
                                 <p className='text-sm'>
                                     {
-                                        fetchedData && (() => {
+                                        fetchedData && fetchedData[0]?.plan != 'free' && (() => {
                                             const subscriptionStartDate = new Date(fetchedData[0]?.payment_tokens?.expires_at || new Date());
                                             const currentDate = new Date();
 
@@ -707,7 +707,7 @@ const Settings: React.FC = () => {
                                                     Your subscription has expired. Please renew your subscription.
                                                 </span>
                                             ) : (
-                                                <span>
+                                                <span className='text-green-600'>
                                                     Your subscription is active until {expirationDate.toLocaleDateString()}
                                                 </span>
                                             );
