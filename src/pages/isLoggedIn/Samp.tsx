@@ -36,7 +36,7 @@ import {
 
 
 // Components
-import Container from '../../comps/System/Projects/Container';
+import Container from '../../comps/System/Projects/container/Container';
 import Items from '../../comps/System/Projects/Items';
 import Modal from '../../comps/System/Projects/Modal';
 import Input from '../../comps/System/Projects/Input';
@@ -46,9 +46,9 @@ import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import Visualizer from '../../comps/System/Projects/Visualizer';
 import useStore from '../../comps/Utils/Zustand/UseStore';
-import EditTaskProject from '../../comps/System/Projects/EditTaskProject';
+import EditTaskProject from '../../comps/System/Projects/tasks/EditTaskProject';
 import Loader from '../../comps/Svg/Loader';
-import EditContainer from '../../comps/System/Projects/EditContainer';
+import EditContainer from '../../comps/System/Projects/container/EditContainer';
 import InviteToProjects from '../../comps/System/Projects/InviteToProjects';
 import ProjectSettings from '../../comps/System/Projects/ProjectSettings';
 import Chat from '../../comps/System/Projects/Chat';

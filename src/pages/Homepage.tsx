@@ -9,7 +9,7 @@ import { LuLayoutTemplate } from "react-icons/lu";
 import noteSample from '../assets/Homepage/Notes/Note.jpeg'
 import { MdOutlineFileDownload } from "react-icons/md";
 import KanbanDemo from '../assets/Homepage/Kanban/KanbanDemo.mp4'
-import ConnectedSvg from '../comps/ConnectedSvg';
+import ConnectedSvg from '../comps/Svg/ConnectedSvg';
 import Footer from '../comps/System/layouts/Footer';
 import AllDevices from '../assets/Homepage/AllDe.png'
 import { MdOutlineArrowOutward } from "react-icons/md";

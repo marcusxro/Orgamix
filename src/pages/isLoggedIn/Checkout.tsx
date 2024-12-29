@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn'
-import orgamixLogo from '../../assets/Orgamix.png'
 import { FaInfoCircle } from "react-icons/fa";
-import { IoChevronBack } from "react-icons/io5";
-import { IoSettingsOutline } from "react-icons/io5";
 import { CiLock } from "react-icons/ci";
 import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import Loader from '../../comps/Svg/Loader';

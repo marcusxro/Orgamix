@@ -9,8 +9,8 @@ import EditTask from '../../comps/System/Tasks/EditTask'
 import 'react-toastify/dist/ReactToastify.css';
 import useStoreBoolean from '../../comps/Utils/Zustand/UseStore'
 import { IoMdAdd } from "react-icons/io";
-import ViewTask from '../../comps/System/ViewTask'
-import TaskSorter from '../../comps/System/TaskSorter'
+import ViewTask from '../../comps/System/Tasks/ViewTask'
+import TaskSorter from '../../comps/System/Tasks/TaskSorter'
 import Loader from '../../comps/Svg/Loader'
 import { motion, AnimatePresence } from 'framer-motion'
 import useStore from '../../comps/Utils/Zustand/UseStore'

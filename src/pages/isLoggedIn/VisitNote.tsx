@@ -5,7 +5,7 @@ import 'react-quill/dist/quill.snow.css';
 import { supabase } from '../../comps/Utils/supabase/supabaseClient';
 import IsLoggedIn from '../../comps/Utils/IsLoggedIn';
 import Loader from '../../comps/Svg/Loader';
-import ShareNotes from '../../comps/System/ShareNotes';
+import ShareNotes from '../../comps/System/Notes/ShareNotes';
 import { MdModeEdit } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import MetaEditor from '../../comps/MetaHeader/MetaEditor';
