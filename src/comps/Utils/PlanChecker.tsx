@@ -68,8 +68,7 @@ const PlanChecker: React.FC = () => {
 
     return (
         <>
-            <>
-                asdasdasd</>
+
             {
                 status === "expired" && (
                     <ExpirationModal />
