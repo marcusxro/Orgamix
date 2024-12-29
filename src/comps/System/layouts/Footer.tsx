@@ -1,5 +1,5 @@
 import React from 'react'
-import OrgamixLogo from '../assets/Orgamix.png'
+import OrgamixLogo from '../../../assets/Orgamix.png'
 import { FaGithub } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
 import { SiGmail } from "react-icons/si";

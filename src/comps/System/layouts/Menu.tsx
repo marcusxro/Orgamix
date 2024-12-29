@@ -1,5 +1,5 @@
 import React from 'react'
-import OrgamixLogo from '../assets/Orgamix.png'
+import OrgamixLogo from '../../../assets/Orgamix.png'
 import { IoMdClose } from "react-icons/io";
 import useStore from '../../Utils/Zustand/UseStore';
 import IsLoggedIn from '../../Utils/IsLoggedIn';
