@@ -1,17 +1,17 @@
 import React, {useEffect, useState } from 'react';
-import useStore from '../../Utils/Zustand/UseStore';
+import useStore from '../../../Utils/Zustand/UseStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'react-router-dom';
-import { supabase } from '../../Utils/supabase/supabaseClient';
-import IsLoggedIn from '../../Utils/IsLoggedIn';
+import { supabase } from '../../../Utils/supabase/supabaseClient';
 import { IoIosContact } from "react-icons/io";
 import { FaLinesLeaning } from "react-icons/fa6";
 import { BsCalendarDate } from "react-icons/bs";
-import Input from './Input';
-import { Button } from './Button';
-import Loader from '../../Loader';
+import Input from '../Input';
+import { Button } from '../Button';
+import Loader from '../../../Svg/Loader';
 import moment from 'moment'
 import { IoMdAdd } from "react-icons/io";
+import IsLoggedIn from '../../../Utils/IsLoggedIn';
 
 interface invitedEmails {
     username: string;

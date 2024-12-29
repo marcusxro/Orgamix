@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import IsLoggedIn from '../Utils/IsLoggedIn'
+import React, {  useState } from 'react'
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import { FaPlus } from "react-icons/fa6";
 import { RxUpdate } from "react-icons/rx";
-import { supabase } from '../Utils/supabase/supabaseClient';
-import Loader from '../Loader';
-import useStore from '../Utils/Zustand/UseStore';
+import { supabase } from '../../Utils/supabase/supabaseClient';
+import Loader from '../../Svg/Loader';
+import useStore from '../../Utils/Zustand/UseStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BiSolidError } from "react-icons/bi";
 

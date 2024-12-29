@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { supabase } from '../Utils/supabase/supabaseClient';
-import IsLoggedIn from '../Utils/IsLoggedIn';
-import Loader from '../Loader';
+import React, { useState } from 'react'
+import { supabase } from '../../../Utils/supabase/supabaseClient';
+import IsLoggedIn from '../../../Utils/IsLoggedIn';
+import Loader from '../../../Svg/Loader';
 import { motion, AnimatePresence } from 'framer-motion';
 
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { supabase } from '../Utils/supabase/supabaseClient'
+import { supabase } from '../../Utils/supabase/supabaseClient'
 import { useParams } from 'react-router-dom'
-import IsLoggedIn from '../Utils/IsLoggedIn'
-import Loader from '../Loader'
+import IsLoggedIn from '../../Utils/IsLoggedIn'
+import Loader from '../../Svg/Loader'
 import { AnimatePresence, motion } from 'framer-motion';
 
 

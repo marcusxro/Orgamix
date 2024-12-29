@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { FaLinkSlash } from "react-icons/fa6";
-import { supabase } from '../Utils/supabase/supabaseClient';
-import IsLoggedIn from '../Utils/IsLoggedIn';
+import { supabase } from '../../Utils/supabase/supabaseClient';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
 import NoUserPfp from '../../assets/UserNoProfile.jpg'
 import { useParams } from 'react-router-dom';
-import Loader from '../Loader';
+import Loader from '../../Svg/Loader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip as ReactTooltip } from 'react-tooltip'
-import FetchPFP from '../FetchPFP';
+import FetchPFP from '../../FetchPFP';
 
 interface accountType {
     userid: string;

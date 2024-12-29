@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import useStore from '../Utils/Zustand/UseStore';
-import IsLoggedIn from '../Utils/IsLoggedIn';
-import { supabase } from '../Utils/supabase/supabaseClient';
+import useStore from '../../../Utils/Zustand/UseStore';
+import IsLoggedIn from '../../../Utils/IsLoggedIn';
+import { supabase } from '../../../Utils/supabase/supabaseClient';
 import { BiCategory } from "react-icons/bi";
 import { MdOutlineQueryStats } from "react-icons/md";
 import { MdDateRange } from "react-icons/md";
@@ -32,7 +32,7 @@ interface dataType {
 
 const ImportGoals: React.FC = () => {
 
-    const { showCreate, setShowCreate, setCreatedAt }: any = useStore()
+    const {  setShowCreate, setCreatedAt }: any = useStore()
     const [fetchedData, setFetchedData] = useState<dataType[] | null>(null);
     const [originalData, setoriginalData] = useState<dataType[] | null>(null);
     const [isEq, setIsEq] = useState<number | null>(null)

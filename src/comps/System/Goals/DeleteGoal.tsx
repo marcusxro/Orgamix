@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '../Utils/supabase/supabaseClient';
-import Loader from '../Loader';
+import { supabase } from '../../Utils/supabase/supabaseClient';
+import Loader from '../../Svg/Loader';
 import { motion, AnimatePresence } from 'framer-motion';
 
 

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { supabase } from '../Utils/supabase/supabaseClient';
-import IsLoggedIn from '../Utils/IsLoggedIn';
-import useStore from '../Utils/Zustand/UseStore';
-import Loader from '../Loader';
+import { supabase } from '../../Utils/supabase/supabaseClient';
+import IsLoggedIn from '../../Utils/IsLoggedIn';
+import useStore from '../../Utils/Zustand/UseStore';
+import Loader from '../../Svg/Loader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BiSolidError } from "react-icons/bi";
 import { FaCheck } from "react-icons/fa";

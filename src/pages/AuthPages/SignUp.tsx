@@ -1,7 +1,5 @@
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
 import React, { FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { firebaseAuthKey } from '../../comps/Utils/firebase/FirebaseKey'
 import Loader from '../../comps/Svg/Loader'
 import { supabase } from '../../comps/Utils/supabase/supabaseClient'
 import { motion } from 'framer-motion'
@@ -254,23 +252,3 @@ const SignUp: React.FC = () => {
 }
 
 export default SignUp
-function createUser(id: any) {
-    throw new Error('Function not implemented.')
-}
-
-function errorModal(arg0: string) {
-    throw new Error('Function not implemented.')
-}
-
-function setIsLoading(arg0: boolean) {
-    throw new Error('Function not implemented.')
-}
-
-function notif(arg0: string) {
-    throw new Error('Function not implemented.')
-}
-
-function setSeePass(arg0: (prevs: any) => boolean) {
-    throw new Error('Function not implemented.')
-}
-
