@@ -173,7 +173,6 @@ const Checkout: React.FC = () => {
 
     function getChannelCode(code: string) {
         if (code === 'gcash') {
-            hehe()
             return 'PH_GCASH'
         }
         if (code === 'visa') {
@@ -188,12 +187,6 @@ const Checkout: React.FC = () => {
         if (code === 'maya') {
             return 'PH_PAYMAYA'
         }
-    }
-
-
-
-    function hehe() {
-        console.log("wow")
     }
 
 
@@ -253,6 +246,9 @@ const Checkout: React.FC = () => {
         const auth = import.meta.env.VITE_XENDIT_SECRET_KEY as string
         const refID = uuidv4();
 
+
+        console.log(url, auth)
+
         try {
             const data = {
                 reference_id: refID,
@@ -289,15 +285,14 @@ const Checkout: React.FC = () => {
     async function DirectDebit() {
         const customerData: Customer | null = await createCustomer();
 
+        console.log(import.meta.env.VITE_XENDIT_BANK_DEBIT_URL as string)
 
         if (customerData === null) {
             console.error('Error creating customer');
             return;
         }
 
-
         const referenceToken = uuidv4(); // Generate a unique token
-
         const tokenData = {
             token: referenceToken, // Your token reference
             is_used: false, // Indicates token usage
@@ -307,9 +302,7 @@ const Checkout: React.FC = () => {
         };
 
         const tokenSaved = await saveTokenToDatabase(user?.id, tokenData);
-
         const URL = import.meta.env.VITE_XENDIT_BANK_DEBIT_URL as string;
-
         console.log(URL)
         const referenceID = user.id + '-' + formatDate(new Date().getTime())
         const successRedirectUrl = `https://www.orgamix.tech/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}${discountCode ? `&discount=${discountCode}` : ''}`;
@@ -331,6 +324,7 @@ const Checkout: React.FC = () => {
                 cancel_redirect_url: "https://redirect.me/cancel"
             }
         };
+
         if (tokenSaved) {
 
             axios.post(URL, data, {
