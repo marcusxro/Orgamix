@@ -312,7 +312,7 @@ const Checkout: React.FC = () => {
 
         console.log(URL)
         const referenceID = user.id + '-' + formatDate(new Date().getTime())
-        const successRedirectUrl = `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}${discountCode ? `&discount=${discountCode}` : ''}`;
+        const successRedirectUrl = `https://www.orgamix.tech/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}${discountCode ? `&discount=${discountCode}` : ''}`;
 
         const data = {
             "customer_id": customerData?.id,
@@ -327,7 +327,7 @@ const Checkout: React.FC = () => {
                 account_email: 'email@email.com',
 
                 success_redirect_url: successRedirectUrl,
-                failure_redirect_url: 'http://localhost:3000/user/failed-payment',
+                failure_redirect_url: 'https://www.orgamix.tech/user/failed-payment',
                 cancel_redirect_url: "https://redirect.me/cancel"
             }
         };
@@ -377,7 +377,7 @@ const Checkout: React.FC = () => {
 
             const tokenSaved = await saveTokenToDatabase(user?.id, tokenData);
             const referenceID = user.id + '-' + formatDate(new Date().getTime())
-            const successRedirectUrl = `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}${discountCode ? `&discount=${discountCode}` : ''}`;
+            const successRedirectUrl = `https://www.orgamix.tech/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}${discountCode ? `&discount=${discountCode}` : ''}`;
 
             if (tokenSaved) {
                 const response = await axios.post(
@@ -391,7 +391,7 @@ const Checkout: React.FC = () => {
                         customer_id: user?.id,
                         channel_properties: {
                             success_redirect_url: successRedirectUrl,
-                            failure_redirect_url: 'http://localhost:3000/user/failed-payment',
+                            failure_redirect_url: 'https://www.orgamix.tech/user/failed-payment',
                             cancel_redirect_url: "https://redirect.me/cancel"
                         },
                         metadata: {
