@@ -311,7 +311,7 @@ const Checkout: React.FC = () => {
             "customer_id": customerData?.id,
             channel_code: 'BA_BPI',
             currency: 'PHP',
-            amount: 100,
+            amount: finalPrice,
             type: 'BANK_ACCOUNT',
             properties: {
                 account_mobile_number: '+asdasdas',
