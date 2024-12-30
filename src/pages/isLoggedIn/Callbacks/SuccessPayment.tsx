@@ -6,6 +6,7 @@ import { useSearchParams } from 'react-router-dom';
 import IsLoggedIn from '../../../comps/Utils/IsLoggedIn';
 import { supabase } from '../../../comps/Utils/supabase/supabaseClient';
 import { useRef } from "react";
+import UseFetchAccount from '../../../Libs/FetchAccount';
 
 interface paymentTokens {
     token: string;
@@ -58,6 +59,8 @@ const SuccessPayment: React.FC = () => {
     
     
     // Validate and update token on success
+
+
     async function validateProcess() {
 
         if(user == null) {

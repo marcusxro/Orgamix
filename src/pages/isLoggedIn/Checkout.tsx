@@ -8,6 +8,8 @@ import Loader from '../../comps/Svg/Loader';
 import axios from 'axios';
 import PaymentHeader from '../../comps/System/Payment/PaymentHeader';
 import { v4 as uuidv4 } from 'uuid'; // For generating unique tokens
+import Customer from '../../@types/Interface/CustomerDetails';
+import MetaEditor from '../../comps/MetaHeader/MetaEditor';
 
 
 interface voucherTypes {
@@ -133,6 +135,7 @@ const Checkout: React.FC = () => {
                 .from('vouchers')
                 .select('*')
                 .eq('code', code)
+
                 .single()
 
             if (error) {
@@ -142,13 +145,13 @@ const Checkout: React.FC = () => {
             }
 
             if (discount) {
-        
-                if(discount.listed_uid != null && discount.listed_uid.some((uid: string) => uid === user.id)) {
+
+                if (discount.listed_uid != null && discount.listed_uid.some((uid: string) => uid === user.id)) {
                     console.error('Discount code has already been used');
                     setErrorMessage('Discount code has already been used')
                     setLoading(false)
                     return;
-                }   
+                }
 
                 setLoading(false)
                 setDiscountCode(code)
@@ -170,22 +173,27 @@ const Checkout: React.FC = () => {
 
     function getChannelCode(code: string) {
         if (code === 'gcash') {
+            hehe()
             return 'PH_GCASH'
         }
         if (code === 'visa') {
             return 'PH_VISA'
         }
         if (code === 'bpi') {
-            return 'PH_BPI'
+            return 'BA_BPI'
         }
         if (code === 'bdo') {
             return 'PH_BDO'
         }
-
         if (code === 'maya') {
-
             return 'PH_PAYMAYA'
         }
+    }
+
+
+
+    function hehe() {
+        console.log("wow")
     }
 
 
@@ -226,40 +234,154 @@ const Checkout: React.FC = () => {
             })
             .eq('userid', userId)
 
-            if (error) {
-                console.error('Error saving token:', error);
-                return false;
-            }
-        
-            console.log('Token saved');
-            return true; // Indicate success
+        if (error) {
+            console.error('Error saving token:', error);
+            return false;
+        }
+
+        console.log('Token saved');
+        return true; // Indicate success
     }
 
-    async function payNow() {
-        if(!user){
+
+
+
+
+
+    async function createCustomer() {
+        const url = import.meta.env.VITE_CUSTOMER_URL as string
+        const auth = import.meta.env.VITE_XENDIT_SECRET_KEY as string
+        const refID = uuidv4();
+
+        try {
+            const data = {
+                reference_id: refID,
+                type: 'INDIVIDUAL',
+                individual_detail: {
+                    given_names: user?.user_metadata?.full_name || user?.email,
+                    surname: ' ',
+                },
+                email: user?.email,
+                mobile_number: '+628121234567890',
+            };
+
+            const response = await axios.post(url, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                auth: {
+                    username: auth.split(':')[0],
+                    password: auth.split(':')[1] || '',
+                },
+            });
+
+            if (response.data) {
+                console.log(response.data);
+                return response.data;
+            }
+        } catch (error: any) {
+            console.error(error.response ? error.response.data : error.message);
+            return null;
+        }
+    }
+
+
+    async function DirectDebit() {
+        const customerData: Customer | null = await createCustomer();
+
+
+        if (customerData === null) {
+            console.error('Error creating customer');
+            return;
+        }
+
+
+        const referenceToken = uuidv4(); // Generate a unique token
+
+        const tokenData = {
+            token: referenceToken, // Your token reference
+            is_used: false, // Indicates token usage
+            created_at: Date.now(), // Timestamp for when the token was created
+            expires_at: Date.now() + 86400000, // Set to tomorrow's date in UNIX timestamp (milliseconds)
+            user_plan: planType, // Change to normalPlan if not working
+        };
+
+        const tokenSaved = await saveTokenToDatabase(user?.id, tokenData);
+
+        const URL = import.meta.env.VITE_XENDIT_BANK_DEBIT_URL as string;
+
+        console.log(URL)
+        const referenceID = user.id + '-' + formatDate(new Date().getTime())
+        const successRedirectUrl = `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}${discountCode ? `&discount=${discountCode}` : ''}`;
+
+        const data = {
+            "customer_id": customerData?.id,
+            channel_code: 'BA_BPI',
+            currency: 'PHP',
+            amount: 100,
+            type: 'BANK_ACCOUNT',
+            properties: {
+                account_mobile_number: '+asdasdas',
+                card_last_four: '1234',
+                card_expiry: '06/24',
+                account_email: 'email@email.com',
+
+                success_redirect_url: successRedirectUrl,
+                failure_redirect_url: 'http://localhost:3000/user/failed-payment',
+                cancel_redirect_url: "https://redirect.me/cancel"
+            }
+        };
+        if (tokenSaved) {
+
+            axios.post(URL, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                auth: {
+                    username: import.meta.env.VITE_XENDIT_SECRET_KEY as string,
+                    password: '', // Leave this blank if not using a password
+                }
+            })
+                .then(response => {
+                    console.log(response.data);
+                    if (response.data) {
+                        const desktopCHeckoutUrl = response.data.authorizer_url
+                        console.log(desktopCHeckoutUrl)
+                        window.open(desktopCHeckoutUrl)
+                    }
+                })
+                .catch(error => {
+                    console.error(error.response ? error.response.data : error.message);
+                });
+        }
+    }
+
+
+    async function payEWallet() {
+        if (!user) {
             return
         }
         try {
             const userDetails = await findUser(user?.id)
             console.log(userDetails)
             console.log(getChannelCode(selectedMethod))
-            const referenceToken = uuidv4(); // Generate a unique token
+            const referenceToken = uuidv4();
 
             const tokenData = {
-                token: referenceToken, // Your token reference
-                is_used: false, // Indicates token usage
-                created_at: Date.now(), // Timestamp for when the token was created
-                expires_at: Date.now() + 86400000, // Set to tomorrow's date in UNIX timestamp (milliseconds)
-                user_plan: planType, // Change to normalPlan if not working
+                token: referenceToken,
+                is_used: false,
+                created_at: Date.now(),
+                expires_at: Date.now() + 86400000,
+                user_plan: planType,
             };
 
             const tokenSaved = await saveTokenToDatabase(user?.id, tokenData);
             const referenceID = user.id + '-' + formatDate(new Date().getTime())
             const successRedirectUrl = `http://localhost:3000/user/success-payment?transaction_id=${referenceID}&item=${planType}&date=${formatDate(new Date().getTime())}&type=${getChannelCode(selectedMethod)}&token=${referenceToken}&finalprice=${finalPrice}${discountCode ? `&discount=${discountCode}` : ''}`;
-           
-             if (tokenSaved) {
+
+            if (tokenSaved) {
                 const response = await axios.post(
-                    'https://api.xendit.co/ewallets/charges',
+                    import.meta.env.VITE_XENDIT_EWALLET_URL as string,
                     {
                         reference_id: referenceID,
                         currency: 'PHP',
@@ -303,17 +425,40 @@ const Checkout: React.FC = () => {
         } catch (error) {
             console.error('Error:', error);
         }
-
-
-
     }
 
-
-
+    function payChannel() {
+        switch (selectedMethod) {
+            case 'gcash':
+                payEWallet()
+                break;
+            case 'visa':
+                payEWallet()
+                break;
+            case 'bpi':
+                DirectDebit()
+                break;
+            case 'bdo':
+                DirectDebit()
+                break;
+            case 'maya':
+                payEWallet()
+                break;
+            default:
+                console.error('Error paying')
+                break;
+        }
+    }
 
     return (
         <div className='w-full'>
             <PaymentHeader />
+
+            <MetaEditor
+                title={`Checkout - ${typeParams.type?.toLocaleUpperCase()} PLAN`}
+                description='Checkout page for payment'
+                keywords='payment, checkout, payment gateway'
+            />
 
             <div className='rounded-lg max-w-[1200px] mx-auto mt-[3rem]  bg-[#313131] border-[1px] border-[#535353]'>
                 <div className='text-[20px] p-3 flex w-full items-center justify-between font-bold border-b-[1px] border-b-[#535353] pb-2'>
@@ -436,7 +581,7 @@ const Checkout: React.FC = () => {
                     </div>
 
                     <div
-                        onClick={() => payNow()}
+                        onClick={() => payChannel()}
                         className='w-full p-3 rounded-md bg-[#111] cursor-pointer hover:bg-[#151515] border-[1px] border-[#535353] mt-5 text-center'>
                         Pay Now
                     </div>
